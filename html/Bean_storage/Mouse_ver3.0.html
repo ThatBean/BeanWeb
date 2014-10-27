@@ -1,0 +1,480 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+<head> 
+
+<meta charset="utf-8"> 
+
+<title>theCanvasMouse</title>
+
+<style type="text/css"> 
+	body {
+		margin:0;
+		padding:0;
+		font-family:verdana,helvetica,arial,sans-serif;
+		
+	}
+	div {
+		margin:0;
+		padding:0;
+		font-size:10px;
+		line-height:10px;
+	}
+	
+	#Bean_Menu {
+		position:fixed;
+		right:30px;
+		bottom:30px;
+		z-index:100;
+		
+		margin:0;
+		padding:0;
+		
+		font-size:40px;
+		line-height:150px;
+		font-weight:bold;
+		text-align: center;
+		
+		width:150px;
+		height:150px;
+		border:5px solid;
+		border-radius: 150px;
+		
+		color: #FFF;
+		border: #427AC7;
+		background-color: #5091E9;
+	}
+	#Bean_Menu:hover {
+		cursor:pointer;
+		border:#427AC7;
+		background-color:#436EEE;
+	}
+	#Bean_Menu:active {
+		border:#EEC900;
+		background-color:#EEEE00;
+	}
+	
+	#Bean_Menu_bg {
+		position:fixed;
+		right:10px;
+		bottom:10px;
+		z-index:80;
+		
+		margin:0;
+		padding:0;
+		
+		width:190px;
+		height:190px;
+		border:5px solid;
+		border-radius: 190px 190px 50px 190px;
+		
+		border: #000;
+		background-color: #505050;
+	}
+	
+	#Bean_Cursor {
+		position:fixed;
+		cursor:pointer;
+		display:none;
+		left:0px;
+		top:0px;
+		z-index:90;
+		
+		margin:0;
+		padding:0;
+		
+		font-size:10px;
+		line-height:50px;
+		font-weight:bold;
+		text-align: center;
+		
+		width:70px;
+		height:70px;
+		/*border-style: none;*/
+		border:1px solid;
+		border-radius: 0px 70px 70px 70px;
+		
+		/*color: #FFF;
+		border: #427AC7;*/
+		background-color: #5091E9;
+		
+		transform:rotate(30deg);
+		-ms-transform:rotate(30deg); /* IE 9 */
+		-moz-transform:rotate(30deg); /* Firefox */
+		-webkit-transform:rotate(30deg); /* Safari and Chrome */
+		-o-transform:rotate(30deg); /* Opera */
+	}
+	
+	#Bean_Cursor_Marker {
+		position:fixed;
+		display:none;
+		left:30px;
+		top:30px;
+		z-index:200;
+		
+		margin:0;
+		padding:0;
+		
+		width:3px;
+		height:3px;
+		/*border-style: none;*/
+		border:2px solid #FF0000;
+		border-radius: 3px;
+		
+		/*color: #FFF;*/
+		/*background-color: #FF0000;*/
+	}
+	
+	/*SD
+	#Bean_Menu {
+		position:absolute;
+		right:20px;
+		bottom:20px;
+		z-index:100;
+		
+		margin:0;
+		padding:0;
+		
+		font-size:10px;
+		line-height:50px;
+		font-weight:bold;
+		text-align: center;
+		
+		width:50px;
+		height:50px;
+		border:2px solid;
+		border-radius: 50px;
+		
+		color: #FFF;
+		border: #427AC7;
+		background-color: #5091E9;
+	}
+	#Bean_Menu:hover {
+		cursor:pointer;
+		border:#427AC7;
+		background-color:#436EEE;
+	}
+	#Bean_Menu:active {
+		border:#EEC900;
+		background-color:#EEEE00;
+	}
+	
+	#Bean_Menu_bg {
+		position:absolute;
+		right:10px;
+		bottom:10px;
+		z-index:80;
+		
+		margin:0;
+		padding:0;
+		
+		width:70px;
+		height:70px;
+		border:2px solid;
+		border-radius: 70px 70px 10px 70px;
+		
+		border: #000;
+		background-color: #505050;
+	}
+	
+	#Bean_Cursor {
+		cursor:pointer;
+		display:none;
+		position:absolute;
+		left:0px;
+		top:0px;
+		z-index:90;
+		
+		margin:0;
+		padding:0;
+		
+		font-size:10px;
+		line-height:50px;
+		font-weight:bold;
+		text-align: center;
+		
+		width:70px;
+		height:70px;
+		border:1px solid;
+		background-color: #5091E9;
+	}*/
+</style>
+
+<script type="text/javascript"> 
+	function getPageSize() {
+		var xScroll,yScroll;
+		if (window.innerHeight && window.scrollMaxY) {
+			xScroll = document.body.scrollWidth;
+			yScroll = window.innerHeight + window.scrollMaxY;
+		} else if (document.body.scrollHeight > document.body.offsetHeight) {
+			xScroll = document.body.scrollWidth;
+			yScroll = document.body.scrollHeight;
+		} else {
+			xScroll = document.body.offsetWidth;
+			yScroll = document.body.offsetHeight;
+		}
+
+		var windowWidth,windowHeight;
+		if (self.innerHeight) {
+			windowWidth = self.innerWidth;
+			windowHeight = self.innerHeight;
+		} else if (document.documentElement && document.documentElement.clientHeight) {
+			windowWidth = document.documentElement.clientWidth;
+			windowHeight = document.documentElement.clientHeight;
+		} else if (document.body) {
+			windowWidth = document.body.clientWidth;
+			windowHeight = document.body.clientHeight;
+		}
+
+		var pageWidth,pageHeight
+		pageHeight = ( (yScroll < windowHeight) ? windowHeight : yScroll );
+		pageWidth = ( (xScroll < windowWidth) ? windowWidth : xScroll );
+
+		return {"pageX":pageWidth,"pageY":pageHeight,"winX":windowWidth,"winY":windowHeight};
+	}
+	
+	function setDegree(obj,deg){  
+		obj.style.webkitTransform="rotate("+deg+"deg)";
+		obj.style.MozTransform="rotate("+deg+"deg)";
+		obj.style.msTransform="rotate("+deg+"deg)";
+		obj.style.OTransform="rotate("+deg+"deg)";
+		obj.style.transform="rotate("+deg+"deg)";
+	}
+	
+	window.addEventListener('load',function(){
+		//get page size info
+		pageinfo = getPageSize();
+		document.getElementById("pageinfo_1").innerHTML="page:"+pageinfo.pageX+"x"+pageinfo.pageY+" | win:"+pageinfo.winX+"x"+pageinfo.winY+" | DPR:"+window.devicePixelRatio+" | devDPI:"+screen.deviceXDPI+"/"+screen.deviceYDPI+" | logDPI:"+screen.logicalXDPI+"/"+screen.logicalYDPI;
+		document.getElementById("pageinfo_2").innerHTML=navigator.userAgent;
+		document.getElementById("theCanvas").width=(pageinfo.winX-80);
+		document.getElementById("theCanvas").height=(pageinfo.winY-10-30*(window.devicePixelRatio>1?2:1));
+		
+		//the cursor offset
+		
+		var B_menu = document.getElementById('Bean_Menu');
+		var B_cursor = document.getElementById('Bean_Cursor');
+		var B_marker = document.getElementById('Bean_Cursor_Marker');
+		
+		//var trigger_margin=50;
+		var triggered=false;
+		
+		B_cursor.style.display="block";
+		B_marker.style.display="block";
+		var B_cursor_Hwidth=B_cursor.offsetWidth/2;
+		var B_marker_Hwidth=B_marker.offsetWidth/2;
+		B_cursor.style.display="none";
+		B_marker.style.display="none";
+		
+		var B_cur_max_deg=0.1;
+		var B_cur_max_X=B_menu.offsetLeft+B_menu.offsetWidth-2*B_cursor_Hwidth;
+		var B_cur_min_X=pageinfo.winX-B_cur_max_X-2*B_cursor_Hwidth;
+		var B_cur_max_Y=B_menu.offsetTop+B_menu.offsetWidth-2*B_cursor_Hwidth;
+		var B_cur_min_Y=pageinfo.winY-B_cur_max_Y-2*B_cursor_Hwidth;
+		
+		//var B_mkr_max_X=B_cur_max_X+1*B_cursor_Hwidth;
+		//var B_mkr_min_X=B_cur_min_X-0*B_cursor_Hwidth;
+		//var B_mkr_max_Y=B_cur_max_Y+1*B_cursor_Hwidth;
+		//var B_mkr_min_Y=B_cur_min_Y-0*B_cursor_Hwidth;
+		
+		document.getElementById("pageinfo_1").innerHTML+="|MX/MY:"+B_cur_max_X+"-"+B_cur_min_X+"|"+B_cur_max_Y+"-"+B_cur_min_Y+"|"+B_cursor_Hwidth;
+		
+		var R_offset=(window.devicePixelRatio>1?150:50);
+		//var R_offset_M=1;
+		var R_offset_M=B_cursor_Hwidth*Math.SQRT2+B_marker_Hwidth;
+		//var R_offset_M=R_offset+B_cursor_Hwidth*Math.SQRT2+B_marker_Hwidth;
+		//var X_org=pageinfo.winX-B_menu.offsetWidth/2;
+		//var Y_org=pageinfo.winY-B_menu.offsetHeight/2;
+		var X_org=B_menu.offsetLeft+B_menu.offsetWidth/2;
+		var Y_org=B_menu.offsetTop+B_menu.offsetHeight/2;
+		
+		document.getElementById("pageinfo_2").innerHTML+="|x/y org="+X_org+"|"+Y_org;
+		
+		//var X_offset=(window.devicePixelRatio>1?120:42)+trigger_margin;
+		//var y_offset=(window.devicePixelRatio>1?170:60);
+		
+		
+		
+		/*
+		// get the canvas element and its context
+		var canvas = document.getElementById('theCanvas');
+		var context = canvas.getContext('2d');
+		
+		var img_cursor=new Image();
+		if (window.devicePixelRatio > 1) {
+			img_cursor.src="Bean_files/cursorIIHD.png";
+		}
+		else {
+			img_cursor.src="Bean_files/cursorII.png";
+		}
+		
+		var img_keyboard=new Image();
+		img_keyboard.src="Bean_files/Keyboard.png";
+		*/
+		
+		function Bean_fakeMouseEvent(iClientX,iClientY,mouseEvent){
+			var getObject=document.elementFromPoint(iClientX, iClientY);
+			if (!getObject) return;
+			if (document.createEventObject) { //For IE
+				oEvent = document.createEventObject();
+				oEvent.clientX = iClientX;
+				oEvent.clientY = iClientY;
+				getObject.fireEvent("on"+mouseEvent, oEvent);    
+			} else {
+				oEvent = document.createEvent("MouseEvents");
+				oEvent.initMouseEvent(mouseEvent, true, true, document.defaultView, 0, 0, 0, iClientX, iClientY, false, false, false, false, 0, null); 
+				getObject.dispatchEvent(oEvent);
+			}
+		}
+		
+		function cur_update(coors,mouseEvent){
+			var tempA=Math.atan2((coors.y-Y_org),(coors.x-X_org));
+			var R_offsetX=Math.min(Math.cos(tempA),B_cur_max_deg);
+			var R_offsetY=Math.min(Math.sin(tempA),B_cur_max_deg);
+			
+			B_cursor.style.left=Math.min(Math.max(coors.x-B_cursor_Hwidth+R_offset*R_offsetX,B_cur_min_X),B_cur_max_X)+"px";
+			B_cursor.style.top=Math.min(Math.max(coors.y-B_cursor_Hwidth+R_offset*R_offsetY,B_cur_min_Y),B_cur_max_Y)+"px";
+			
+			
+			//B_marker
+			B_marker.style.left=parseInt(B_cursor.style.left)+B_cursor_Hwidth-B_marker_Hwidth+R_offset_M*Math.cos(tempA)+"px";
+			B_marker.style.top=parseInt(B_cursor.style.top)+B_cursor_Hwidth-B_marker_Hwidth+R_offset_M*Math.sin(tempA)+"px";
+			//B_marker.style.left=Math.min(Math.max(coors.x-B_marker_Hwidth+R_offset_M*R_offsetX,B_mkr_min_X),B_mkr_max_X)+"px";
+			//B_marker.style.top=Math.min(Math.max(coors.y-B_marker_Hwidth+R_offset_M*R_offsetY,B_mkr_min_Y),B_mkr_max_Y)+"px";
+			
+			
+			Bean_fakeMouseEvent(parseInt(B_marker.style.left)+B_marker_Hwidth,parseInt(B_marker.style.left)+B_marker_Hwidth,mouseEvent);
+			
+			//if (Math.sin(tempA)> || Math.cos(tempA)>0.1) {
+			//	return cur_hide();
+			//}
+			setDegree(B_cursor,(tempA*180/Math.PI+135));
+			//change label
+			document.getElementById("xycoordinates").innerHTML="Coordinates: (" + coors.x + "," + coors.y + ")"+"|A:"+tempA+"|"+(tempA*180/Math.PI)+"|sin/cos:"+Math.sin(tempA)+"|"+Math.cos(tempA)+"|"+B_cursor.style.left+"|"+B_cursor.style.top;
+		}
+		
+		
+		
+		function cur_draw(coors){
+			//set reigger
+			triggered=true;
+			//show && move
+			B_cursor.style.display="block";
+			B_marker.style.display="block";
+			
+			//Math.PI
+			//var tempA=((coors.x-X_org)/(coors.y-Y_org));
+			
+			cur_update(coors,"mouseover");
+		}
+		
+		function cur_redraw(coors){
+			//check "swipe"
+			if (!triggered) return;
+			//show && move
+			cur_update(coors,"mouseover");
+		}
+		
+		function cur_hide(coors){
+			//clear trigger
+			if (triggered) {
+			triggered=false;
+			//clear
+			B_cursor.style.display="none";
+			B_marker.style.display="none";
+						//alert("cur_hide");
+			
+			cur_update(coors,"click");
+			
+			//change label
+			document.getElementById("xycoordinates").innerHTML="try swipe/drag from the left border of canvas";
+			}
+		}
+		
+		// create a drawer which tracks touch movements
+		var drawer = {
+			touchstart: cur_draw,
+			mousedown: cur_draw,
+			touchmove: cur_redraw,
+			mousemove: cur_redraw,
+			touchend: cur_hide,
+			touchcancel: cur_hide,
+			mouseout: cur_hide,
+			mouseup: cur_hide
+		};
+		// create a function to pass touch events and coordinates to drawer
+		var lastX=1;
+		var lastY=1;
+		function draw(event){
+			event.preventDefault();
+			// get the touch coordinates
+			document.getElementById("pageinfo_2").innerHTML=event.type;
+			var coors;
+			if (event.type=="touchend" || event.type=="mouseup") {
+				coors = {
+					x: lastX,
+					y: lastY
+				}
+			}
+			else if (event.targetTouches) {
+				coors = {
+					x: event.targetTouches[0].clientX,
+					y: event.targetTouches[0].clientY
+					//x: event.targetTouches[0].pageX,
+					//y: event.targetTouches[0].pageY
+				}
+			}
+			else {
+				coors = {
+					x: event.clientX,
+					y: event.clientY
+					//x: event.pageX,
+					//y: event.pageY
+				}
+			}
+			// pass the coordinates to the appropriate handler
+			lastX=coors.x;
+			lastY=coors.y;
+			if(!lastX && !lastX) ;//alert(event.type+" coor error "+event.target+"|"+event.currentTarget);
+			else drawer[event.type](coors);
+		}
+		
+		// attach the touchstart, touchmove, touchend event listeners.
+	    B_menu.addEventListener('touchstart',draw, false);
+	    document.body.addEventListener('touchmove',draw, false);
+	    document.body.addEventListener('touchend',draw, false);
+	    document.body.addEventListener('touchcancel',draw, false);
+		
+	    B_menu.addEventListener('mousedown',draw, false);
+		//B_menu.addEventListener('mousemove',draw, false);
+		//document.getElementById('Bean_Menu_bg').addEventListener('mouseout',function(event){event.preventDefault();}, false);
+		//document.getElementById('Bean_Menu_bg').addEventListener('mousemove',function(event){event.preventDefault();}, false);
+		document.body.addEventListener('mousemove',draw, false);
+	    document.body.addEventListener('mouseup',draw, false);
+		//document.body.addEventListener('mouseout',draw, false);
+		
+		
+		// prevent elastic scrolling
+		//document.body.addEventListener('touchmove',function(event){
+		//	event.preventDefault();
+		//},false);	// end body.onTouchMove
+	},false);	// end window.onLoad
+</script> 
+
+</head>
+
+<body style="margin:0px;">
+	
+	<canvas id="theCanvas" style="border:solid #4682d9;border-width: 1px 1px 1px 50px;">Sorry, your browser is not supported.</canvas>
+	<div id="xycoordinates">try swipe/drag from the left border of canvas????!!!</div>
+	<div id="pageinfo_1">Page info undetected</div> 
+	<div id="pageinfo_2">Page info undetected</div> 
+	
+	<!--
+	<div id="contents">???</div> 
+	-->
+	
+	<div id="Bean_Menu">MENU</div>
+	<div id="Bean_Menu_bg"></div>
+	<canvas id="Bean_Cursor"></canvas>
+	<canvas id="Bean_Cursor_Marker"></canvas>
+</body>
+</html>

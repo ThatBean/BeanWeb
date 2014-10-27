@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <script>
+            function imitateClick(iClientX, iClientY) {
+                
+				alert("get"+"|"+iClientX+"|"+iClientY);
+				
+				var oEvent;
+                if (document.createEventObject) { //For IE
+                    oEvent = document.createEventObject();
+                    oEvent.clientX = iClientX;
+                    oEvent.clientY = iClientY;
+                    document.elementFromPoint(iClientX, iClientY).fireEvent("onclick", oEvent);    
+                } else {
+                    oEvent = document.createEvent("MouseEvents");
+                    oEvent.initMouseEvent("click", true, true, document.defaultView, 0, 0, 0, iClientX, iClientY, false, false, false, false, 0, null); 
+					document.elementFromPoint(iClientX, iClientY).dispatchEvent(oEvent);
+                }
+            }
+            var body = document.body;
+            body.onmousemove = function(event) {
+                document.getElementById('pCoor').innerHTML=("(" + event.clientX + "," + event.clientY + ")");
+            };
+            //imitateClick(body, 100, 100);
+        </script>
+		<p id="pCoor">&nbsp;</p>
+		<p>
+		Emu click @<input type="text" name="mx" id="mx" />x<input type="text" name="my" id="my" />
+		</p>
+		<button name="btn" id="btn" onclick="imitateClick(document.getElementById('mx').value, document.getElementById('my').value);">go</button>
+		
+		<button num=0 onclick="alert('button 0')">0</button>
+		<button num=1 onclick="alert('button 1')">1</button>
+		<button num=2 onclick="alert('button 2')">2</button>
+		<button num=3 onclick="alert('button 3')">3</button>
+		<iframe src="http://www.baidu.com/">error frame</iframe>
+<pre>
+Thttp://pay.beijing.com.cn/customer/gb/pay_bank.jsp?v_rcvpost=5749&v_rcvaddr=5749&v_orderstatus=1&v_oid=20140110-5749-M2BX55BH7K-9&v_md5info=9063dde6641f490d8c2e8d4977eedef1&v_pmode=85&v_ordername=5749&v_mid=5749&version=3.0&v_moneytype=0&v_ymd=20140110&v_rcvname=5749&v_amount=50&v_url=https://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/payEaseTopUpReturn&v_rcvtel=5749
+ 
+　　  
+
+</pre>
+    </body>
+</html>

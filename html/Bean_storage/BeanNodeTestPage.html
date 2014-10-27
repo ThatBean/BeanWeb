@@ -1,0 +1,55 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+<head> 
+
+<meta charset="utf-8"> 
+
+<title>Bean's Page for Node</title>
+
+<style type="text/css"> 
+	body {
+		margin:0;
+		padding:0;
+		font-family:verdana,helvetica,arial,sans-serif;
+		/*overflow:hidden;*/
+	}
+</style>
+
+<script type="text/javascript" src="Bean_Looop.js"></script> 
+
+<script>
+	window.addEventListener('load',function(){
+		var B_log = document.getElementById('B_log');
+		
+		B_log.innerHTML="Testing";
+		
+		B_log.innerHTML+=window.B_looop;
+		
+		window.B_looop.init();
+		
+		//window.B_looop.Test("Booyah");
+		
+	});
+	
+	var running=false;
+	function trigger(){
+		if (!running) {
+			window.B_looop.run();
+			running=true;
+		}
+		else {
+			window.B_looop.stop();
+			running=false;
+		}
+	};
+	
+	
+</script>
+
+</head>
+
+<body style="margin:0px;">
+	<pre id="B_log">Log space</pre>
+	<button id="B_trigger" onclick="trigger();return false;">B_looop?</button>
+</body>
+</html>

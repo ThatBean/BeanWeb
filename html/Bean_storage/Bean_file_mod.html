@@ -1,0 +1,255 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head> 
+<meta charset="utf-8"> 
+<title>Bean File Mod</title>
+<style type="text/css">
+.fontsetting {
+	font-family:Monospace,Tahoma,Geneva;
+}
+button,
+.button {
+	/*display: inline-block;*/
+	/*height: 100%;
+	width: 100%;*/
+	padding: 0 15px;
+	line-height: 38px;
+	text-align: center;
+	/*font-size: 16px;*/
+	font-weight: bold;
+	color: #FFF;
+	border: 0px solid #C8C8C8;
+	background-color: #B8B8B8;
+}
+button:hover,
+.button:hover {
+	cursor:pointer;
+	border: 0px solid #404040;
+	background-color: #808080;
+}
+button:active,
+.button:active {
+	border: 0px solid #101010;
+	background-color: #000000;
+}
+
+input {
+	/*display: inline-block;*/
+	/*height: 35px;*/
+	/*padding: 0 15px;*/
+	/*line-height: 38px;*/
+	/*text-align: center;*/
+	font-size: 1.1em;
+	font-weight: bold;
+	width: 98%;
+	/*margin: 0.2em 0em;*/
+	border: 0px solid #B8B8B8;
+}
+
+table {
+	width:100%;
+}
+
+fieldset, td {
+	padding: 0.2em;
+	margin: 0;
+	border: 1px solid #B8B8B8;
+}
+
+
+#file_text {
+	width: 99%;
+	height: auto;
+	border: 0px solid #B8B8B8;
+	overflow: auto;
+}
+
+#pStatus {
+	width: 99%;
+	height: 3em;
+	border: 0px solid #B8B8B8;
+	font-size: 0.8em;
+	font-weight: bold;
+	color: #808080;
+	overflow: auto;
+}
+</style>
+
+<script type="text/javascript"> 
+
+if (!addEventListener) {
+	addEventListener=attachEvent;
+}
+
+var msg_sp="||";	//message spliter
+var xmlHttp;	//AJAX XHR link
+var sc_option;	//for mod/open for StateChanged
+//Save Text To File In Path
+function TextToFile(url,message) {
+	//alert(url+"|"+message+"|"+sc_option);
+	xmlHttp=GetXmlHttpObject();
+	if (xmlHttp==null) {
+		alert ("Browser does not support HTTP Request");
+		return;
+	} 
+	xmlHttp.onreadystatechange=func_StateChanged;
+	xmlHttp.open("POST",url,true);
+	xmlHttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+	xmlHttp.send(message);
+}
+
+//func for "return"
+function func_StateChanged() { 
+	if (xmlHttp.readyState==4 || xmlHttp.readyState=="complete") { 
+		if (xmlHttp.status==404) { 
+			document.getElementById("pStatus").innerHTML="404... PHP not found...";
+		}
+		else {
+			var sc_index=xmlHttp.responseText.indexOf(msg_sp);
+			if (sc_index<0) {	//failed to get file content
+				document.getElementById("pStatus").innerHTML=xmlHttp.responseText;
+			}
+			else {
+				document.getElementById("pStatus").innerHTML=xmlHttp.responseText.substring(0,sc_index);
+				document.getElementById("file_text").value=xmlHttp.responseText.substring(sc_index+msg_sp.length);
+			}
+		}
+	}
+	else if (xmlHttp.readyState>=0) { 
+		document.getElementById("pStatus").innerHTML="Completing ["+xmlHttp.readyState+"] of [4]...";
+	}
+}
+
+//copied....
+function GetXmlHttpObject() {
+	var xmlHttp=null;
+	try {	// Firefox, Opera 8.0+, Safari
+		xmlHttp=new XMLHttpRequest();
+	}
+	catch(e) {	// Internet Explorer
+		try {
+			xmlHttp=new ActiveXObject("Msxml2.XMLHTTP");
+		}
+		catch(e) {
+			xmlHttp=new ActiveXObject("Microsoft.XMLHTTP");
+		}
+	}
+	return xmlHttp;
+}
+
+//
+function FileMod(fm_option) {
+	//alert(url+"|"+message+"|"+sc_option);
+	var url="Bean_file_mod.php";
+	var m_file_name=document.getElementById("file_name").value;
+	var m_file_path=document.getElementById("file_path").value;
+	var m_file_text=encodeURIComponent(document.getElementById("file_text").value);
+	var message="option="+fm_option+"&file_name="+m_file_name+"&file_path="+m_file_path+"&file_text="+m_file_text;
+	sc_option=fm_option;	//for StateChanged func
+	//alert(url+"|"+message+"|"+sc_option);
+	//encodeURIComponent("dfg$%^");
+	//m_file_text=m_file_text.replace(/\+/g, "%2B");
+	//m_file_text=m_file_text.replace(/\&/g, "%26");
+	//m_file_text=m_file_text.replace(/\%/g, "%25");
+	TextToFile(url,message);
+}
+
+function getPageSize() {
+	var xScroll,yScroll;
+	if (window.innerHeight && window.scrollMaxY) {
+		xScroll = document.body.scrollWidth;
+		yScroll = window.innerHeight + window.scrollMaxY;
+	} else if (document.body.scrollHeight > document.body.offsetHeight) {
+		xScroll = document.body.scrollWidth;
+		yScroll = document.body.scrollHeight;
+	} else {
+		xScroll = document.body.offsetWidth;
+		yScroll = document.body.offsetHeight;
+	}
+	var windowWidth,windowHeight;
+	if (self.innerHeight) {
+		windowWidth = self.innerWidth;
+		windowHeight = self.innerHeight;
+	} else if (document.documentElement && document.documentElement.clientHeight) {
+		windowWidth = document.documentElement.clientWidth;
+		windowHeight = document.documentElement.clientHeight;
+	} else if (document.body) {
+		windowWidth = document.body.clientWidth;
+		windowHeight = document.body.clientHeight;
+	}
+	var pageWidth,pageHeight
+	pageHeight = ( (yScroll < windowHeight) ? windowHeight : yScroll );
+	pageWidth = ( (xScroll < windowWidth) ? windowWidth : xScroll );
+	return {"pageX":pageWidth,"pageY":pageHeight,"winX":windowWidth,"winY":windowHeight};
+}
+
+var height_change=0;	// for height change
+
+function ReSizeW() {
+	var margin_X=2,margin_Y=25;
+	//get page size info
+	var pageinfo = getPageSize();
+	document.getElementById("pStatus").innerHTML="page:"+pageinfo.pageX+"x"+pageinfo.pageY+" | win:"+pageinfo.winX+"x"+pageinfo.winY+" | DPR:"+window.devicePixelRatio+" | devDPI:"+screen.deviceXDPI+"/"+screen.deviceYDPI+" | logDPI:"+screen.logicalXDPI+"/"+screen.logicalYDPI;
+	//reset to "full window"
+	var obj_container = document.getElementById("container");
+	var obj_text = document.getElementById("file_text");
+	
+	if (height_change==0) height_change=obj_text.offsetHeight-obj_container.offsetHeight;
+	
+	obj_container.width=(pageinfo.winX-margin_X)+"px";
+	obj_container.height=obj_container.style.minHeight=obj_container.style.maxHeight=(pageinfo.winY-margin_Y)+"px";
+	obj_text.height=obj_text.style.minHeight=obj_text.style.maxHeight=pageinfo.winY-margin_Y+height_change+"px";
+}
+
+window.addEventListener('load',function(){	
+	//resize window
+	ReSizeW();
+	//add Help to file_text
+	document.getElementById("file_text").value='Enter File Text Here... \n\n-click "Modi" to modify path/file...\n-click "Open" to open path/file...';
+	
+},false);	// end window.onLoad
+
+var evt = "onorientationchange" in window ? "orientationchange" : "resize";
+
+window.addEventListener(evt,ReSizeW);
+
+
+</script> 
+</head>
+
+<body class="fontsetting">
+<fieldset id="container">
+<legend>Bean File Mod</legend>
+<table>
+	<tr>
+		<td>
+			<label for="file_name">File name</label>
+		</td>
+		<td>
+			<input type="text" name="file_name" id="file_name" /> 
+		</td>
+		<td rowspan="2" class="button" onclick="FileMod('mod')">Modi</td>
+		<td rowspan="2" class="button" onclick="FileMod('open')">Open</td>
+	</tr>
+	<tr>
+		<td>
+			<label for="file_path">File path</label>
+		</td>
+		<td>
+			<input type="text" name="file_path" id="file_path" /> 
+		</td>
+	</tr>
+	<tr>
+		<td colspan="4">
+			<textarea type="text" name="file_text" id="file_text" wrap=off></textarea> 
+		</td>
+	</tr>
+	<tr>
+		<td colspan="4">
+		<div name="pStatus" id="pStatus"></div>
+		</td>
+	</tr>
+</table>
+</fieldset>
+</body>
+</html>

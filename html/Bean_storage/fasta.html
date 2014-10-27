@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<meta charset="utf-8"> 
+
+	<title>Bean's Fasta Tool</title>
+
+	<style type="text/css"> 
+		div {
+			font-size:10px;
+			line-height:10px;
+			border: 2px solid #222222;
+			width:90%;
+			height:30em;
+			overflow:auto;
+		}
+		table {
+			border-collapse:collapse;
+		}
+		td {
+			border: 1px solid #CCCCCC;
+		}
+	</style>
+	</head>
+    <body>
+		
+        <script>
+            //<--!script type="text/javascript" src="http://thatbean.com/Bean_storage/Bean_Mouse.js">
+			//<\/script--> 
+			function calcATCG(seq) {
+                if (!seq) return;
+				
+				var resATCG = {
+					A:0,
+					T:0,
+					C:0,
+					G:0,
+					U:0,
+					remain:0
+				};
+				
+				var seq_Array=seq.split("\n");
+				//alert(seq_Array);
+				var seq_temp="";
+				var seq_count=0;
+				
+				while(seq_temp=seq_Array.shift()) {
+					if (seq_temp.search(/>/)==-1) {
+						for (seq_count=0;seq_count<seq_temp.length;seq_count++) {
+							switch(seq_temp[seq_count]) {
+								case "A":
+									resATCG.A+=1;
+									break;
+								case "T":
+									resATCG.T+=1;
+									break;
+								case "C":
+									resATCG.C+=1;
+									break;
+								case "G":
+									resATCG.G+=1;
+									break;
+								case "U":
+									resATCG.U+=1;
+									break;
+								default:
+									resATCG.remain+=1;
+							}
+						}
+						/*
+						//alert(seq_temp+"|"+seq_temp.length);
+						seq_count=seq_temp.length;
+						seq_temp=seq_temp.replace(/A/g, "");
+						resATCG.A+=seq_count-seq_temp.length;//alert(seq_temp+"|"+seq_temp.length);
+						seq_count=seq_temp.length;
+						seq_temp=seq_temp.replace(/T/g, "");
+						resATCG.T+=seq_count-seq_temp.length;//alert(seq_temp+"|"+seq_temp.length);
+						seq_count=seq_temp.length;
+						seq_temp=seq_temp.replace(/C/g, "");
+						resATCG.C+=seq_count-seq_temp.length;//alert(seq_temp+"|"+seq_temp.length);
+						seq_count=seq_temp.length;
+						seq_temp=seq_temp.replace(/G/g, "");
+						resATCG.G+=seq_count-seq_temp.length;//alert(seq_temp+"|"+seq_temp.length);
+						seq_count=seq_temp.length;
+						seq_temp=seq_temp.replace(/U/g, "");
+						resATCG.U+=seq_count-seq_temp.length;//alert(seq_temp+"|"+seq_temp.length);
+						resATCG.remain=seq_temp.length;
+						//return resATCG;
+						*/
+					}
+				}
+				return resATCG;
+            }
+			
+			function THEcalcATCG(textareaObj,pObj) {
+                var res = calcATCG(textareaObj.value);
+				if (!res) pObj.innerHTML="Nothing...";
+				else pObj.innerHTML="Total ATCG:"+(res.A+res.T+res.C+res.G+res.U)+"|G&divide;C:"+(res.G/res.C)+"<br />--A:"+res.A+"|T:"+res.T+"|C:"+res.C+"|G:"+res.G+"|U:"+res.U+"|ETC:"+res.remain;
+				return;
+            }
+        </script>
+		
+		<textarea cols=100 rows=8 id="ATCG_fasta">Fasta ATCG sequence here!</textarea><br />
+		<button id="ATCG_btn" onclick="THEcalcATCG(document.getElementById('ATCG_fasta'),document.getElementById('ATCG_p'));">calc ATCG</button>
+		<pre id="ATCG_p">ATCG Results here!</pre>
+		<hr />
+		<p>Some Results here:</p>
+		<p><b>Bacillus subtilis subsp. subtilis str. 168</b>
+			<br />ALLseq: Total ATCG:4215606|G&divide;C:0.9954616853986363
+			<br />--A:1188073|T:1193137|C:919284|G:915112|U:0|ETC:0
+			<br />Coding: Total ATCG:3698178|G&divide;C:1.1924877971614072
+			<br />--A:1111286|T:951443|C:745933|G:889516|U:0|ETC:0
+		</p>
+		<p>
+			<b>Escherichia coli str. K-12 substr. MG1655</b>
+			<br />ALLseq: Total ATCG:4639675|G&divide;C:0.997769495928122
+			<br />--A:1142228|T:1140970|C:1179554|G:1176923|U:0|ETC:0
+			<br />Coding: Total ATCG:4137243|G&divide;C:1.1164879856502667
+			<br />--A:998059|T:994043|C:1013538|G:1131603|U:0|ETC:0
+		</p>
+		<hr />
+		<hr />
+		<script>
+			var mapCODON = {
+				"T":1,
+				"U":1,
+				"C":2,
+				"A":3,
+				"G":4
+			};
+			
+			var UNmapCODON = {
+				0:"T",
+				1:"C",
+				2:"A",
+				3:"G"
+			};
+			
+			var mapANTI_CODON = {
+				"A":"T",
+				"G":"C",
+				"T":"A",
+				"U":"A",
+				"C":"G"
+			};
+			
+			var CODON_res;
+			var _FIX_N=3;
+			
+            function calcCODON(seq) {
+                if (!seq) return;
+				//alert("GET seq:"+seq);
+				
+				var res_Array = new Array(64);	//save counted TCAG codon in [TCA] -> [012] -> 0*16+1*4+2=6 -> res_Array[6] ==TCA
+				
+				var seq_Array=seq.split("\n");	//split seq
+				//alert(seq_Array);
+				var seq_temp=0;
+				var seq_codon=0;
+				var seq_count=0;
+				var temp=0;
+				var i=0;
+				
+				while(seq_temp=seq_Array.shift()) {
+					if (seq_temp.search(/>/)==-1) {	//ignore line starts with ">"
+						for (i=0;i<seq_temp.length;i++) {
+							//alert(i+"|"+seq_temp+"|"+seq_temp.length);
+							temp=mapCODON[seq_temp[i]];
+							if (temp) {
+								//alert("GET MAP: "+temp+"|st: "+seq_temp[i]+"|i: "+i);
+								seq_codon=seq_codon*4+(temp-1);
+								seq_count++;
+								if (seq_count==3) {
+									res_Array[seq_codon]=(res_Array[seq_codon]?res_Array[seq_codon]+1:1);
+									//alert("GET CODON: "+seq_codon+"|"+res_Array[seq_codon]);
+									seq_codon=0;
+									seq_count=0;
+								}
+							}
+						}
+					}
+				}
+				//alert (res_Array);
+				return res_Array;
+            }
+			
+			function THEcalcCODON(textareaObjCODON,pObj) {
+                var res = calcCODON(textareaObjCODON.value);
+				if (!res) pObj.innerHTML="Nothing...";
+				else {
+					CODON_res=res;
+					
+					pObj.innerHTML="CODON count:<br />";
+					var i=0;
+					
+					var total=0;
+					for (i=0;i<res.length;i++) total+=(res[i]?res[i]:0);
+					
+					for (i=0;i<res.length;i++) {
+						pObj.innerHTML+="CODON-"+(UNmapCODON[Math.floor(i/16)]+UNmapCODON[Math.floor(i%16/4)]+UNmapCODON[i%4])+": ";
+						pObj.innerHTML+=(res[i]?res[i]+" / "+res[i]/total:"-- / --")+"<br />";
+					}
+				}
+				return;
+            }
+			
+			function Reset_CODON_res() {
+				CODON_res=false;
+			}
+			
+			function THEcalcCODON_TRANS(textareaObjCODON,textareaObjTrans,pObj) {
+                var res = (CODON_res?CODON_res:calcCODON(textareaObjCODON.value));	//check if calculated
+				var trans = textareaObjTrans.value.substr(textareaObjTrans.value.indexOf("|")+1,64);
+				if (!res || !trans || trans.length!=64) pObj.innerHTML="Nothing...";
+				else {
+					CODON_res=res;
+					
+					pObj.innerHTML="CODON count:<br />";
+					var i=0;
+					
+					var total=0;
+					for (i=0;i<res.length;i++) total+=(res[i]?res[i]:0);
+					
+					var transArrayAA=new Array();
+					var transArrayTotal=new Array();
+					
+					for (i=0;i<res.length;i++) {
+						pObj.innerHTML+="CODON-"+(UNmapCODON[Math.floor(i/16)]+UNmapCODON[Math.floor(i%16/4)]+UNmapCODON[i%4])+": ";
+						pObj.innerHTML+=(res[i]?res[i]+" / "+res[i]/total:"-- / --");
+						
+						pObj.innerHTML+=" trans: "+trans[i]+"<br />";
+						
+						if (!transArrayTotal[trans[i]] && res[i]) transArrayAA.push(trans[i]);
+						transArrayTotal[trans[i]]=(transArrayTotal[trans[i]]?transArrayTotal[trans[i]]:0)+(res[i]?res[i]:0);
+					}
+					
+					pObj.innerHTML+="<hr />";
+					
+					for (i=0;i<transArrayAA.length;i++) {
+						pObj.innerHTML+=transArrayAA[i]+"="+transArrayTotal[transArrayAA[i]]+"<br />";
+					}
+				}
+				return;
+            }
+			
+			
+			function THEcalcCODON_TRANS_COPYN(textareaObjCODON,textareaObjTrans,textareaObjCopyn,pObj) {
+                var res = (CODON_res?CODON_res:calcCODON(textareaObjCODON.value));	//check if calculated
+				var trans = textareaObjTrans.value.substr(textareaObjTrans.value.indexOf("|")+1,64);//AA translate string, by TTT,TTC,TTA,TTG,TCT... order
+				var copyn = textareaObjCopyn.value.split("\n");//tRNA copy number Array
+				if (!res || !trans || trans.length!=64 || !copyn) pObj.innerHTML="Nothing...";
+				else {
+					CODON_res=res;	//record result
+					
+					pObj.innerHTML="CODON count:<br />";
+					var i=0;
+					
+					var total=0;
+					for (i=0;i<res.length;i++) total+=(res[i]?res[i]:0);
+					
+					var copynArray=new Array();
+					var copynTotal=0;
+					var temp
+					var tempCodon;
+					var tempNumber;
+					for (i=0;i<copyn.length;i++) {
+						
+						temp=copyn[i].split("\t");
+						tempNumber=temp[1];
+						temp=temp[0];
+						//Anti-Codon to Codon id
+						tempCodon=mapCODON[mapANTI_CODON[temp[0]]]+mapCODON[mapANTI_CODON[temp[1]]]*4+mapCODON[mapANTI_CODON[temp[2]]]*4*4-1-4-16;
+						//if (tempNumber==6)alert("GET "+temp+" Cod "+tempCodon+" Num "+tempNumber+" "+UNmapCODON[Math.floor(tempCodon/16)]+UNmapCODON[Math.floor(tempCodon%16/4)]+UNmapCODON[tempCodon%4]);
+						copynArray[tempCodon]=parseInt(tempNumber);
+					}
+					//alert(copynArray);
+					
+					var transTotal=0;
+					var transArrayAA=new Array();
+					var transArrayTotal=new Array();
+					var copynArrayTotal=new Array();
+					
+					var transArrayGC=new Array();
+					var copynArrayGC=new Array();
+					
+					//output CODON result and collect AA result
+					for (i=0;i<res.length;i++) {
+						pObj.innerHTML+="CODON-"+(UNmapCODON[Math.floor(i/16)]+UNmapCODON[Math.floor(i%16/4)]+UNmapCODON[i%4])+":\t";
+						pObj.innerHTML+=(res[i]?res[i]+"/"+(res[i]/total).toFixed(_FIX_N):"--/--");
+						pObj.innerHTML+="\ttrans:"+trans[i];
+						pObj.innerHTML+="\ttRNA-"+(copynArray[i]?copynArray[i]:"--")+"<br />";
+						
+						//if not recorded this AA,add AA to transArrayAA
+						if (!transArrayTotal[trans[i]] && res[i]) {
+							transArrayAA.push(trans[i]);
+							copynTotal+=parseInt(copynArray[i]);//copynArrayTotal[trans[i]];
+						}
+						
+						//calc Total Codon by AA
+						transArrayTotal[trans[i]]=(transArrayTotal[trans[i]]?transArrayTotal[trans[i]]:0)+(res[i]?res[i]:0);
+						copynArrayTotal[trans[i]]=(copynArrayTotal[trans[i]]?copynArrayTotal[trans[i]]:0)+(copynArray[i]?copynArray[i]:0);
+						
+						//calc Codons ended with G or C by AA
+						if (UNmapCODON[i%4]=="G" || UNmapCODON[i%4]=="C") {
+							transArrayGC[trans[i]]=(transArrayGC[trans[i]]?transArrayGC[trans[i]]:0)+(res[i]?res[i]:0);
+							copynArrayGC[trans[i]]=(copynArrayGC[trans[i]]?copynArrayGC[trans[i]]:0)+(copynArray[i]?copynArray[i]:0);
+							//alert("GET "+UNmapCODON[i%4]+" i="+i+" trans="+trans[i]+" tr/co"+transArrayGC[trans[i]]+"|"+copynArrayGC[trans[i]]);
+						}
+						
+						//get total number
+						transTotal+=(res[i]?res[i]:0);
+					}
+					
+					pObj.innerHTML+="<hr />";
+					
+					//Generate AA result
+					pObj.innerHTML+="Total AA:"+transTotal+"\tTotal tRNA Copy:"+copynTotal+"<br />";
+					pObj.innerHTML+="AA=AAnum/AAcopy  \t  num%/copy%  \t  AAnumGC/AAcopyGC  \t  numGC%/copyGC%<br />";
+					
+					var PCtransArray=new Array();
+					var PCcopynArray=new Array();
+					
+					var PCtransArrayGC=new Array();
+					var PCcopynArrayGC=new Array();
+					
+					//AA result
+					for (i=0;i<transArrayAA.length;i++) {
+						//AAnum/AAcopy 
+						pObj.innerHTML+=transArrayAA[i]+"="+transArrayTotal[transArrayAA[i]]+"/"+copynArrayTotal[transArrayAA[i]];
+						//num%/copy% 
+						pObj.innerHTML+="\t"+(transArrayTotal[transArrayAA[i]]/transTotal).toFixed(_FIX_N)+"/"+(copynArrayTotal[transArrayAA[i]]/copynTotal).toFixed(_FIX_N);
+						//AAnumGC/AAcopyGC 
+						pObj.innerHTML+="\t"+transArrayGC[transArrayAA[i]]+"/"+copynArrayGC[transArrayAA[i]];
+						//numGC%/copyGC%
+						pObj.innerHTML+="\t"+(transArrayGC[transArrayAA[i]]/transArrayTotal[transArrayAA[i]]).toFixed(_FIX_N)+"/"+(copynArrayGC[transArrayAA[i]]/copynArrayTotal[transArrayAA[i]]).toFixed(_FIX_N)+"<br />";
+						
+						
+						//generate AAnum/AAcopy array
+						PCtransArray.push(parseInt(transArrayTotal[transArrayAA[i]]));
+						PCcopynArray.push(parseInt(copynArrayTotal[transArrayAA[i]]));
+						
+						//generate numGC%/copyGC% array
+						PCtransArrayGC.push((transArrayGC[transArrayAA[i]]/transArrayTotal[transArrayAA[i]]));
+						PCcopynArrayGC.push((copynArrayGC[transArrayAA[i]]/copynArrayTotal[transArrayAA[i]]));
+					}
+					var PC_t_c = getPearsonsCorrelation(PCtransArray,PCcopynArray);
+					var PC_GC_t_c = getPearsonsCorrelation(PCtransArrayGC,PCcopynArrayGC);
+					
+					pObj.innerHTML+="<h1>Pearson Correlation for AAnum/AAcopy:"+PC_t_c+"</h1>";
+					pObj.innerHTML+="<h1>Pearson Correlation for numGC%/copyGC%:"+PC_GC_t_c+"</h1>";
+				}
+				return;
+            }
+			
+function getPearsonsCorrelation (x, y) //from [http://stevegardner.net/2012/06/11/javascript-code-to-calculate-the-pearson-correlation-coefficient/]
+{
+	var shortestArrayLength = 0;
+	if(x.length == y.length)
+	{
+		shortestArrayLength = x.length;
+	}
+	else if(x.length > y.length)
+	{
+		shortestArrayLength = y.length;
+		console.error('x has more items in it, the last ' + (x.length - shortestArrayLength) + ' item(s) will be ignored');
+	}
+	else
+	{
+		shortestArrayLength = x.length;
+		console.error('y has more items in it, the last ' + (y.length - shortestArrayLength) + ' item(s) will be ignored');
+	}
+ 
+	var xy = [];
+	var x2 = [];
+	var y2 = [];
+ 
+	for(var i=0; i<shortestArrayLength; i++)
+	{
+		xy.push(x[i] * y[i]);
+		x2.push(x[i] * x[i]);
+		y2.push(y[i] * y[i]);
+	}
+ 
+	var sum_x = 0;
+	var sum_y = 0;
+	var sum_xy = 0;
+	var sum_x2 = 0;
+	var sum_y2 = 0;
+ 
+	for(var i=0; i<shortestArrayLength; i++)
+	{
+		sum_x += x[i];
+		sum_y += y[i];
+		sum_xy += xy[i];
+		sum_x2 += x2[i];
+		sum_y2 += y2[i];
+	}
+ 
+	var step1 = (shortestArrayLength * sum_xy) - (sum_x * sum_y);
+	var step2 = (shortestArrayLength * sum_x2) - (sum_x * sum_x);
+	var step3 = (shortestArrayLength * sum_y2) - (sum_y * sum_y);
+	var step4 = Math.sqrt(step2 * step3);
+	var answer = step1 / step4;
+ 
+	return answer;
+}
+        </script>
+		
+		<textarea cols=100 rows=8 id="CODON_fasta" onchange="Reset_CODON_res();">Fasta coding sequence here!
+>lcl|U00096.3_cdsid_AAC73112.1 [gene=thrL] [protein=thr operon leader peptide] [protein_id=AAC73112.1] [location=190..255]
+ATGAAACGCATTAGCACCACCATTACCACCACCATCACCATTACCACAGGTAACGGTGCGGGCTGA</textarea><br />
+		<textarea cols=100 rows=4 id="CODON_trans">Fasta CODON translate here! Like:
+id 11 - ncbieaa  |FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG|
+Start and end with '|'
+can be found int the table below.</textarea><br />
+		<textarea cols=100 rows=4 id="CODON_copyn">Fasta tRNA copy number here! Like:
+AntiCodon+[tab]+CopyNumber
+this is for Escherichia coli str. K-12 substr. MG1655
+AntiCodon	Escherichia coli K-12
+AAA	0
+AAC	0
+AAG	0
+AAT	0
+ACA	0
+ACC	0
+ACG	4
+ACT	0
+AGA	0
+AGC	0
+AGG	0
+AGT	0
+ATA	0
+ATC	0
+ATG	0
+ATT	0
+CAA	1
+CAC	0
+CAG	4
+CAT	8
+CCA	1
+CCC	1
+CCG	1
+CCT	1
+CGA	1
+CGC	0
+CGG	1
+CGT	2
+CTA	0
+CTC	0
+CTG	2
+CTT	0
+GAA	2
+GAC	2
+GAG	1
+GAT	3
+GCA	1
+GCC	4
+GCG	0
+GCT	1
+GGA	2
+GGC	2
+GGG	1
+GGT	2
+GTA	3
+GTC	3
+GTG	1
+GTT	4
+TAA	1
+TAC	5
+TAG	1
+TAT	0
+TCA	1
+TCC	1
+TCG	0
+TCT	1
+TGA	1
+TGC	3
+TGG	1
+TGT	1
+TTA	0
+TTC	4
+TTG	2
+TTT	6
+</textarea><br />
+		<button id="CODON_btn" onclick="THEcalcCODON(document.getElementById('CODON_fasta'),document.getElementById('CODON_p'));">calc CODON</button>
+		<button id="CODON_btn" onclick="THEcalcCODON_TRANS(document.getElementById('CODON_fasta'),document.getElementById('CODON_trans'),document.getElementById('CODON_p'));">calc CODON & TRANS</button>
+		<button id="CODON_btn" onclick="THEcalcCODON_TRANS_COPYN(document.getElementById('CODON_fasta'),document.getElementById('CODON_trans'),document.getElementById('CODON_copyn'),document.getElementById('CODON_p'));">calc CODON & TRANS & COPYN</button>
+		<pre id="CODON_p">CODON Results here!</pre>
+		
+		<hr />
+<h1>Genetic-code-table</h1>
+<div>
+<pre>
+ {
+  name "Standard" ,
+  name "SGC0" ,
+  id 1 ,
+  ncbieaa  "FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
+  sncbieaa "---M---------------M---------------M----------------------------"
+  -- Base1  TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
+  -- Base2  TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
+  -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
+ },
+ {
+  name "Vertebrate Mitochondrial" ,
+  name "SGC1" ,
+  id 2 ,
+  ncbieaa  "FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIMMTTTTNNKKSS**VVVVAAAADDEEGGGG",
+  sncbieaa "--------------------------------MMMM---------------M------------"
+  -- Base1  TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
+  -- Base2  TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
+  -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
+ },
+ {
+  name "Yeast Mitochondrial" ,
+  name "SGC2" ,
+  id 3 ,
+  ncbieaa  "FFLLSSSSYY**CCWWTTTTPPPPHHQQRRRRIIMMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
+  sncbieaa "----------------------------------MM----------------------------"
+  -- Base1  TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
+  -- Base2  TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
+  -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
+ },
+ {
+    name "Mold Mitochondrial; Protozoan Mitochondrial; Coelenterate
+ Mitochondrial; Mycoplasma; Spiroplasma" ,
+  name "SGC3" ,
+  id 4 ,
+  ncbieaa  "FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
+  sncbieaa "--MM---------------M------------MMMM---------------M------------"
+  -- Base1  TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
+  -- Base2  TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
+  -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
+ },
+ {
+  name "Invertebrate Mitochondrial" ,
+  name "SGC4" ,
+  id 5 ,
+  ncbieaa  "FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIMMTTTTNNKKSSSSVVVVAAAADDEEGGGG",
+  sncbieaa "---M----------------------------MMMM---------------M------------"
+  -- Base1  TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
+  -- Base2  TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
+  -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
+ },
+ {
+  name "Ciliate Nuclear; Dasycladacean Nuclear; Hexamita Nuclear" ,
+  name "SGC5" ,
+  id 6 ,
+  ncbieaa  "FFLLSSSSYYQQCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
+  sncbieaa "-----------------------------------M----------------------------"
+  -- Base1  TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
+  -- Base2  TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
+  -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
+ },
+ {
+  name "Echinoderm Mitochondrial; Flatworm Mitochondrial" ,
+  name "SGC8" ,
+  id 9 ,
+  ncbieaa  "FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNNKSSSSVVVVAAAADDEEGGGG",
+  sncbieaa "-----------------------------------M---------------M------------"
+  -- Base1  TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
+  -- Base2  TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
+  -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
+ },
+ {
+  name "Euplotid Nuclear" ,
+  name "SGC9" ,
+  id 10 ,
+  ncbieaa  "FFLLSSSSYY**CCCWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
+  sncbieaa "-----------------------------------M----------------------------"
+  -- Base1  TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
+  -- Base2  TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
+  -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
+ },
+ {
+  name "Bacterial, Archaeal and Plant Plastid" ,
+  id 11 ,
+  ncbieaa  "FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
+  sncbieaa "---M---------------M------------MMMM---------------M------------"
+  -- Base1  TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
+  -- Base2  TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
+  -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
+ },
+ {
+  name "Alternative Yeast Nuclear" ,
+  id 12 ,
+  ncbieaa  "FFLLSSSSYY**CC*WLLLSPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
+  sncbieaa "-------------------M---------------M----------------------------"
+  -- Base1  TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
+  -- Base2  TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
+  -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
+ },
+ {
+  name "Ascidian Mitochondrial" ,
+  id 13 ,
+  ncbieaa  "FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIMMTTTTNNKKSSGGVVVVAAAADDEEGGGG",
+  sncbieaa "---M------------------------------MM---------------M------------"
+  -- Base1  TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
+  -- Base2  TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
+  -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
+ },
+ {
+  name "Alternative Flatworm Mitochondrial" ,
+  id 14 ,
+  ncbieaa  "FFLLSSSSYYY*CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNNKSSSSVVVVAAAADDEEGGGG",
+  sncbieaa "-----------------------------------M----------------------------"
+  -- Base1  TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
+  -- Base2  TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
+  -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
+ } ,
+ {
+  name "Blepharisma Macronuclear" ,
+  id 15 ,
+  ncbieaa  "FFLLSSSSYY*QCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
+  sncbieaa "-----------------------------------M----------------------------"
+  -- Base1  TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
+  -- Base2  TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
+  -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
+ } ,
+ {
+  name "Chlorophycean Mitochondrial" ,
+  id 16 ,
+  ncbieaa  "FFLLSSSSYY*LCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
+  sncbieaa "-----------------------------------M----------------------------"
+  -- Base1  TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
+  -- Base2  TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
+  -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
+ } ,
+ {
+  name "Trematode Mitochondrial" ,
+  id 21 ,
+  ncbieaa  "FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIMMTTTTNNNKSSSSVVVVAAAADDEEGGGG",
+  sncbieaa "-----------------------------------M---------------M------------"
+  -- Base1  TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
+  -- Base2  TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
+  -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
+ } ,
+ {
+  name "Scenedesmus obliquus Mitochondrial" ,
+  id 22 ,
+  ncbieaa  "FFLLSS*SYY*LCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
+  sncbieaa "-----------------------------------M----------------------------"
+  -- Base1  TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
+  -- Base2  TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
+  -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
+ } ,
+ {
+  name "Thraustochytrium Mitochondrial" ,
+  id 23 ,
+  ncbieaa  "FF*LSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
+  sncbieaa "--------------------------------M--M---------------M------------"
+  -- Base1  TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
+  -- Base2  TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
+  -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
+ } ,
+ {
+  name "Pterobranchia Mitochondrial" ,
+  id 24 ,
+  ncbieaa  "FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSSKVVVVAAAADDEEGGGG",
+  sncbieaa "---M---------------M---------------M---------------M------------"
+  -- Base1  TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
+  -- Base2  TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
+  -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
+ }
+</pre>
+</div>
+		<hr />
+<h1>tRNA-copy-number-table</h1>
+<div>
+<table>
+<tr><td>AntiCodon</td><td>Escherichia coli K-12</td><td>Bacillus subtilis</td><td>Saccharomyces cerevisiae</td><td>Schizosaccharomyces pombe</td><td>Drosophila melanogaster</td><td>Arabidopsis thaliana</td><td>Bifidobacterium adolescentis</td><td>Bifidobacterium longum</td><td>Nitrosomonas europaea</td><td>Thiobacillus denitrificans</td><td>Bacillus cereus ATCC14597</td><td>Helicobacter hepaticus</td><td>Bos taurus</td><td>Mus musculus</td><td>Homo sapiens</td></tr>
+<tr><td>AAA</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>7</td><td>0</td><td>0</td></tr>
+<tr><td>AAC</td><td>0</td><td>0</td><td>14</td><td>9</td><td>6</td><td>15</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>23</td><td>8</td><td>11</td></tr>
+<tr><td>AAG</td><td>0</td><td>0</td><td>0</td><td>5</td><td>5</td><td>12</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>11</td><td>8</td><td>12</td></tr>
+<tr><td>AAT</td><td>0</td><td>0</td><td>13</td><td>8</td><td>9</td><td>19</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>17</td><td>11</td><td>14</td></tr>
+<tr><td>ACA</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>157</td><td>0</td><td>0</td></tr>
+<tr><td>ACC</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>20</td><td>1</td><td>0</td></tr>
+<tr><td>ACG</td><td>4</td><td>4</td><td>7</td><td>8</td><td>10</td><td>9</td><td>2</td><td>2</td><td>1</td><td>1</td><td>4</td><td>0</td><td>14</td><td>6</td><td>7</td></tr>
+<tr><td>ACT</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>4</td><td>0</td><td>0</td></tr>
+<tr><td>AGA</td><td>0</td><td>0</td><td>11</td><td>7</td><td>8</td><td>37</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>14</td><td>9</td><td>11</td></tr>
+<tr><td>AGC</td><td>0</td><td>0</td><td>11</td><td>9</td><td>12</td><td>16</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>30</td><td>19</td><td>29</td></tr>
+<tr><td>AGG</td><td>0</td><td>0</td><td>2</td><td>6</td><td>7</td><td>16</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>12</td><td>7</td><td>10</td></tr>
+<tr><td>AGT</td><td>0</td><td>0</td><td>11</td><td>7</td><td>9</td><td>10</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>14</td><td>9</td><td>10</td></tr>
+<tr><td>ATA</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>10</td><td>0</td><td>1</td></tr>
+<tr><td>ATC</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>6</td><td>0</td><td>0</td></tr>
+<tr><td>ATG</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>3</td><td>1</td><td>0</td></tr>
+<tr><td>ATT</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td></tr>
+<tr><td>CAA</td><td>1</td><td>1</td><td>10</td><td>4</td><td>4</td><td>10</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>15</td><td>4</td><td>7</td></tr>
+<tr><td>CAC</td><td>0</td><td>0</td><td>2</td><td>1</td><td>7</td><td>8</td><td>2</td><td>2</td><td>1</td><td>1</td><td>0</td><td>0</td><td>45</td><td>11</td><td>16</td></tr>
+<tr><td>CAG</td><td>4</td><td>1</td><td>0</td><td>1</td><td>8</td><td>3</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>9</td><td>10</td><td>10</td></tr>
+<tr><td>CAT</td><td>8</td><td>6</td><td>11</td><td>10</td><td>12</td><td>24</td><td>2</td><td>3</td><td>3</td><td>3</td><td>9</td><td>3</td><td>33</td><td>18</td><td>20</td></tr>
+<tr><td>CCA</td><td>1</td><td>1</td><td>6</td><td>3</td><td>8</td><td>14</td><td>1</td><td>2</td><td>1</td><td>1</td><td>2</td><td>1</td><td>182</td><td>8</td><td>9</td></tr>
+<tr><td>CCC</td><td>1</td><td>0</td><td>2</td><td>1</td><td>0</td><td>5</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>1315</td><td>7</td><td>7</td></tr>
+<tr><td>CCG</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>4</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>14</td><td>3</td><td>5</td></tr>
+<tr><td>CCT</td><td>1</td><td>1</td><td>1</td><td>1</td><td>3</td><td>8</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>1</td><td>111</td><td>5</td><td>5</td></tr>
+<tr><td>CGA</td><td>1</td><td>0</td><td>1</td><td>1</td><td>4</td><td>4</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>7</td><td>3</td><td>4</td></tr>
+<tr><td>CGC</td><td>0</td><td>0</td><td>0</td><td>1</td><td>3</td><td>7</td><td>1</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>17</td><td>10</td><td>5</td></tr>
+<tr><td>CGG</td><td>1</td><td>0</td><td>0</td><td>1</td><td>5</td><td>5</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>5</td><td>3</td><td>4</td></tr>
+<tr><td>CGT</td><td>2</td><td>0</td><td>1</td><td>1</td><td>3</td><td>6</td><td>1</td><td>2</td><td>1</td><td>1</td><td>0</td><td>0</td><td>7</td><td>5</td><td>6</td></tr>
+<tr><td>CTA</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>12</td><td>0</td><td>1</td></tr>
+<tr><td>CTC</td><td>0</td><td>0</td><td>2</td><td>6</td><td>19</td><td>13</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>171</td><td>13</td><td>13</td></tr>
+<tr><td>CTG</td><td>2</td><td>0</td><td>1</td><td>2</td><td>8</td><td>9</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>42</td><td>10</td><td>21</td></tr>
+<tr><td>CTT</td><td>0</td><td>0</td><td>14</td><td>9</td><td>13</td><td>18</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>40</td><td>19</td><td>17</td></tr>
+<tr><td>GAA</td><td>2</td><td>3</td><td>11</td><td>6</td><td>8</td><td>16</td><td>1</td><td>1</td><td>1</td><td>1</td><td>4</td><td>1</td><td>28</td><td>7</td><td>12</td></tr>
+<tr><td>GAC</td><td>2</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>2</td><td>2</td><td>1</td><td>1</td><td>2</td><td>1</td><td>0</td><td>1</td><td>0</td></tr>
+<tr><td>GAG</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>GAT</td><td>3</td><td>3</td><td>1</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td><td>2</td><td>4</td><td>1</td><td>0</td><td>1</td><td>8</td></tr>
+<tr><td>GCA</td><td>1</td><td>1</td><td>4</td><td>3</td><td>7</td><td>15</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>353</td><td>57</td><td>30</td></tr>
+<tr><td>GCC</td><td>4</td><td>4</td><td>16</td><td>8</td><td>14</td><td>23</td><td>3</td><td>3</td><td>1</td><td>1</td><td>5</td><td>1</td><td>62</td><td>14</td><td>15</td></tr>
+<tr><td>GCG</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>9</td><td>0</td><td>0</td></tr>
+<tr><td>GCT</td><td>1</td><td>2</td><td>2</td><td>3</td><td>6</td><td>13</td><td>1</td><td>1</td><td>1</td><td>1</td><td>2</td><td>1</td><td>18</td><td>8</td><td>8</td></tr>
+<tr><td>GGA</td><td>2</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>30</td><td>1</td><td>0</td></tr>
+<tr><td>GGC</td><td>2</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>2</td><td>2</td><td>1</td><td>1</td><td>0</td><td>1</td><td>2</td><td>0</td><td>0</td></tr>
+<tr><td>GGG</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>GGT</td><td>2</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td></tr>
+<tr><td>GTA</td><td>3</td><td>2</td><td>8</td><td>4</td><td>9</td><td>76</td><td>1</td><td>1</td><td>1</td><td>1</td><td>3</td><td>1</td><td>38</td><td>10</td><td>14</td></tr>
+<tr><td>GTC</td><td>3</td><td>4</td><td>16</td><td>8</td><td>14</td><td>26</td><td>2</td><td>2</td><td>1</td><td>1</td><td>6</td><td>1</td><td>48</td><td>16</td><td>19</td></tr>
+<tr><td>GTG</td><td>1</td><td>2</td><td>8</td><td>5</td><td>5</td><td>10</td><td>1</td><td>1</td><td>1</td><td>1</td><td>2</td><td>1</td><td>22</td><td>10</td><td>11</td></tr>
+<tr><td>GTT</td><td>4</td><td>4</td><td>11</td><td>7</td><td>12</td><td>16</td><td>3</td><td>3</td><td>1</td><td>1</td><td>5</td><td>1</td><td>40</td><td>14</td><td>32</td></tr>
+<tr><td>TAA</td><td>1</td><td>3</td><td>7</td><td>2</td><td>4</td><td>6</td><td>1</td><td>1</td><td>1</td><td>1</td><td>3</td><td>1</td><td>9</td><td>4</td><td>7</td></tr>
+<tr><td>TAC</td><td>5</td><td>4</td><td>3</td><td>3</td><td>2</td><td>7</td><td>1</td><td>1</td><td>1</td><td>1</td><td>6</td><td>1</td><td>22</td><td>3</td><td>5</td></tr>
+<tr><td>TAG</td><td>1</td><td>2</td><td>3</td><td>2</td><td>2</td><td>10</td><td>1</td><td>1</td><td>1</td><td>1</td><td>3</td><td>1</td><td>5</td><td>3</td><td>3</td></tr>
+<tr><td>TAT</td><td>0</td><td>0</td><td>2</td><td>1</td><td>2</td><td>5</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>8</td><td>5</td><td>5</td></tr>
+<tr><td>TCA</td><td>1</td><td>0</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>25</td><td>2</td><td>3</td></tr>
+<tr><td>TCC</td><td>1</td><td>3</td><td>3</td><td>3</td><td>6</td><td>12</td><td>1</td><td>1</td><td>1</td><td>1</td><td>4</td><td>1</td><td>398</td><td>7</td><td>9</td></tr>
+<tr><td>TCG</td><td>0</td><td>0</td><td>0</td><td>2</td><td>10</td><td>6</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>12</td><td>5</td><td>6</td></tr>
+<tr><td>TCT</td><td>1</td><td>1</td><td>12</td><td>3</td><td>3</td><td>9</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>44</td><td>5</td><td>6</td></tr>
+<tr><td>TGA</td><td>1</td><td>2</td><td>4</td><td>3</td><td>2</td><td>9</td><td>1</td><td>1</td><td>1</td><td>0</td><td>4</td><td>1</td><td>6</td><td>3</td><td>5</td></tr>
+<tr><td>TGC</td><td>3</td><td>5</td><td>6</td><td>2</td><td>2</td><td>10</td><td>1</td><td>1</td><td>1</td><td>2</td><td>6</td><td>1</td><td>34</td><td>11</td><td>9</td></tr>
+<tr><td>TGG</td><td>1</td><td>3</td><td>10</td><td>2</td><td>5</td><td>45</td><td>1</td><td>1</td><td>1</td><td>1</td><td>4</td><td>1</td><td>9</td><td>8</td><td>7</td></tr>
+<tr><td>TGT</td><td>1</td><td>4</td><td>5</td><td>3</td><td>6</td><td>8</td><td>1</td><td>1</td><td>1</td><td>1</td><td>5</td><td>1</td><td>10</td><td>4</td><td>6</td></tr>
+<tr><td>TTA</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>4</td><td>1</td><td>2</td></tr>
+<tr><td>TTC</td><td>4</td><td>6</td><td>15</td><td>5</td><td>6</td><td>12</td><td>1</td><td>1</td><td>1</td><td>1</td><td>7</td><td>1</td><td>450</td><td>8</td><td>13</td></tr>
+<tr><td>TTG</td><td>2</td><td>4</td><td>9</td><td>4</td><td>4</td><td>8</td><td>1</td><td>1</td><td>1</td><td>1</td><td>4</td><td>1</td><td>18</td><td>6</td><td>11</td></tr>
+<tr><td>TTT</td><td>6</td><td>4</td><td>8</td><td>4</td><td>6</td><td>13</td><td>1</td><td>1</td><td>1</td><td>1</td><td>6</td><td>1</td><td>81</td><td>11</td><td>17</td></tr>
+</table>
+</div>
+    </body>
+</html>

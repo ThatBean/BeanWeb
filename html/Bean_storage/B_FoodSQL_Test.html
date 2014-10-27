@@ -1,0 +1,244 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head> 
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf8" />
+
+<title>SJTU Food Place Comment System</title>
+
+<style type="text/css">
+.fontsetting {
+	font-family:Monospace,Tahoma,Geneva;
+}
+button,
+.button {
+	/*display: inline-block;*/
+	/*height: 100%;
+	width: 100%;*/
+	padding: 0 15px;
+	line-height: 38px;
+	text-align: center;
+	/*font-size: 16px;*/
+	font-weight: bold;
+	color: #FFF;
+	border: 0px solid #C8C8C8;
+	background-color: #B8B8B8;
+}
+button:hover,
+.button:hover {
+	cursor:pointer;
+	border: 0px solid #404040;
+	background-color: #808080;
+}
+button:active,
+.button:active {
+	border: 0px solid #101010;
+	background-color: #000000;
+}
+
+input {
+	/*display: inline-block;*/
+	/*height: 35px;*/
+	/*padding: 0 15px;*/
+	/*line-height: 38px;*/
+	/*text-align: center;*/
+	font-size: 1.1em;
+	font-weight: bold;
+	width: 98%;
+	/*margin: 0.2em 0em;*/
+	border: 0px solid #B8B8B8;
+}
+
+table {
+	width:100%;
+}
+
+fieldset, td {
+	padding: 0.2em;
+	margin: 0;
+	border: 1px solid #B8B8B8;
+}
+
+div {
+	padding: 0.2em;
+	margin: 0;
+	border: 1px solid #B8B8B8;
+}
+
+#file_text {
+	width: 99%;
+	height: auto;
+	border: 0px solid #B8B8B8;
+	overflow: auto;
+}
+
+#pStatus {
+	width: 99%;
+	height: 20em;
+	border: 0px solid #B8B8B8;
+	font-size: 0.8em;
+	font-weight: bold;
+	color: #808080;
+	overflow: auto;
+}
+</style>
+
+<script type="text/javascript" src="B_FoodSQL_Req.js"></script> 
+
+
+<script type="text/javascript">
+
+function GetDetail() {
+	var Table = document.getElementById("Detail_Table").value;
+	var ID = document.getElementById("Detail_ID").value;
+	MakeReq_AJAX_POST('FoodSQL=1& reqType=get||Detail& reqSpec='+Table+'||'+foodSQL_Col[Table][0]+'||'+ID+'||'+foodSQL_reqDetail[Table]);
+	document.getElementById("Detail_Result").innerHTML = "Getting Result for "+Table+"...";
+}
+function GetUpperID() {
+	var Table = document.getElementById("Detail_Table").value;
+	var ID = document.getElementById("Detail_ID").value;
+	if (foodSQL_UpperTable[Table]) {
+		MakeReq_AJAX_POST('FoodSQL=1& reqType=get||UpperID& reqSpec='+Table+'||'+ID);
+		document.getElementById("UpperID_Result").innerHTML = "Getting Result for "+Table+"...";
+	}
+	else document.getElementById("UpperID_Result").innerHTML = "No UpperID for "+Table+"...";
+}
+function GetUnderList() {
+	var Table = document.getElementById("Detail_Table").value;
+	var ID = document.getElementById("Detail_ID").value;
+	if (foodSQL_UnderTable[Table]) {
+		MakeReq_AJAX_POST('FoodSQL=1& reqType=get||UnderList& reqSpec='+Table+'||'+ID);
+		document.getElementById("UnderList_Result").innerHTML = "Getting Result for "+Table+"...";
+	}
+	else document.getElementById("UnderList_Result").innerHTML = "No UnderList for "+Table+"...";
+}
+
+
+
+function StringtoTable(R_Table, R_Result, R_isID) {
+	var formatedRes='';
+	if (R_isID) formatedRes='<table>'+"<tr><td>"+foodSQL_Col[R_Table][0]+"</td></tr>";
+	else formatedRes='<table>'+"<tr><td>"+foodSQL_reqDetail[R_Table].replace(/\,/g, "</td><td>")+"</td></tr>";
+	//alert("org:"+R_Result);
+	R_Result = R_Result.replace(/\{/g, "");
+	//alert("replace:"+R_Result);
+	R_Result = R_Result.split("}");
+	//alert("split:"+R_Result);
+	for (iR in R_Result) {
+		//alert("Get"+R_Result[iR]);
+		if (R_Result[iR]) formatedRes+="<tr><td>"+R_Result[iR].replace(/\|/g, "</td><td>")+"</td></tr>";
+	} 
+	formatedRes+="</table>";
+	return formatedRes;
+}
+
+
+function ReportDetail(R_Table, R_Result) {
+	var objResult = document.getElementById("Detail_Result");
+	if (!R_Result) objResult.innerHTML = "No Detail returned...";
+	else {
+		var formatedRes = StringtoTable(R_Table, R_Result);
+		objResult.innerHTML = formatedRes;
+	}
+}
+
+function ReportUpperID(R_Table, R_Result) {
+	var objResult = document.getElementById("UpperID_Result");
+	if (!R_Result) objResult.innerHTML = "No UpperID returned...";
+	else {
+		var formatedRes = StringtoTable(foodSQL_UpperTable[R_Table], R_Result, 1);
+		objResult.innerHTML = formatedRes;
+	}
+}
+
+function ReportUnderList(R_Table, R_Result) {
+	var objResult = document.getElementById("UnderList_Result");
+	if (!R_Result) objResult.innerHTML = "No UnderList returned...";
+	else {
+		var formatedRes = StringtoTable(foodSQL_UnderTable[R_Table], R_Result, 1);
+		objResult.innerHTML = formatedRes;
+	}
+}
+
+var ReportDistributor = {
+			"Detail": ReportDetail,
+			"UpperID": ReportUpperID,
+			"UnderList": ReportUnderList,
+			"Type": "Func"
+		};
+
+
+window.addEventListener('load',function(){
+	var margin_X=2,margin_Y=25;
+	//get page size info
+	var pageinfo = getPageSize();
+	document.getElementById("pStatus").innerHTML="page:"+pageinfo.pageX+"x"+pageinfo.pageY+" | win:"+pageinfo.winX+"x"+pageinfo.winY+" | DPR:"+window.devicePixelRatio+" | devDPI:"+screen.deviceXDPI+"/"+screen.deviceYDPI+" | logDPI:"+screen.logicalXDPI+"/"+screen.logicalYDPI;
+},false);	// end window.onLoad
+
+/*
+<button onclick="MakeReq_AJAX_POST('FoodSQL=111& reqType=get||Detail& reqSpec=Food||fID||60||'+foodSQL_reqDetail
+['Food'])">Detail</button> 
+<button onclick="MakeReq_AJAX_POST('FoodSQL=111& reqType=get||UpperID& reqSpec=Food||60')">UpperID</button> 
+<button onclick="MakeReq_AJAX_POST('FoodSQL=111& reqType=get||UnderList& reqSpec=PlaceWin||6')">UnderList</button> 
+*/
+</script> 
+
+</head>
+
+
+<html>
+<body class="fontsetting">
+<fieldset id="container">
+<legend>SJTU Food Place Comment System</legend>
+<table>
+	<tr>
+		<td colspan="6">
+			<b>[Get Detailed info] <br />
+			--Table = 'FoodSet','Food','PlaceBld','PlaceWin','Comment','User'</b>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<label>Table</label>
+		</td>
+		<td>
+			<input type="text" name="Detail_Table" id="Detail_Table" /> 
+		</td>
+		<td rowspan="2"class="button" onclick="GetDetail();">Get Detail</td>
+		<td rowspan="2"class="button" onclick="GetUpperID();">Get UpperID</td>
+		<td rowspan="2"class="button" onclick="GetUnderList();">Get UnderList</td>
+	</tr>
+	<tr>
+		<td>
+			<label>ID</label>
+		</td>
+		<td>
+			<input type="text" name="Detail_ID" id="Detail_ID" /> 
+		</td>
+	</tr>
+	<tr>
+		<td colspan="6">
+		<div name="Detail_Result" id="Detail_Result">Detail here...</div>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="6">
+		<div name="UpperID_Result" id="UpperID_Result">UpperID here...</div>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="6">
+		<div name="UnderList_Result" id="UnderList_Result">UnderList here...</div>
+		</td>
+	</tr>
+</table>
+</div>
+
+<div name="pStatus" id="pStatus"></div>
+
+<div id="Add">Add - future functon</div>
+<div id="Edit">Edit - future functon</div>
+<div id="Del">Del - future functon</div>
+</fieldset>
+</body>
+</html>

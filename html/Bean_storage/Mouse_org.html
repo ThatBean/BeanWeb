@@ -1,0 +1,191 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+<head> 
+
+<meta charset="utf-8"> 
+
+<title>theCanvas</title>
+
+<style type="text/css"> 
+	body {
+		margin:0;
+		padding:0;
+		font-family:verdana,helvetica,arial,sans-serif;
+	}
+	div {
+		margin:0;
+		padding:0;
+		font-size:10px;
+		line-height:10px;
+	}
+</style>
+
+<script type="text/javascript"> 
+	function getPageSize() {
+		var xScroll,yScroll;
+		if (window.innerHeight && window.scrollMaxY) {
+			xScroll = document.body.scrollWidth;
+			yScroll = window.innerHeight + window.scrollMaxY;
+		} else if (document.body.scrollHeight > document.body.offsetHeight) {
+			xScroll = document.body.scrollWidth;
+			yScroll = document.body.scrollHeight;
+		} else {
+			xScroll = document.body.offsetWidth;
+			yScroll = document.body.offsetHeight;
+		}
+
+		var windowWidth,windowHeight;
+		if (self.innerHeight) {
+			windowWidth = self.innerWidth;
+			windowHeight = self.innerHeight;
+		} else if (document.documentElement && document.documentElement.clientHeight) {
+			windowWidth = document.documentElement.clientWidth;
+			windowHeight = document.documentElement.clientHeight;
+		} else if (document.body) {
+			windowWidth = document.body.clientWidth;
+			windowHeight = document.body.clientHeight;
+		}
+
+		var pageWidth,pageHeight
+		pageHeight = ( (yScroll < windowHeight) ? windowHeight : yScroll );
+		pageWidth = ( (xScroll < windowWidth) ? windowWidth : xScroll );
+
+		return {"pageX":pageWidth,"pageY":pageHeight,"winX":windowWidth,"winY":windowHeight};
+	}
+	
+	window.addEventListener('load',function(){
+		//the cursor offset
+		var trigger_margin=50;
+		var triggered=false;
+		////var X_offset=(window.devicePixelRatio>1?130:45)+trigger_margin;
+		////var y_offset=(window.devicePixelRatio>1?290:110);
+		var X_offset=(window.devicePixelRatio>1?120:42)+trigger_margin;
+		var y_offset=(window.devicePixelRatio>1?170:60);
+		// get the canvas element and its context
+		var canvas = document.getElementById('theCanvas');
+		var context = canvas.getContext('2d');
+		var img_cursor=new Image();
+		if (window.devicePixelRatio > 1) {
+			img_cursor.src="Bean_files/cursorIIHD.png";
+		}
+		else {
+			img_cursor.src="Bean_files/cursorII.png";
+		}
+		
+		var img_keyboard=new Image();
+		img_keyboard.src="Bean_files/Keyboard.png";
+		/*
+		function cur_draw(coors){
+			//clear screen
+			canvas.width = canvas.width;
+			//check "swipe"
+			if (!triggered && coors.x>trigger_margin) return;
+			triggered=true;
+			//draw
+			context.drawImage(img_cursor,coors.x-X_offset,coors.y-y_offset);
+			//change label
+			document.getElementById("xycoordinates").innerHTML="Coordinates: (" + coors.x + "," + coors.y + ")";
+		}
+		*/
+		function cur_redraw(coors){
+			//clear screen
+			canvas.width = canvas.width;
+			context.drawImage(img_keyboard,20,20);
+			context.drawImage(img_keyboard,20,420,300,150);
+			//check "swipe"
+			if (!triggered && coors.x>trigger_margin) return;
+			triggered=true;
+			//draw
+			context.drawImage(img_cursor,coors.x-X_offset,coors.y-y_offset);
+			//change label
+			document.getElementById("xycoordinates").innerHTML="Coordinates: (" + coors.x + "," + coors.y + ")";
+		}
+		
+		function canvas_clear(){
+			//clear screen
+			canvas.width = canvas.width;
+			context.drawImage(img_keyboard,20,20);
+			context.drawImage(img_keyboard,20,420,300,150);
+			//clear trigger
+			triggered=false;
+			//change label
+			document.getElementById("xycoordinates").innerHTML="try swipe/drag from the left border of canvas";
+		}
+		
+		// create a drawer which tracks touch movements
+		var drawer = {
+			touchstart: cur_redraw,
+			mousedown: cur_redraw,
+			touchmove: cur_redraw,
+			mousemove: cur_redraw,
+			touchend: canvas_clear,
+			touchcancel: canvas_clear,
+			mouseout: canvas_clear,
+			mouseup: canvas_clear
+		};
+		// create a function to pass touch events and coordinates to drawer
+		function draw(event){
+			// get the touch coordinates
+			document.getElementById("pageinfo_2").innerHTML=event.type;
+			var coors;
+			if (event.type=="touchend") {
+				coors = {
+					x: 0,
+					y: 0
+				}
+			}
+			else if (event.targetTouches) {
+				coors = {
+					x: event.targetTouches[0].pageX,
+					y: event.targetTouches[0].pageY
+				}
+			}
+			else {
+				coors = {
+					x: event.pageX,
+					y: event.pageY
+				}
+			}
+			// pass the coordinates to the appropriate handler
+			drawer[event.type](coors);
+		}
+		
+		// attach the touchstart, touchmove, touchend event listeners.
+	    canvas.addEventListener('touchstart',draw, false);
+	    canvas.addEventListener('touchmove',draw, false);
+	    canvas.addEventListener('touchend',draw, false);
+	    canvas.addEventListener('touchcancel',draw, false);
+	    canvas.addEventListener('mousedown',draw, false);
+	    canvas.addEventListener('mousemove',draw, false);
+	    canvas.addEventListener('mouseup',draw, false);
+		canvas.addEventListener('mouseout',draw, false);
+		
+		
+		// prevent elastic scrolling
+		document.body.addEventListener('touchmove',function(event){
+			event.preventDefault();
+		},false);	// end body.onTouchMove
+		
+		//get page size info
+		pageinfo = getPageSize();
+		document.getElementById("pageinfo_1").innerHTML="page:"+pageinfo.pageX+"x"+pageinfo.pageY+" | win:"+pageinfo.winX+"x"+pageinfo.winY+" | DPR:"+window.devicePixelRatio+" | devDPI:"+screen.deviceXDPI+"/"+screen.deviceYDPI+" | logDPI:"+screen.logicalXDPI+"/"+screen.logicalYDPI;
+		document.getElementById("pageinfo_2").innerHTML=navigator.userAgent;
+		document.getElementById("theCanvas").width=(pageinfo.winX-80);
+		document.getElementById("theCanvas").height=(pageinfo.winY-10-30*(window.devicePixelRatio>1?2:1));
+		
+		context.font="40px Georgia";
+		context.fillText("Try drag from the left border...",10,90);
+		
+		
+	},false);	// end window.onLoad
+</script> 
+
+</head>
+
+<body style="margin:0px;">
+	<canvas id="theCanvas" style="border:solid #4682d9;border-width: 1px 1px 1px 50px;">Sorry, your browser is not supported.</canvas>
+	<div id="xycoordinates">try swipe/drag from the left border of canvas</div>
+	<div id="pageinfo_1">Page info undetected</div> 
+	<div id="pageinfo_2">Page info undetected</div> 
+</body>
+</html>

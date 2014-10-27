@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+
+<html>
+
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="chrome=1">
+		<title>Welcome to ThatBean.com!</title>
+		<meta name="title" content="Welcome to ThatBean.com!">
+		<meta name="keywords" content="thatbean,Dr.Eames,Bean,Personal">
+		<meta name="description" content="This is a web build by Bean/Dr.Eames">
+		<link href="Bean_files/Bean_css.css" rel="stylesheet" type="text/css">
+		<script src="Bean_files/Bean_js.js"></script>
+		<script type="text/javascript">
+			if(top != window){
+				top.location.href = "http://thatbean.com";
+			}
+			window["PATHS_PASSPORT"] = "http://thatbean.com";
+		</script>
+		<script type="text/javascript">
+			window.onload=function(){
+			document.getElementById('B_name').onfocus=function(){CheckIn('label_B_name');};
+			document.getElementById('B_name').onblur=function(){CheckOut(this,'label_B_name');};
+			document.getElementById('B_email').onfocus = function(){CheckIn('label_B_email');};
+			document.getElementById('B_email').onblur = function(){CheckOut(this,'label_B_email');};
+			}
+		</script>
+<script type="text/javascript" src="http://thatbean.com/Bean_storage/Bean_Mouse.js"></script> 
+	</head>
+
+	<body>
+
+		<div class="container">
+
+			<div class="header">
+				<h1 class="compact">Welcome to ThatBean.com!</h1>
+				<p class="compact"> This is a web build by Bean/Dr.Eames</p>
+			</div>
+
+			<table class="content">
+				<tr>
+					<td class="c01_left">
+						<iframe src="Bean_index_tab.html" frameBorder="0" width=100% scrolling="no" height=100%></iframe>
+					</td>
+					<td class="c01_right">
+						<h3 align="center">Welcome Here!</h3>
+						<div class="c01_box">
+<!--================== [!@#$%^&*] the cut space ==================-->
+							<form id="c01_form" action="#" method="post">
+								<li>
+									<label id="label_B_name" for="B_name">Your User Name</label>
+									<input type="text" name="c01_B_name" id="B_name" class="text" tabindex="1">
+									<em></em>
+								</li>
+								<li>
+									<label id="label_B_email" for="B_email">Your Email</label>
+									<input type="text" name="c01_B_email" id="B_email" class="text" tabindex="2">
+									<em></em>
+								</li>
+								<li>
+									<button type="submit" tabindex="3">Login</button>
+								</li>
+								<li>
+									<p>Those blocks above do nothing. Maybe it's good to give them another try later.</p>
+								</li>
+
+							</form>
+<!--================== [!@#$%^&*] the cut space ==================-->
+						</div>
+					</td>
+				</tr>
+			</table>
+
+			<div class="footer">
+				<p class="compact">
+				
+					<a href="mailto:bean@thatbean.com?subject=From%20ThatBean&body=Say%20something" class="set">Bean@ThatBean.com</a> | 
+					<a href="https://github.com/ThatBean" class="set">Bean in Git</a> | 
+					<a href="http://steamcommunity.com/id/dreames" class="set">Dr.Eames in Steam</a> | 
+					<a href="http://thatbean.com" class="set">thatbean.com</a> | 
+					&nbsp;&clubs;&infin;? Copywrong 2013 by Bean.
+				</p>
+			</div>
+		
+		</div>
+
+	</body>
+
+</html>

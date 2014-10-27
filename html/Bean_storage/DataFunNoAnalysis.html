@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<meta charset="utf-8"> 
+
+	<title>Bean's Data Fun</title>
+
+	<style type="text/css"> 
+		div {
+			border: 1px solid #222222;
+			
+		}
+		pre {
+			font-size:8px;
+			line-height:9px;
+			border: 1px solid #222222;
+			height:10em;
+			overflow:auto;
+		}
+		input {
+			width: 5em;
+			text-align: center;
+		}
+		i {
+			font-size:8px;
+			line-height:9px;
+		}
+		b {
+			Color: #00F;
+		}
+		b:hover {
+			cursor: pointer;
+			Color: #F00;
+		}
+		table, tr {
+			width: 100%;
+		}
+		td {
+			width: 50%;
+			height: 10em;
+			vertical-align: top;
+			overflow:auto;
+		}
+	</style>
+	<script type="text/javascript">
+	
+//bean@thatbean.com
+//for debug, check this under console
+var res;
+
+//for convenient?
+var MaximumDate = 99999;
+var MinimumDate = 0;
+
+var TYPE_pair = "user-shop pair";
+var TYPE_user = "user";
+var TYPE_shop = "shop";
+
+//for each user or shop or user-shop pair, there will be one FunHistory
+var FunHistory = (function () {
+	function FunHistory(id, type) {
+		this.ID = id;	//for user or shop only, user-shop pair will be null
+		this.Type = type || TYPE_pair; //see above
+		this.Related = {};	//user <--> shop link
+		this.Actions = {0: [], 1: [], 2: [], 3: []};
+		this.TimeLines = {};
+		
+		this.totalRelated = 0;
+		this.totalActions = 0;
+		
+		this.lifeSpan = [MaximumDate, MinimumDate];
+		
+	}
+	
+	FunHistory.prototype.addAction = function (idRelated, action, date) {
+		if (!this.Related[idRelated]) {
+			this.totalRelated++;
+			this.Related[idRelated] = new FunHistory(idRelated);
+		}
+		this.Related[idRelated].mixInfo(action, date);
+		this.mixInfo(action, date);
+		
+		return this.Related[idRelated];
+	}
+	
+	FunHistory.prototype.linkAction = function (idRelated, funHistory, action, date) {
+		if (!this.Related[idRelated]) {
+			this.totalRelated++;
+			this.Related[idRelated] = funHistory;
+		}
+		this.mixInfo(action, date);
+	}
+	
+	FunHistory.prototype.mixInfo = function (action, date) {
+		
+		//Add action and count it
+		this.Actions[action].push(date);
+		this.totalActions++;
+		
+		if (!this.TimeLines[date]) {
+			this.TimeLines[date] = {0: 0, 1: 0, 2: 0, 3: 0};
+		}
+		this.TimeLines[date][action]++;
+		
+		//calc life span
+		if (date > this.lifeSpan[1]) {
+			this.lifeSpan[1] = date;
+		}
+		if (date < this.lifeSpan[0]) {
+			this.lifeSpan[0] = date;
+		}
+	}
+	
+	FunHistory.prototype.sort = function () {
+		//sort in reverse
+		var sortFunction = function (a,b) {return b - a};
+		this.Actions[0].sort(sortFunction);
+		this.Actions[1].sort(sortFunction);
+		this.Actions[2].sort(sortFunction);
+		this.Actions[3].sort(sortFunction);
+	}
+	
+	FunHistory.prototype.sortRelated = function () {
+		for (var i in this.Related) {
+			this.Related[i].sort();
+		}
+	}
+	
+	return FunHistory;
+})();
+
+
+var DateTrans = (function () {
+	function DateTrans() {
+		this.minDate = MaximumDate;
+		this.maxDate = MinimumDate;
+	}
+	DateTrans.prototype.trans = function (strDate) {
+		var splitedDate = strDate.split("/");
+		var translatedDate = DateTrans.transMonthMap[splitedDate[0]] + splitedDate[1] * 1;
+		
+		if (translatedDate > this.maxDate) {
+			this.maxDate = translatedDate;
+		}
+		if (translatedDate < this.minDate) {
+			this.minDate = translatedDate;
+		}
+		
+		return translatedDate;
+	}
+	DateTrans.transMonthMap = {
+		4: 0,
+		5: 0 + 30,
+		6: 0 + 30 + 31,
+		7: 0 + 30 + 31 + 30,
+		8: 0 + 30 + 31 + 30 + 31,
+		9: 0 + 30 + 31 + 30 + 31 + 31,
+	}
+	return DateTrans;
+})();
+
+
+
+
+//arrangement of Data column
+var PlaceUserID = 0;
+var PlaceShopID = 1;
+var PlaceAction = 2;
+var PlaceDate = 3;
+
+
+function getFun(strData) {	//strData should be the formatted list of events
+	if (!strData) return;
+	var Result = {
+		Users: {},
+		Shops: {},
+		DateTrans: new DateTrans()
+	};
+	var arrData=strData.split("\n");	//get each line
+	var tempData="";
+	while(tempData=arrData.shift()) {
+		tempData = tempData.split("\t");	//get each column
+		//DateTranslation
+		var translatedDate = Result.DateTrans.trans(tempData[PlaceDate]);
+		//User get
+		var tempUser;
+		if (!Result.Users[tempData[PlaceUserID]]) {
+			tempUser= new FunHistory(tempData[PlaceUserID], TYPE_user);
+			Result.Users[tempData[PlaceUserID]] = tempUser;
+		}
+		else {
+			tempUser = Result.Users[tempData[PlaceUserID]];
+		}
+		//Shop get
+		var tempShop;
+		if (!Result.Shops[tempData[PlaceShopID]]) {
+			tempShop= new FunHistory(tempData[PlaceShopID], TYPE_shop);
+			Result.Shops[tempData[PlaceShopID]] = tempShop;
+		}
+		else {
+			tempShop = Result.Shops[tempData[PlaceShopID]];
+		}
+		//Add Action Date
+		var tempAction = tempUser.addAction(tempData[PlaceShopID], tempData[PlaceAction], translatedDate);
+		tempShop.linkAction(tempData[PlaceUserID], tempAction, tempData[PlaceAction], translatedDate);
+	}
+	return Result;
+}
+
+
+
+
+
+
+function parseFun(data, pObj) {
+	if (!data) return;
+	var parseSkip = parseInt(document.getElementById('inputParseSkip').value) || 0;
+	var Result = "";
+	for (var i in data.Users) {
+		var shops = data.Users[i].Related;
+		if (shops) {
+			currentUser = i;
+			shopArray = [];
+			for (var j in shops) {
+				if (shops[j]["Actions"][1].length || shops[j].totalActions > parseSkip) {
+					shopArray.push(j);
+				}
+			}
+			if (shopArray.length) {
+				Result += createHtmlRelated_User(currentUser, shopArray);
+			}
+		}
+	}
+	return Result;
+}
+
+function createHtmlRelated_User(UserID, ShopIDArray, action) {
+	var onAction = "on" + (action || "click");
+	var check = action ? 1 : 0;
+	var resHTML = "<b " + onAction + "='eventInspect(event, " + check + ","
+			+ UserID + ", null)'>" 
+			+ UserID + "</b>";
+	resHTML += "\t";
+	for (var i = 0; i < ShopIDArray.length; i++) {
+		resHTML += "<b " + onAction + "='eventInspect(event, " + check + "," + UserID + "," 
+				+ ShopIDArray[i] + ")'>" 
+				+ ShopIDArray[i] + "</b>";
+		if (i != ShopIDArray.length - 1) resHTML += ",";
+	}
+	resHTML += "\n";
+	return resHTML;
+}
+function createHtmlRelated_Shop(ShopID, UserIDArray, action) {
+	var onAction = "on" + (action || "click");
+	var check = action ? 1 : 0;
+	var resHTML = "<b " + onAction + "='eventInspect(event, " + check + ",null," 
+			+ ShopID + ",\"\")'>" 
+			+ ShopID + "</b>";
+	resHTML += "\t";
+	for (var i = 0; i < UserIDArray.length; i++) {
+		resHTML += "<b " + onAction + "='eventInspect(event, " + check + "," + UserIDArray[i] + "," + ShopID + ")'>" 
+				+ UserIDArray[i] + "</b>";
+		if (i != UserIDArray.length - 1) resHTML += ",";
+	}
+	resHTML += "\n";
+	return resHTML;
+}
+
+
+var theClipBoardData = undefined;
+document.addEventListener("paste", function(e) {
+    e.preventDefault();
+    if (e.clipboardData) {
+        content = (e.originalEvent || e).clipboardData.getData('text/plain');
+        //document.execCommand('insertText', false, content);
+    }
+    else if (window.clipboardData) {
+        content = window.clipboardData.getData('Text');
+        //document.selection.createRange().pasteHTML(content);
+    }
+	theClipBoardData = content;
+	alert("get Pasted ClipBoard Data!");
+	
+	var appendInfo = "[All Data is here]";
+	
+	if (theClipBoardData.length > 200) {appendInfo = "[Displayed only part of data for speed]"}
+	
+	document.getElementById('DataFunData').value = "[Data from ClipBoard] \n" + theClipBoardData.slice(0, 200) + "\n" + appendInfo;
+});
+
+function THEparseFun(textareaObj,pObj) {
+	PlaceUserID = parseInt(document.getElementById('inputPlaceUserID').value);
+	PlaceShopID = parseInt(document.getElementById('inputPlaceShopID').value);
+	PlaceAction = parseInt(document.getElementById('inputPlaceAction').value);
+	PlaceDate = parseInt(document.getElementById('inputPlaceDate').value);
+	
+	pObj.innerHTML="Getting Data...";
+	res = res || getFun(theClipBoardData || textareaObj.value);
+	pObj.innerHTML="Calculating...";
+	strRes = parseFun(res,pObj);
+	var resString = "Nothing...too bad..."
+	if (!strRes) pObj.innerHTML="Nothing...";
+	else {
+		resString = strRes;
+	}
+	pObj.innerHTML="Parsed Data: <br />UserID\tShopID<br />"+resString;
+	return;
+}
+
+
+
+
+
+
+
+
+//Inspect elements
+
+function InspUser(inputUserObj, inputShopObj) {
+	userID = parseInt(inputUserObj.value);
+	shopID = parseInt(inputShopObj.value);
+	
+	Inspect(userID, shopID);
+}
+
+
+//add key detection
+var Trigger = true;
+document.onkeypress = keyPressed;
+function keyPressed (event) {
+	Trigger = !Trigger;
+	document.getElementById("spanInspTrigger").innerHTML = Trigger ? "ON" : "OFF";
+	//alert(Trigger);
+}
+
+
+function eventInspect(event, check, userID, shopID) {
+	if (Trigger || !check) {
+		Inspect(userID, shopID);
+	}
+}
+function Inspect(userID, shopID) {
+	//display basic:
+	if (!res) {
+		alert("no data given yet!");
+		return;
+	}
+	
+	var clientWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+	var useWidth = clientWidth * 0.95 >> 0;
+	
+	
+	//alert(startPos+"|"+endPos);
+	canvasObj = document.getElementById('canvasInspGraph');
+	canvasObj.style.display = '';
+	var ctx = canvasObj.getContext("2d");
+	var canvasHeight = canvasObj.height;
+	var canvasWidth = useWidth;
+	
+	//clear all
+	canvasObj.width = canvasWidth;
+	
+	var totalDay = res.DateTrans.maxDate - res.DateTrans.minDate;
+	var dayOffset = res.DateTrans.minDate;
+	
+	var offSet = 5;
+	
+	var scaleW = useWidth / (totalDay + 3 * offSet);
+	var scaleH = Math.min(5, canvasHeight / 8 >> 0);
+	var startPos = (offSet + 0) * scaleW;
+	var endPos = (offSet + totalDay) * scaleW;
+	var criticalPos = (offSet + totalDay * 3 / 4) * scaleW;
+	
+	
+	
+	//start and end line
+	drawLine(ctx, startPos, 0, startPos, canvasHeight, '#aaaa00');
+	drawLine(ctx, endPos, 0, endPos, canvasHeight, '#aaaa00');
+	
+	drawText(ctx, "Day " + 0, startPos, 0);
+	drawText(ctx, "Day " + totalDay, endPos, 0);
+	
+	drawLine(ctx, criticalPos, 0, criticalPos, canvasHeight, '#00aaaa');
+	drawText(ctx, "Day " + parseInt(totalDay * 3 / 4), criticalPos, 0);
+	
+	
+	//base line
+	drawLine(ctx, 0, canvasHeight, canvasWidth, canvasHeight);
+	
+	var mark = 0;
+	var step = 5;
+	for (var i = canvasHeight; i > 0; i = i - step * scaleH) {
+		drawLine(ctx, 0, i, canvasWidth, i, '#cccccc', 1);
+		drawText(ctx, "" + mark, 0, i - 1 * scaleH, scaleH, '#aaaaaa');
+		mark += step;
+	}
+	
+	if (!res.Users[userID]) userID = undefined;
+	else {
+		var user = res.Users[userID];
+		var shopIDArray = [];
+		for (var j in user.Related) {
+				shopIDArray.push(j);
+		}
+		var userRelatedHTML = createHtmlRelated_User(userID, shopIDArray, "mouseover").replace(/\t/g, " || ").replace(/>,</g, "> <");
+	}
+	
+	if (!res.Shops[shopID]) shopID = undefined;
+	else {
+		var shop = res.Shops[shopID];
+		var userIDArray = [];
+		for (var j in shop.Related) {
+				userIDArray.push(j);
+		}
+		var shopRelatedHTML = createHtmlRelated_Shop(shopID, userIDArray, "mouseover").replace(/\t/g, " || ").replace(/>,</g, "> <");
+	}
+	
+	if (!userID && !shopID) {
+		alert("At least one ID must be given!");
+		return;
+	}
+	
+	relatedObj = document.getElementById('iInspRelated');
+	relatedObj.innerHTML = "<table><tr><td>User || related Shop History<hr />" + userRelatedHTML + "</td><td>Shop || related User History<hr />" + shopRelatedHTML + "</td></tr></table>";
+	
+	
+	titleObj = document.getElementById('spanInspTitle');
+	titleObj.innerHTML = "The Inspect Result of ";
+	
+	if (!shopID) {	//show user only
+		titleObj.innerHTML += "User-" + userID;
+		drawTimeLines(user, ctx, scaleW, scaleH, offSet, dayOffset, canvasHeight);
+		return;
+	}
+	if (!userID) {	//show shop only
+		titleObj.innerHTML += "Shop-" + shopID;
+		drawTimeLines(shop, ctx, scaleW, scaleH, offSet, dayOffset, canvasHeight);
+		return;
+	}
+	//show user-shop pair
+	var pair = user.Related[shopID];
+	titleObj.innerHTML += "User-" + userID + " Shop-" + shopID;
+	drawTimeLines(pair, ctx, scaleW, scaleH, offSet, dayOffset, canvasHeight);
+	return;
+}
+
+function drawTimeLines (targetObj, ctx, scaleW, scaleH, offSet, dayOffset, canvasHeight) {
+	for (var i in targetObj.TimeLines) {
+		for (var j in targetObj.TimeLines[i]) {
+			if (targetObj.TimeLines[i][j]) {
+				drawPoint(
+					ctx, 
+					(offSet + i * 1 - dayOffset) * scaleW + j * scaleW / 5, 
+					canvasHeight - targetObj.TimeLines[i][j] * scaleH, 
+					sizePack[j], 
+					colorPack[j]
+				);
+				drawLine(
+					ctx, 
+					(offSet + i * 1 - dayOffset) * scaleW + j * scaleW / 5, 
+					canvasHeight - targetObj.TimeLines[i][j] * scaleH, 
+					(offSet + i * 1 - dayOffset) * scaleW + j * scaleW / 5, 
+					canvasHeight, 
+					colorPack[j]
+				);
+			}
+		}
+	}
+}
+
+var colorPack = {
+	0: '#ff0000',
+	1: '#000000',
+	2: '#00ff00',
+	3: '#0000ff'
+}
+var sizePack = {
+	0: 2,
+	1: 3,
+	2: 2,
+	3: 2.5
+}
+
+function drawLine(ctx, sx, sy, ex, ey, color, lineWidth) {
+	ctx.beginPath();
+	ctx.strokeStyle = color || '#000000';
+	ctx.lineWidth = lineWidth || 1;
+	ctx.moveTo(sx, sy);
+	ctx.lineTo(ex, ey);
+	ctx.stroke();
+}
+function drawPoint(ctx, x, y, size, color) {
+	ctx.fillStyle=color || "#000000";
+	ctx.beginPath();
+	ctx.arc(x,y,size,0,Math.PI*2,true);
+	ctx.closePath();
+	ctx.fill();
+}
+function drawText(ctx, text, x, y, size, color) {
+	textSize = size || 10;
+	ctx.font= textSize + "px Verdana";
+	ctx.fillStyle=color || "#000000";
+	ctx.fillText(text, x, y + textSize);
+	
+}
+	
+	</script>
+	</head>
+    <body>
+		<span>Data should be like: UserID + "\t" + ShopID + "\t" + "Action" + "\t" + Month + "/" + Day + "\n"</span>
+		<br />
+		<span>Like below. The Column of Data can be different, by adjusting values below</span>
+		<br />
+		
+		Column of userID<input id="inputPlaceUserID" value="0"/>
+		ShopID<input id="inputPlaceShopID" value="1"/>
+		Action<input id="inputPlaceAction" value="2"/>
+		Date<input id="inputPlaceDate" value="3"/>
+		<hr />
+		
+		<textarea cols=40 rows=8 id="DataFunData" onchange="res = false; theClipBoardData = undefined;">10944750	13451	0	6/4
+10944750	13451	2	6/4
+10944750	13451	2	6/4
+10944750	13451	0	6/4
+10944750	13451	0	6/4
+10944750	13451	0	6/4
+10944750	13451	0	6/4
+10944750	13451	0	6/4
+10944750	21110	0	6/7
+10944750	1131	0	7/23
+10944750	1131	0	7/23
+10944750	8689	0	5/2
+10944750	8689	2	5/2
+10944750	8689	2	5/2
+10944750	8689	0	5/2
+10944750	8689	0	5/2
+10944750	26619	0	6/28
+10944750	5185	0	7/10
+10944750	18575	0	5/2
+10944750	23662	0	6/19
+10944750	23662	0	6/19
+10944750	24955	0	7/26
+10944750	155	0	8/7
+10944750	155	3	8/7
+10944750	15761	0	4/24
+10944750	15761	0	4/24
+10944750	15761	0	4/24
+10944750	15761	0	4/24
+10944750	19673	0	7/5
+10944750	19673	0	7/5
+10944750	19673	0	7/5
+10944750	19673	0	7/5
+10944750	19673	0	7/4
+10944750	19673	0	7/4
+10944750	19673	1	7/5
+10944750	15315	0	6/1
+10944750	15315	0	6/1
+10944750	15980	0	5/2
+10944750	1996	0	5/2
+10944750	1996	0	5/2
+10944750	1996	0	5/2
+10944750	1996	0	5/2
+10944750	13779	0	7/8
+10944750	21501	0	7/7
+10944750	21501	0	7/7
+10944750	21501	0	7/7
+10944750	21501	0	7/7
+10944750	23251	0	6/14
+10944750	23251	0	6/14
+10944750	23251	0	6/14
+10944750	11465	0	6/28
+10944750	6290	0	5/16
+10944750	6290	0	5/20
+10944750	6290	0	5/16
+10944750	18730	0	8/7
+10944750	18730	0	8/7
+10944750	14580	0	7/26
+10944750	14580	0	5/2
+10944750	7373	0	6/11
+10944750	7373	0	6/11
+10944750	7373	0	6/11
+10944750	7373	0	6/11
+10944750	4078	0	5/15
+10944750	8628	0	6/10
+10944750	8628	0	6/10
+10944750	8628	0	6/10
+10944750	8628	0	6/10
+10944750	8628	0	6/10
+10944750	25687	0	5/8
+10944750	25687	0	6/6
+10944750	25687	0	8/9
+10944750	25687	0	5/8
+10944750	25687	0	5/8
+10944750	25687	0	7/2
+10944750	25687	0	7/25
+10944750	25687	0	5/15
+10944750	25687	0	7/2
+10944750	25687	0	5/15
+10944750	25687	0	8/9
+10944750	25687	0	7/25
+10944750	25687	0	5/17
+10944750	25687	0	5/8
+10944750	25687	0	5/8
+10944750	25687	0	5/15
+10944750	25687	0	5/8
+10944750	25687	0	5/8
+10944750	25687	0	5/8
+10944750	25687	0	5/8
+10944750	25687	0	7/2
+10944750	25687	0	6/15
+10944750	25687	0	6/15
+10944750	25687	0	7/2
+10944750	25687	2	5/8
+10944750	25687	0	7/2
+10944750	25687	0	5/17
+10944750	25687	0	5/15
+10944750	25687	0	6/15
+10944750	25687	0	5/17
+10944750	25687	0	8/13
+10944750	25687	0	8/9
+10944750	25687	0	6/6
+10944750	25687	0	5/8
+10944750	25687	0	5/15
+10944750	9817	0	6/11
+10944750	9817	0	6/11
+10944750	23564	0	7/2
+10944750	29547	0	7/9
+10944750	29547	0	7/9
+10944750	29547	0	7/9
+10944750	12055	0	7/2
+10944750	12055	0	7/2
+10944750	12055	0	7/2
+10944750	12055	0	7/2
+10944750	3631	0	5/24
+10944750	1461	0	6/10
+10944750	1461	0	6/10
+10944750	1461	0	6/9
+10944750	1461	0	6/10
+10944750	1461	0	6/9
+10944750	1461	0	6/10
+10944750	1461	0	6/10
+10944750	1461	0	6/10
+10944750	1461	0	6/10
+10944750	1461	0	6/9
+10944750	1461	0	6/10
+10944750	1461	0	6/10
+10944750	1461	0	6/10
+10944750	1461	0	6/10
+10944750	22416	0	7/31
+10944750	19414	0	6/28
+10944750	24869	0	4/18
+10944750	7150	0	6/7
+10944750	7150	1	6/7
+10944750	7150	0	6/7
+10944750	5357	0	5/8
+10944750	6294	0	7/13
+10944750	6294	0	7/13
+10944750	6294	0	7/13
+10944750	7737	0	5/30
+10944750	11638	0	5/8
+10944750	11026	0	5/2
+10944750	10480	0	5/2
+10944750	10480	0	5/2
+10944750	10970	0	7/3
+10944750	10970	0	7/3
+10944750	18697	0	7/26
+10944750	8719	0	6/6
+10944750	8719	0	5/1
+10944750	8719	0	6/6
+10944750	8719	0	8/6
+10944750	8719	0	8/6
+10944750	8719	0	5/1
+10944750	8719	0	8/6
+10944750	8719	0	5/1
+10944750	8719	0	6/6
+10944750	8719	0	7/3
+10944750	1472	0	5/2
+10944750	21672	0	6/23
+10944750	13592	0	7/2
+10944750	13592	0	7/2
+10944750	13592	0	7/2
+10944750	12490	0	6/11
+10944750	12490	0	6/11
+10944750	12490	0	6/11
+10944750	17920	0	7/28
+10944750	17920	0	7/28
+10944750	17920	0	7/28
+10944750	17920	0	7/28
+10944750	13450	0	8/15
+10944750	13450	0	8/15
+10944750	13450	0	8/15
+10944750	11776	0	6/24
+10944750	25933	0	7/22
+10944750	28504	0	5/24
+10944750	22086	0	7/31
+10944750	6918	0	7/10
+10944750	6918	0	7/10
+10944750	6918	0	8/9
+10944750	6918	0	7/10
+10944750	28011	0	5/2
+10944750	11022	0	5/2
+10944750	11022	0	5/2
+10944750	11022	0	5/2
+10944750	11022	0	5/2
+10944750	11022	0	5/2
+10944750	2826	0	6/10
+10944750	2826	0	6/7
+10944750	25372	0	7/3
+10944750	25372	0	7/3
+10944750	25372	1	7/3
+10944750	25372	1	7/3
+10944750	25372	0	7/12
+10944750	25372	0	6/10
+10944750	25372	0	7/3
+10944750	25372	0	7/3
+10944750	25372	0	7/9
+10944750	25372	0	7/3
+10944750	25372	0	7/3
+10944750	25372	0	7/3
+10944750	25372	0	7/3
+10944750	25372	0	7/3
+10944750	6080	0	5/24
+10944750	11942	2	5/2
+10944750	11942	0	5/2
+10944750	679	0	6/24
+10944750	19166	0	5/1
+10944750	28230	0	7/23
+10944750	28230	0	7/23
+10944750	24359	0	7/4
+10944750	12599	0	6/11
+10944750	12599	0	6/11
+10944750	12599	0	7/3
+10944750	12599	0	6/11
+10944750	12599	0	6/11
+10944750	28752	0	7/31
+10944750	28752	1	7/31
+10944750	28752	0	7/31
+10944750	28752	1	7/31
+10944750	11080	0	8/10
+10944750	11080	0	8/9
+10944750	11080	0	8/9
+10944750	11167	0	6/10
+10944750	11167	0	6/10
+10944750	24193	0	8/8
+10944750	24193	0	8/8
+12028500	18024	0	7/20
+12028500	8519	0	8/3
+12028500	8519	0	8/3
+12028500	8519	0	8/3
+12028500	8519	0	8/3
+12028500	8519	0	8/3
+12028500	20386	0	7/12
+12028500	21392	0	8/1
+12028500	21392	0	8/1
+12028500	21392	1	8/3
+12028500	21392	0	8/1
+12028500	21392	1	8/3
+12028500	28059	0	8/14
+12028500	28059	0	8/14
+12028500	21293	0	7/28
+12028500	13431	0	7/30
+12028500	15935	0	7/8
+12028500	16540	1	7/19
+12028500	16540	0	7/19
+12028500	27014	0	7/3
+12028500	16540	0	7/19
+12028500	18496	1	8/4
+12028500	18496	0	8/4
+12028500	22380	0	7/16
+12028500	17739	0	7/15
+12028500	17739	0	7/15
+12028500	9922	0	7/8
+12028500	15686	0	7/19
+12028500	9922	0	7/8
+12028500	2173	0	8/5
+12028500	18665	0	7/20
+12028500	2173	0	8/5
+12028500	1428	0	7/27
+12028500	661	0	7/27
+12028500	622	0	5/6
+12028500	661	0	7/27
+12028500	661	0	8/3
+12028500	11018	0	8/5
+12028500	6869	0	7/22
+12028500	8027	0	7/27
+12028500	21941	0	7/27
+12028500	15368	0	8/14
+12028500	15368	0	8/14
+12028500	15426	0	7/24
+12028500	17692	0	7/26
+12028500	11679	0	8/14
+12028500	11679	0	8/14
+12028500	11679	0	8/14
+12028500	20655	0	7/29
+12028500	27794	0	8/13
+12028500	11196	0	8/3
+12028500	11196	0	8/3
+12028500	11196	0	8/3
+12028500	11196	0	8/3
+12028500	11196	0	8/3
+12028500	11196	0	8/3
+12028500	11196	1	8/3
+12028500	11196	1	8/3
+12028500	11196	0	8/3
+12028500	11196	0	8/3
+12028500	11196	0	8/3
+12028500	11196	0	8/3
+12028500	11196	0	8/3
+12028500	11196	1	8/3
+12028500	11196	0	8/3
+12028500	11196	0	8/3
+12028500	11196	0	8/3
+12028500	6133	0	8/3
+12028500	6133	0	8/3
+12028500	7600	0	7/26
+12028500	7600	0	7/26
+12028500	7600	0	7/26
+12028500	7600	0	7/26
+12028500	15584	0	8/4
+12028500	19891	0	8/9
+12028500	20796	0	7/6
+12028500	16460	0	7/6
+12028500	21593	0	7/30
+12028500	21593	0	7/30
+12028500	21593	0	7/30
+12028500	18647	0	8/3
+12028500	5254	0	6/17
+12028500	396	0	6/26
+12028500	13390	0	7/16
+12028500	13390	0	6/16
+12028500	13390	1	7/27
+12028500	13390	0	7/26
+12028500	13390	0	7/26
+12028500	13390	1	7/16
+12028500	13390	1	7/16
+12028500	13390	1	6/16
+12028500	13390	0	6/16
+12028500	13390	0	6/16
+12028500	13390	0	6/16
+12028500	13390	0	6/16
+12028500	13390	0	7/16
+12028500	13390	0	6/16
+12028500	13390	0	7/16
+12028500	24869	0	7/29
+12028500	24869	0	7/29
+12028500	19949	0	7/27
+12028500	27272	0	7/28
+12028500	27272	0	5/6
+12028500	2999	0	8/5
+12028500	2999	0	8/5
+12028500	2999	0	8/5
+12028500	5639	0	6/27
+12028500	24849	0	8/14
+12028500	11849	0	8/5
+12028500	22484	0	7/14
+12028500	8696	0	8/1
+12028500	8696	0	8/1
+12028500	28481	0	8/8
+12028500	15311	0	7/9
+12028500	15311	0	7/9
+12028500	22688	0	7/26
+12028500	15311	1	7/9
+12028500	15311	0	7/9
+12028500	10570	0	8/5
+12028500	27335	0	8/5
+12028500	27335	0	8/5
+12028500	3032	0	5/6
+12028500	10840	0	7/16
+12028500	4418	0	7/16
+12028500	24551	0	8/13
+12028500	28570	0	7/26
+12028500	12368	0	8/13
+12028500	28570	0	7/26
+12028500	14821	0	7/8
+12028500	11684	0	8/14
+12028500	3850	0	8/5
+12028500	21565	0	8/8
+12028500	18082	0	8/13
+12028500	3892	0	7/24
+12028500	24088	0	8/11
+12028500	13747	0	5/6
+12028500	13747	0	7/10
+12028500	13747	0	5/6
+12028500	5858	0	7/15
+12028500	14182	0	7/19
+12028500	28654	0	7/19
+12028500	5858	0	7/15
+12028500	23370	0	8/5
+12028500	679	0	5/5
+12028500	27985	0	8/10
+12028500	9089	0	7/15
+12028500	24581	0	8/8
+12028500	24581	0	8/8
+12028500	27446	0	7/19
+12028500	25260	0	6/29
+12028500	25260	0	6/29
+12028500	25260	0	6/29
+12028500	21975	0	7/25
+12028500	21975	1	7/25
+12028500	17024	0	6/18
+12028500	17024	0	6/25
+12028500	905	0	8/4
+12028500	12358	0	7/21
+12028500	9213	0	8/10
+12028500	9213	0	8/10
+12028500	9213	0	8/10
+12028500	9213	0	8/10
+12028500	15196	0	7/26
+12028500	11694	0	7/26
+12028500	11694	0	7/26
+12028500	14533	0	8/15
+12028500	3126	0	7/29
+1206500	5962	0	8/15
+1206500	4571	0	5/26
+1206500	7868	0	5/26</textarea><br />
+
+		<button id="btn" onclick="THEparseFun(document.getElementById('DataFunData'),document.getElementById('pLog'));document.getElementById('divInspect').style.display='block';">parse Fun</button>
+		Skip shop if no buy and other actions less than<input id="inputParseSkip" value="3"/>
+		<br />
+		
+		<pre id="pLog">Fun Results here!</pre>
+
+		<div id="divInspect" style="display:none;">
+			User ID: <input id="inputInspUserID" />  Shop ID<input id="inputInspShopID" />
+			<button id="btn1" onclick="InspUser(document.getElementById('inputInspUserID'),document.getElementById('inputInspShopID'));">Check</button>
+			<hr />
+			<span id="spanInspTitle">Inspect result</span>
+			<br />
+			<canvas id="canvasInspGraph" width="500" height="200" style="display:none;">Use Modern Browser to show canvas, please...</canvas>
+			<br />
+			<p>
+			the red line: Start time and end time<br />
+			dots: operation, x = time of operation, y = how many operations<br />
+			dot color: Red-click, Green-book, Blue-cart, Black-buy
+			</p>
+			Press X to toggle Hover Selection - <span id="spanInspTrigger">ON</span>
+			<i id="iInspRelated"></i>
+		</div>
+		<hr />
+    </body>
+</html>

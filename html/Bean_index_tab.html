@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<title>Bean's Tab in HTML</title>
+<style type="text/css">
+<!--
+/*
+Color List
+#F7FF5B - bg
+#F7FFE6 - fg
+#FFFFFF - font hover
+#525252 - font
+#FFBA26 - tc00
+#FFAD26 - tc01
+#FF9B27 - tc02
+*/
+body,div,ul,li{
+	margin:0 auto;
+	padding:0;
+	font-family:'\5fae\8f6f\96c5\9ed1',Tahoma,Geneva,'\5B8B\4F53';
+}
+body{
+	font-family:Tahoma,Geneva,'\5fae\8f6f\96c5\9ed1','\5B8B\4F53';
+	color:#FFFFFF;
+	text-align:center;
+}
+ul{
+	list-style:none;
+}
+.main{
+	clear:both;
+	height: 100%;
+	width: 100%;
+	text-align:center;
+}
+/*tabs*/
+#tabs {
+	height: 100%;
+	width: 100%;
+	background-color: #F7FF5B;
+}
+.menu li{
+	display:block;
+	float: left;
+	padding: 10px 0;
+	width:180px;
+	text-align: center;
+	cursor:pointer;
+	background: #F7FF5B;
+	color:#525252;
+}
+.menu li.hover0{
+	background: #FFBA26;
+	color:#FFFFFF;
+}
+.menu li.hover1{
+	background: #FFAD26;
+	color:#FFFFFF;
+}
+.menu li.hover2{
+	background: #FF9B27;
+	color:#FFFFFF;
+}
+#tabmain ul{
+	display: none;
+}
+#tabmain ul.block{
+	display: block;
+}
+#tabmain li{
+	height: 600px;
+	width: 100%;
+	text-align: left;
+}
+.t0{
+	background: #FFBA26;
+}
+.t1{
+	background: #FFAD26;
+}
+.t2{
+	background: #FF9B27;
+}
+
+img{
+	padding: 10px;
+	height: 200px;
+	width: 200px;
+	float: left;
+}
+
+h2{
+	margin: 0px;
+	padding: 20px;
+}
+
+p{
+	margin: 0px;
+	padding: 0px 20px;
+	text-indent: 2em;
+	text-align: left;
+}
+-->
+</style>
+<script src="Bean_files/Bean_js.js"></script>
+</head>
+<body>
+<b>
+<!--Main html-->
+<div id="tabs">
+	<ul class="menu" id="tabmenu">
+		<li onmouseover="setTab(0,'tabmenu','tabmain')" class="hover0">Bean</li>
+		<li onmouseover="setTab(1,'tabmenu','tabmain')">Metro Style</li>
+		<li onmouseover="setTab(2,'tabmenu','tabmain')">Dr.Eames</li>
+	</ul>
+	<div class="main" id="tabmain">
+		<ul class="block"><li class="t0">
+			<img src="Bean_files/tab01_01.png" alt="Bean">
+			<h2>That Bean</h2>
+			<p>The Dr.Eames domain is difficult to represent, and I guess no one want it yet.(Dr-Eames.com)</p>
+			<p>So, it's 'ThatBean.com' or 'TheBeanStudio.net', and I'm nowhere near a studio.</p>
+			<p>Blah blah blah, blah blah blah blah.</p>
+			<p>Blah blah blah, blah blah blah blah.</p>
+			<p>Blah blah blah, blah blah blah blah.</p>
+
+			<a href="Bean_storage/Mouse.html" target="_blank">Bean's swipe mouse prototype</a> <br />
+			<a href="Bean_storage/Bean_Binary_Killer.html" target="_blank">Bean's Binary &lt;-&gt; Decimal Tool</a> <br />
+			<a href="Bean_storage/Bean_poll.html" target="_blank">Bean's Poll</a> <br />
+			<a href="Bean_storage/fasta.html" target="_blank">Bean's Fasta Tool</a> <br />
+			<a href="Bean_storage/motif.html" target="_blank">Bean's Naive Consensus Tool</a> <br />
+			<a href="Bean_storage/BeanNodeTestPage.html" target="_blank">Bean's Page for Node</a> <br />
+			<a href="Bean_storage/DataFunNoAnalysis.html" target="_blank">Bean's Page for Fun Data Analysis</a> <br />
+			<a href="Bean_storage/get_random_multi.html" target="_blank">Bean's get random tool</a> <br />
+
+			<a href="Bean_storage/Bean2D test.html" target="_blank">Bean's Page for Bean2D</a> <br />
+
+
+			<div style="position:absolute;right:15px;bottom:10px;width:240px;height:70px;background-color: #008cd2;">
+			  <div style="height:100%;width:100%;overflow:hidden">
+				<table align="left" border="0px" cellpadding="5px" cellspacing="0px" style="table-layout:fixed;word-wrap:break-word;">
+				  <tr>
+					<td width="240px" height="50px" align="center" valign="middle" style="color:#ffffff;font:14px Arial">Get an @thatbean.com E-mail</td>
+				  </tr>
+				</table>
+			  </div>
+			  <div style="position:absolute;border:1px solid #ffffff;width:90px;left:15px;bottom:5px;">
+				<div style="border:1px solid #ffffff;background-color: #109ce2;padding:1px 0px 1px 0px;margin:0px;text-align:center;">
+				  <a href="https://domains.live.com/members/signup.aspx?domain=thatbean.com" target="_blank" style="font:bold 12px Arial,Helvetica,sans-serif;color:#FFFFFF;text-decoration:none;">I'm in!</a>
+				</div>
+			  </div>
+			  <div style="position:absolute;border:1px solid #ffffff;width:90px;right:15px;bottom:5px;">
+				<div style="border:1px solid #ffffff;background-color: #109ce2;padding:1px 0px 1px 0px;margin:0px;text-align:center;">
+				  <a href="http://mail.live.com" target="_blank" style="font:bold 12px Arial,Helvetica,sans-serif;color:#FFFFFF;text-decoration:none;">Check Mail</a>
+				</div>
+			  </div>
+			</div>
+		</li></ul>
+		<ul><li class="t1">
+			<img src="Bean_files/tab01_02.png" alt="Metro Style">
+			<h2>Metro Style not IOS7</h2>
+			<p>IOS7 style goes no where, so this web is Metro styled.</p>
+			<p>Blah blah blah, blah blah blah blah.</p>
+			<p>Blah blah blah, blah blah blah blah.</p>
+			<p>Blah blah blah, blah blah blah blah.</p>
+		</li></ul>
+		<ul><li class="t2">
+			<img src="Bean_files/tab01_03.png" alt="Dr.Eames">
+			<h2>Dr.Eames in Steam</h2>
+			<p>I've wasted much money on over 200 games(218 till now), wonderful.</p>
+			<p>Blah blah blah, blah blah blah blah.</p>
+			<p>Blah blah blah, blah blah blah blah.</p>
+			<p>Blah blah blah, blah blah blah blah.</p>
+		</li></ul>
+	</div>
+</div>
+</b>
+</body>
+</html>

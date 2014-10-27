@@ -1,0 +1,122 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+<head> 
+
+<meta charset="utf-8"> 
+
+<title>Bean's Button Page for Mouse Test</title>
+
+<style type="text/css"> 
+	body {
+		margin:0;
+		padding:0;
+		font-family:verdana,helvetica,arial,sans-serif;
+		/*overflow:hidden;*/
+	}
+	div {
+		margin:0;
+		padding:0;
+		font-size:10px;
+		line-height:10px;
+		overflow:hidden;
+	}
+
+
+	
+button,
+.button {
+	display: inline-block;
+	height: 22px;
+	width: 4em;
+	margin:0.2em 0.1em;
+	padding:0;
+	line-height: 20px;
+	text-align: center;
+	font-size: 18px;
+	color: #FFF;
+	border: 2px solid #427AC7;
+	background-color: #5091E9;
+}
+button:hover,
+.button:hover {
+	cursor:pointer;
+	border: 2px solid #427AC7;
+	background-color: #436EEE;
+}
+button:active,
+.button:active {
+	border: 2px solid #EEC900;
+	background-color: #EEEE00;
+}
+</style>
+
+<script type="text/javascript" src="Bean_Mouse.js"></script> 
+
+</head>
+
+<body style="margin:0px;">
+	<canvas id="theCanvas" style="border:solid #4682d9;border-width: 1px 1px 1px 50px;" width="1000px">Sorry, your browser is not supported.</canvas>
+	<br />
+	<script>
+	
+	
+	function insertCss( code ) {
+    var style = document.createElement('style');
+    style.type = 'text/css';
+
+    if (style.styleSheet) {
+        // IE
+        style.styleSheet.cssText = code;
+    } else {
+        // Other browsers
+        style.innerHTML = code;
+    }
+	document.body.appendChild( style );
+    //document.getElementsByTagName("head")[0].appendChild( style );
+	}
+	
+	insertCss( ".buttonRED {	color: #FFF;	border: 2px solid #000000;	background-color: #FF0000;}" );
+	
+	Number.prototype.BeanFormat = function (F_length) {
+		var tempSpace="";
+		for(var i=0;i<(F_length-this.toString().length);i++) tempSpace=tempSpace+"&nbsp;";
+		return tempSpace+this.toString();
+	}
+	
+	var canvas = document.getElementById('theCanvas');
+	var context = canvas.getContext('2d');
+		
+	function Canvas_DrawText(CTinfo) {
+		canvas.width = canvas.width;
+		context.font="40px Georgia";
+		context.fillText(CTinfo,10,50);
+	}
+	
+	var tgt_btn_no = -1;
+		function btn_hit(btn_no) {
+			alert(" button #"+btn_no+" clicked");
+			
+			if(tgt_btn_no==btn_no || tgt_btn_no==-1) {
+				//alert("target clicked");
+				
+				if (tgt_btn_no!=-1) document.getElementById('btn_'+tgt_btn_no).className="";
+				
+				tgt_btn_no = Math.floor(Math.random()*800);
+				var Tinfo="Click the Button ["+tgt_btn_no+"] if you can?";
+				Canvas_DrawText(Tinfo);
+				document.getElementById('btn_'+tgt_btn_no).className="buttonRED";
+			}
+		}
+		
+	window.addEventListener('load',function(){
+		Canvas_DrawText("try swipe/drag from the \"MENU\" button");
+	});
+	</script>
+	
+	<script>
+	//document.write("<div style='width:90%;'>");
+	for(var i=0;i<800;i++) document.write("<button id='btn_"+i+"' onclick='btn_hit("+i+");'>["+i.BeanFormat(4)+"]</button>");
+	//document.write("<div style='height:400px;'></div></div>");
+	</script>
+</body>
+</html>

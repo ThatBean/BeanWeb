@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<meta charset="utf-8"> 
+
+	<title>Bean's Naive Consensus Tool</title>
+
+	<style type="text/css"> 
+		div {
+			font-size:10px;
+			line-height:10px;
+			border: 2px solid #222222;
+			width:90%;
+			height:30em;
+			overflow:auto;
+		}
+		table {
+			border-collapse:collapse;
+		}
+		td {
+			border: 1px solid #CCCCCC;
+		}
+		
+		input {
+			width: 4em;
+		}
+	</style>
+	</head>
+    <body>
+		
+        <script>
+			//##################################################################
+			//For debug
+			var B_showAlert=false;	//for display Debug information
+			var B_alertBaseLevel=0;
+			var B_alertDefaultLevel=10;
+			function B_ALERT(msg,alertLevel) {
+				if (!alertLevel) alertLevel=B_alertDefaultLevel;
+				if (B_showAlert && alertLevel>=B_alertBaseLevel) {
+					alert("[TEST MSG]"+msg+"[TEST MSG]");
+				}
+			}
+			
+			String.prototype.repeat = function( num ) {
+				return new Array( isNaN(num)? 1 : ++num ).join( this );
+			}
+			
+			function digString(myObj,tabbed){  
+				if (typeof(myObj) == 'function') return "a function";  
+				if (typeof(myObj) != 'object') return myObj;  
+				if (myObj == null) return;  
+				
+				var tabbedTab="|___".repeat(tabbed);
+				//var tabbedTab=(tabbed?"-".repeat(tabbed):"");
+				
+				var ObjString = "<br />"+tabbedTab+"'"+typeof(myObj)+"'{";  
+
+				for (var i in myObj) ObjString += "<br />"+tabbedTab+"["+i+"|"+typeof(myObj[i])+"]:"+digString(myObj[i],(tabbed?tabbed+1:1));  
+	
+				return ObjString+"<br />"+tabbedTab+"}<br />";  
+			}
+			//for debug
+			//##################################################################
+			//for use
+			Object.prototype.Clone = function(){  //js object clone code from web
+				var objClone;  
+				if (this.constructor == Object){  
+					objClone = new this.constructor();   
+				}else{  
+					objClone = new this.constructor(this.valueOf());   
+				}  
+				for(var key in this){  
+					if ( objClone[key] != this[key] ){   
+						if ( typeof(this[key]) == 'object' ){   
+							objClone[key] = this[key].Clone();  
+						}else{  
+							objClone[key] = this[key];  
+						}  
+					}  
+				}  
+				objClone.toString = this.toString;  
+				objClone.valueOf = this.valueOf;  
+				return objClone;
+			}
+			
+			Array.prototype.SortTop = function(topNum, sortFunc){  //js object clone code from web
+				this.sort(sortFunc);
+				while (this.length>topNum) this.pop();
+				return this;
+			}
+			//for use
+			//##################################################################
+			
+			var _FIX_N=3;	//precision
+			
+			var NC_motif_len=9;	//the desired motif length
+			var NC_motif_max=20;	//the number of top motif to return
+			var NC_motif_show=20;	//the number of top motif to show in Html
+			
+			var NC_PWM_res_ratio_pro=0.4;	//the min ratio for a reasonable result
+			
+			var NC_PWM_log_modifier=1/Math.log(2);	//make the log -> log2
+			
+			
+			
+			
+			var NC_bg_prob = {		//background probability
+				"A":0.35,
+				"T":0.35,
+				"C":0.15,
+				"G":0.15
+			}
+			
+			function set_BGP(BGP_Key,BGP_Value) {
+				if (!NC_bg_prob[BGP_Key]) {
+					alert("Error key, how does this happen???");
+					return;
+				}
+				if (!(BGP_Value>0 && BGP_Value<1)) {
+					alert("Please enter probability for "+BGP_Key+" between [0,1]");
+					return;
+				}
+				NC_bg_prob[BGP_Key]=BGP_Value;
+			}
+			
+			function autoSetBGP() {
+				if (!NC_bg_prob[BGP_Key]) {
+					alert("Error key, how does this happen???");
+					return;
+				}
+				if (!(BGP_Value>0 && BGP_Value<1)) {
+					alert("Please enter probability for "+BGP_Key+" between [0,1]");
+					return;
+				}
+				NC_bg_prob[BGP_Key]=BGP_Value;
+			}
+			
+			function autoSetBGP() {
+                var res = calcATCG(document.getElementById('NC_fasta').value);
+				if (!res) alert("Failed... No seq entered?");
+				else {
+					var total=res.A+res.T+res.C+res.G+res.U;
+					
+					NC_bg_prob["A"]=res.A/total;
+					NC_bg_prob["T"]=(res.T+res.U)/total;
+					NC_bg_prob["C"]=res.C/total;
+					NC_bg_prob["G"]=res.G/total;
+					
+					document.getElementById('NC_motif_BGP_A').value=NC_bg_prob["A"];
+					document.getElementById('NC_motif_BGP_T').value=NC_bg_prob["T"];
+					document.getElementById('NC_motif_BGP_C').value=NC_bg_prob["C"];
+					document.getElementById('NC_motif_BGP_G').value=NC_bg_prob["G"];
+				}
+				return;
+            }
+			
+			//##################################################################
+			function calcATCG(seq) {
+                if (!seq) return;
+				var resATCG = {A:0, T:0, C:0, G:0, U:0, remain:0};
+				var seq_Array=seq.split("\n");
+				var seq_temp="";
+				var seq_count=0;
+				while(seq_temp=seq_Array.shift()) {
+					if (seq_temp.search(/>/)==-1) {
+						for (seq_count=0;seq_count<seq_temp.length;seq_count++) {
+							switch(seq_temp[seq_count]) {
+								case "A":	resATCG.A+=1;break;
+								case "T":	resATCG.T+=1;break;
+								case "C":	resATCG.C+=1;break;
+								case "G":	resATCG.G+=1;break;
+								case "U":	resATCG.U+=1;break;
+								default:	resATCG.remain+=1;
+							}
+						}
+					}
+				}
+				return resATCG;
+            }
+			//##################################################################
+			
+			
+			
+			
+			
+			function set_Motif_Length(int_Val) {
+				NC_motif_len=parseInt(int_Val);
+				//alert("GET LENGTH:"+NC_motif_len);
+			}
+			function set_Max_Reult(int_Val) {
+				NC_motif_max=parseInt(int_Val);
+			}
+			function set_Show_Reult(int_Val) {
+				NC_motif_show=parseInt(int_Val);
+			}
+			
+			
+			
+			
+			
+			function new_Motif_Pack(seq) {
+				var temp_Motif_Pack = {
+					"pack_PWM"		:null,	//history PWM
+					"info_Score"	:0,
+					"seq_Pack"		:new Array(),	//an Array of string of k-mers
+					"seq_New"		:""
+				};
+				
+				var temp_PWM  = {
+					"A":new Array(NC_motif_len),
+					"T":new Array(NC_motif_len),
+					"C":new Array(NC_motif_len),
+					"G":new Array(NC_motif_len),
+					"Total":new Array(NC_motif_len)
+				}
+				//set all to 0
+				for(var key in temp_PWM) {
+					for (var i=0;i<temp_PWM[key].length;i++) {
+						temp_PWM[key][i]=0;
+					}
+				}
+				temp_Motif_Pack["pack_PWM"]=temp_PWM;
+				if (seq) temp_Motif_Pack["seq_New"]=seq;
+				return temp_Motif_Pack;
+			}
+			
+			function calc_PWM(motif_Pack) {
+				//start counting
+				var temp_seq=motif_Pack["seq_New"];
+				var temp_PWM=motif_Pack["pack_PWM"];
+				for (var i=0;i<temp_seq.length;i++) {
+					temp_PWM[temp_seq[i]][i]+=1;
+					temp_PWM["Total"][i]+=1;
+				}
+				//calc info score
+				var temp_score=0.0;
+				var temp_W=0;
+				for(var key in temp_PWM) {
+					if (key=="Total") continue;
+					for (var i=0;i<temp_PWM[key].length;i++) {
+						temp_W=temp_PWM[key][i]/temp_PWM["Total"][i];
+						if (temp_W==0) {
+							temp_W=0;
+						}
+						else {
+							temp_W=temp_W*Math.log(temp_W/NC_bg_prob[key]);
+						}
+						temp_score+=temp_W;
+					}
+				}
+				motif_Pack["info_Score"]=temp_score*NC_PWM_log_modifier;
+				B_ALERT("get:"+temp_score+" adding:"+temp_seq);
+				//move seq_new to Pack
+				motif_Pack["seq_Pack"].push(motif_Pack["seq_New"]);
+				motif_Pack["seq_New"]="";
+				return temp_score;
+			}
+			
+			
+			
+			function gen_Motif_Pack_Array(seq_Array) {
+				var temp_Motif_Pack_Array=new Array();
+				var temp_Motif_Pack;
+				for (var i=0;i<seq_Array.length;i++) {
+					temp_Motif_Pack=new_Motif_Pack(seq_Array[i]);
+					calc_PWM(temp_Motif_Pack);
+					temp_Motif_Pack_Array.push(temp_Motif_Pack);
+				}
+				return temp_Motif_Pack_Array;
+			}
+			
+			function expand_Motif_Pack_Array(motif_Pack_Array, seq_Array) {
+				var temp_Motif_Pack_Array=new Array();
+				var temp_Motif_Pack;
+				for (var i=0;i<motif_Pack_Array.length;i++) {
+					for (var ii=0;ii<seq_Array.length;ii++) {
+						temp_Motif_Pack=motif_Pack_Array[i].Clone();
+						temp_Motif_Pack["seq_New"]=(seq_Array[ii]);
+						calc_PWM(temp_Motif_Pack);
+						temp_Motif_Pack_Array.push(temp_Motif_Pack);
+					}
+				}
+				return temp_Motif_Pack_Array;
+			}
+			
+			
+			
+			function splash_Motif(seq_string) {
+				if (NC_motif_len>seq_string.length) return null;
+				
+				var temp_splash_Array=new Array();
+				for (var i=0;i<(seq_string.length-NC_motif_len+1);i++) {
+					temp_splash_Array.push(seq_string.substr(i,NC_motif_len));
+				}
+				
+				return temp_splash_Array;
+			}
+			
+			function extractNC(seq) {
+				if (!seq) return;
+				var seq_Array=seq.split("\n");
+				var seq_temp="";
+				var seq_temp_Extracted="";
+				var seq_Extracted_Array=new Array();
+				
+				while(seq_temp=seq_Array.shift()) {
+					if (seq_temp.search(/>/)==-1) {	//ignore ">" line
+						seq_temp_Extracted+=seq_temp.replace(/[^ATCG]/g, "");
+					}
+					else {
+						if (seq_temp_Extracted) {	//save last seq
+							seq_Extracted_Array.push(seq_temp_Extracted);
+							seq_temp_Extracted="";
+						}
+					}
+				}
+				if (seq_temp_Extracted) {	//save last seq
+					seq_Extracted_Array.push(seq_temp_Extracted);
+					seq_temp_Extracted="";
+				}
+				//alert(seq_Extracted_Array);
+				return seq_Extracted_Array;
+			}
+			
+			function motif_Pack_Array_Sort(a, b) {
+				return b["info_Score"]-a["info_Score"];
+			}
+			
+			function calcNC(seq){
+                if (!seq) return "Not a word?";
+				//format input sequence
+				var seq_Array=extractNC(seq);
+				if (!seq_Array || !seq_Array.length) return "No sequence found?";
+				if (seq_Array.length<2) return "not enough Lines given";
+				
+				//iteration 1
+				var motif_seq_Array=splash_Motif(seq_Array.shift());	//splash the first seq to motif size
+				var motif_Pack_Array=gen_Motif_Pack_Array(motif_seq_Array);	//use these to generate first Motif_Pack_Array
+				
+				//iteration k
+				while (seq_Array.length) {
+					motif_seq_Array=splash_Motif(seq_Array.shift());	//splash the k-th seq
+					motif_Pack_Array=expand_Motif_Pack_Array(motif_Pack_Array,motif_seq_Array);	//add to Array
+					motif_Pack_Array.SortTop(NC_motif_max, motif_Pack_Array_Sort);	//pick the top "NC_motif_max" pack
+				}
+				
+				return motif_Pack_Array;
+			}
+			
+			function extract_MP_Result(motifPack) {
+				//get ratio
+				var temp_PWM=motifPack["pack_PWM"];
+				var PWM_Info="";
+				for(var key in temp_PWM) {
+					if (key=="Total" || typeof(temp_PWM[key])=="function") continue;
+					PWM_Info+="--["+key+"] ";
+					for (var i=0;i<temp_PWM[key].length;i++) {
+						PWM_Info+=(temp_PWM[key][i]/temp_PWM["Total"][i]).toFixed(_FIX_N)+"|";
+					}
+					PWM_Info+="<br />";
+				}
+				//get max Seq
+				var Res_Seq_Top="";
+				var Res_Seq_Pro="";
+				var top_Key=0;
+				for (var i=0;i<temp_PWM["Total"].length;i++) {
+					for(var key in temp_PWM) {
+						if (key=="Total") continue;
+						if (!top_Key || temp_PWM[top_Key][i]<temp_PWM[key][i]) top_Key=key;
+					}
+					Res_Seq_Top+=top_Key;
+					Res_Seq_Pro+=((temp_PWM[top_Key][i]/temp_PWM["Total"][i])>NC_PWM_res_ratio_pro?top_Key:"-");
+				}
+				PWM_Info+="Top: "+Res_Seq_Top+"<br />Pro: "+Res_Seq_Pro;
+				
+				
+				var Res="";
+				Res+="Score: "+motifPack["info_Score"].toFixed(_FIX_N)+"<br />";
+				Res+="PWM: <br />"+PWM_Info+"<br />";
+				Res+="Seq: "+motifPack["seq_Pack"]+"<br />";
+				
+				return Res;
+			}
+			
+			function THEcalcNC(textareaObj,pObj) {
+				pObj.innerHTML="Calculating...";
+				var res = calcNC(textareaObj.value);
+				if (!res) pObj.innerHTML="Nothing...";
+				else {
+					//pObj.innerHTML="Total NC:"+digString(res);
+					pObj.innerHTML="Total NC:<br />";
+					for (var i=0;i<(res.length>NC_motif_show?NC_motif_show:res.length);i++) {
+						pObj.innerHTML+="[[Result No."+i+"]]:"+extract_MP_Result(res[i])+"<br />";
+					}
+				}
+				return;
+            }
+        </script>
+		
+		<textarea cols=100 rows=8 id="NC_fasta">&gt;Fasta Motif Containing sequence here!
+&gt;CT3134:tll:CG1378_8926  
+AAAATAAAAAACAAATATTTGCATTTC
+&gt;CT3134:tll:CG1378_8921  
+GCTAAGAAATGCAAATATTTGTTTTTT
+&gt;CT3134:tll:CG1378_8844
+		</textarea><br />
+		
+		<button id="NC_btn" onclick="THEcalcNC(document.getElementById('NC_fasta'),document.getElementById('NC_p'));">calc NC</button> 
+		
+		Motif Length:<input value=9 id="NC_motif_len" onchange="set_Motif_Length(this.value);"/> 
+		Max Result:<input value=20 id="NC_motif_max"  onchange="set_Max_Reult(this.value);"/>
+		Show Result:<input value=20 id="NC_motif_max"  onchange="set_Show_Reult(this.value);"/>
+		<br />
+		Background probabilities:
+		A:<input value=0.35 id="NC_motif_BGP_A"  onchange="set_BGP('A',this.value);"/>
+		T:<input value=0.35 id="NC_motif_BGP_T"  onchange="set_BGP('T',this.value);"/>
+		C:<input value=0.15 id="NC_motif_BGP_C"  onchange="set_BGP('C',this.value);"/>
+		G:<input value=0.15 id="NC_motif_BGP_G"  onchange="set_BGP('G',this.value);"/>
+		<button id="NC_btn_BGP" onclick="autoSetBGP();">calc BGP from seq</button> 
+		
+		<p id="NC_p">Native Consensus Results here!</p>
+    </body>
+</html>

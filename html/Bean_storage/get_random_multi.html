@@ -1,0 +1,55 @@
+From:<input id="01" /><br />
+To:<input id="02" /><br />
+Count:<input id="03" /><br />
+<p id="out">Result will be here</p><br />
+<button onclick="get_random();">Get Random</button>
+
+<script>
+	function get_random_int(range_01, range_02) {
+		var from = Math.min(range_01, range_02)
+		var to = Math.max(range_01, range_02)
+		
+		var res = Math.floor(Math.random() * (to - from + 1) + from)
+		if (res == Math.max(from, to) + 1) {
+			return get_random_int(from, to);
+		}
+		console.log("get", res)
+		return res;
+	}
+	
+	
+	function get_random_int_multi(range_01, range_02, count) {
+		var from = Math.min(range_01, range_02)
+		var to = Math.max(range_01, range_02)
+		var res = new Array();
+		
+		for (var i = 0; i < count; i++) {
+			var new_rand = get_random_int(from, to - i)
+			var j;
+			for (j = 0; j < res.length; j++) {
+				if (res[j] <= new_rand) {
+					new_rand++;
+				}
+				else {
+					break;
+				}
+			}
+			
+			res.splice(j, 0, new_rand);
+		}
+		return res;
+	}
+	
+	function get_random() {
+		var range_01 = document.getElementById("01").value || 0;
+		var range_02 = document.getElementById("02").value || 0;
+		var count = document.getElementById("03").value || 1;
+		
+		var res = get_random_int_multi(range_01, range_02, count)
+		
+		document.getElementById("out").innerHTML = "Get: " + res.join(", ");
+		
+	}
+	
+	
+</script>

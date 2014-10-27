@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"> 
+		<title>Bean's Poll Page</title>
+		<style type="text/css"> 
+			body, div, #BEAN_POLL {
+				margin:0;
+				padding:0;
+				font-family:'\5fae\8f6f\96c5\9ed1',Tahoma,Geneva,'\5B8B\4F53';
+				font-style:normal;
+			}
+			
+			input {
+				width: 100%;
+				font-family:'\5fae\8f6f\96c5\9ed1',Tahoma,Geneva,'\5B8B\4F53';
+				font-style:normal;
+			}
+			
+			#BEAN_POLL {
+				position: fixed;
+				top: 1%;
+				left: 50%;
+				width: 1024px;
+				margin-left: -512px;	
+			}
+			#BEAN_TABLE_POLL {
+				margin-left: auto;
+				margin-right: auto;
+			}
+			#BEAN_RESULT_POLL td {
+				width: 4em;
+				line-height: 2em;
+				text-align: center;
+				font-size: 1.5em;
+			}
+			#BEAN_BUTTON_POLL button {
+				height: 4em;
+				font-size: 1.2em;
+			}
+			#BEAN_COMMIT_POLL button {
+				height: 2em;
+				font-size: 1.2em;
+			}
+			
+			button {
+				width: 100%;
+				font-family:'\5fae\8f6f\96c5\9ed1',Tahoma,Geneva,'\5B8B\4F53';
+				font-style:normal;
+				text-align: center;
+				border-style: none;
+				color: #FFF;
+				background-color: #5091E9;
+			}
+			button:hover {
+				cursor:pointer;
+				background-color: #436EEE;
+			}
+			button:active {
+				background-color: #EEEE00;
+			}
+			
+			.B_CSS_VOTED {
+				background-color: #5091E9;
+			}
+			.B_CSS_UNVOTED {
+				background-color: #000000;
+			}
+		</style>
+	</head>
+    <body>
+		<script>
+			var B_nominate;		//Array of nominate name
+			var B_select;		//how many selected nominate needed for a vote
+			var B_temp;			//for a vote
+			var B_result;		//for a vote
+			var B_selected;		//how many selected nominate 
+			var B_polled;		//how many vote made
+			var B_type;			//0:exact needed|1:exact or less
+			var B_title;		//Poll title
+			
+			//中文版
+			
+			function B_func_initValue_CH() {
+				
+				var tgtObj = document.getElementById('BEAN_POLL');
+				var nominateNameList = document.getElementById('BEAN_POLL_NOM').value;
+				var nominateNeeded = document.getElementById('BEAN_POLL_SEL').value;
+				var exactNumber = document.getElementById('BEAN_POLL_EXA').checked;
+				var pollTitle = document.getElementById('BEAN_POLL_TTL').value;
+				
+				//alert(nominateNameList+"|"+nominateNeeded+"|"+exactNumber);
+				
+				B_nominate = nominateNameList.split("|");
+				B_select = nominateNeeded;
+				B_type = exactNumber;
+				B_temp = new Array(B_nominate.length);
+				B_result = new Array(B_nominate.length);
+				B_selected = 0;
+				B_polled = 0;
+				B_title = pollTitle;
+				B_func_createTable_CH(tgtObj);
+			}
+
+			function B_func_createTable_CH(Obj) {
+				var B_tableHTML="<table id='BEAN_TABLE_POLL'>";
+				B_tableHTML+="<tr><td colspan='"+B_nominate.length+"'>"+B_title+"</td></tr>";
+				/*
+				B_tableHTML+="<tr id='BEAN_NOMINATE_POLL'>";
+				for (var i=0;i<B_nominate.length;i++) {
+					B_tableHTML+="<td>"+B_nominate[i]+"</td>";
+				}
+				B_tableHTML+="</tr>";
+				*/
+				B_tableHTML+="<tr id='BEAN_RESULT_POLL'>";
+				for (var i=0;i<B_nominate.length;i++) {
+					B_result[i]=0;
+					B_temp[i]=0;
+					B_tableHTML+="<td>"+B_result[i]+"</td>";
+				}
+				B_tableHTML+="</tr>";
+				B_tableHTML+="<tr id='BEAN_BUTTON_POLL'>";
+				for (var i=0;i<B_nominate.length;i++) {
+					B_result[i]=0;
+					B_tableHTML+="<td><button class='B_CSS_UNVOTED' onclick='B_func_addPoll_CH("+i+",this)'>"+B_nominate[i]+"</button></td>";
+				}
+				B_tableHTML+="</tr>";
+				B_tableHTML+="<tr id='BEAN_COMMIT_POLL'>";
+				B_tableHTML+="<td colspan='"+(B_nominate.length-1)+"'><p id='BEAN_MESSAGE_POLL'>点击右侧按钮完成投票</p></td>";
+				B_tableHTML+="<td><button onclick='B_func_finishPoll_CH()'>投票</button></td>";
+				B_tableHTML+="</tr>";
+				B_tableHTML+="</table>";
+				
+				Obj.innerHTML=B_tableHTML;
+			}
+			
+			function B_func_addPoll_CH(nomNumber,Obj) {
+				B_temp[nomNumber]=(B_temp[nomNumber]?0:1);	//reverse
+				B_selected=B_selected+(B_temp[nomNumber]?1:-1);	//record
+				//alert("get "+Obj+"|"+Obj.className);
+				Obj.className=B_temp[nomNumber]?"B_CSS_VOTED":"B_CSS_UNVOTED";
+				
+				document.getElementById('BEAN_MESSAGE_POLL').innerHTML="已选："+B_selected+"票 | "+(B_type?"需要：":"需要：最多")+B_select+"票";
+			}
+			
+			function B_func_finishPoll_CH() {
+				if ((B_selected!=B_select && B_type) || (B_selected>B_select && !B_type)) {
+					document.getElementById('BEAN_MESSAGE_POLL').innerHTML="[投票失败] 已选："+B_selected+"票 | "+(B_type?"需要：":"需要：最多")+B_select+"票";
+				}
+				else {
+					B_polled++;
+					document.getElementById('BEAN_MESSAGE_POLL').innerHTML="[投票成功] 有效票数："+B_polled+"票";
+					
+					var B_resultTagTd=document.getElementById('BEAN_RESULT_POLL').getElementsByTagName('td');
+					var B_buttonTagBtn=document.getElementById('BEAN_BUTTON_POLL').getElementsByTagName('button');
+					for (var i=0;i<B_nominate.length;i++) {
+						B_result[i]+=B_temp[i];
+						B_resultTagTd[i].innerHTML=B_result[i]+(B_temp[i]?"!":"");
+						B_buttonTagBtn[i].className="B_CSS_UNVOTED";
+						B_temp[i]=0;
+					}
+					B_selected=0;
+				}
+			}
+			
+			//English version
+			
+			function B_func_initValue() {
+				
+				var tgtObj = document.getElementById('BEAN_POLL');
+				var nominateNameList = document.getElementById('BEAN_POLL_NOM').value;
+				var nominateNeeded = document.getElementById('BEAN_POLL_SEL').value;
+				var exactNumber = document.getElementById('BEAN_POLL_EXA').checked;
+				var pollTitle = document.getElementById('BEAN_POLL_TTL').value;
+				
+				//alert(nominateNameList+"|"+nominateNeeded+"|"+exactNumber);
+				
+				B_nominate = nominateNameList.split("|");
+				B_select = nominateNeeded;
+				B_type = exactNumber;
+				B_temp = new Array(B_nominate.length);
+				B_result = new Array(B_nominate.length);
+				B_selected = 0;
+				B_polled = 0;
+				B_title = pollTitle;
+				B_func_createTable(tgtObj);
+			}
+
+			function B_func_createTable(Obj) {
+				var B_tableHTML="<table id='BEAN_TABLE_POLL'>";
+				B_tableHTML+="<tr><td colspan='"+B_nominate.length+"'>"+B_title+"</td></tr>";
+				/*
+				B_tableHTML+="<tr id='BEAN_NOMINATE_POLL'>";
+				for (var i=0;i<B_nominate.length;i++) {
+					B_tableHTML+="<td>"+B_nominate[i]+"</td>";
+				}
+				B_tableHTML+="</tr>";
+				*/
+				B_tableHTML+="<tr id='BEAN_RESULT_POLL'>";
+				for (var i=0;i<B_nominate.length;i++) {
+					B_result[i]=0;
+					B_temp[i]=0;
+					B_tableHTML+="<td>"+B_result[i]+"</td>";
+				}
+				B_tableHTML+="</tr>";
+				B_tableHTML+="<tr id='BEAN_BUTTON_POLL'>";
+				for (var i=0;i<B_nominate.length;i++) {
+					B_result[i]=0;
+					B_tableHTML+="<td><button class='B_CSS_UNVOTED' onclick='B_func_addPoll("+i+",this)'>"+B_nominate[i]+"</button></td>";
+				}
+				B_tableHTML+="</tr>";
+				B_tableHTML+="<tr id='BEAN_COMMIT_POLL'>";
+				B_tableHTML+="<td colspan='"+(B_nominate.length-1)+"'><p id='BEAN_MESSAGE_POLL'>First select then click 'Vote'</p></td>";
+				B_tableHTML+="<td><button onclick='B_func_finishPoll()'>Vote</button></td>";
+				B_tableHTML+="</tr>";
+				B_tableHTML+="</table>";
+				
+				Obj.innerHTML=B_tableHTML;
+			}
+			
+			function B_func_addPoll(nomNumber,Obj) {
+				B_temp[nomNumber]=(B_temp[nomNumber]?0:1);	//reverse
+				B_selected=B_selected+(B_temp[nomNumber]?1:-1);	//record
+				//alert("get "+Obj+"|"+Obj.className);
+				Obj.className=B_temp[nomNumber]?"B_CSS_VOTED":"B_CSS_UNVOTED";
+				
+				document.getElementById('BEAN_MESSAGE_POLL').innerHTML="[FAILED] Selected: "+B_selected+" | "+(B_type?"Need: ":"Need: at most ")+B_select+" per vote";
+			}
+			
+			function B_func_finishPoll() {
+				if ((B_selected!=B_select && B_type) || (B_selected>B_select && !B_type)) {
+					document.getElementById('BEAN_MESSAGE_POLL').innerHTML="[FAILED] Selected: "+B_selected+" | "+(B_type?"Need: ":"Need: at most ")+B_select+" per vote";
+				}
+				else {
+					B_polled++;
+					document.getElementById('BEAN_MESSAGE_POLL').innerHTML="[SUCCESS] Passed: "+B_polled+" vote";
+					
+					var B_resultTagTd=document.getElementById('BEAN_RESULT_POLL').getElementsByTagName('td');
+					var B_buttonTagBtn=document.getElementById('BEAN_BUTTON_POLL').getElementsByTagName('button');
+					for (var i=0;i<B_nominate.length;i++) {
+						B_result[i]+=B_temp[i];
+						B_resultTagTd[i].innerHTML=B_result[i]+(B_temp[i]?"!":"");
+						B_buttonTagBtn[i].className="B_CSS_UNVOTED";
+						B_temp[i]=0;
+					}
+					B_selected=0;
+				}
+			}
+        </script>
+		
+		
+		<var id="BEAN_POLL">
+		
+		<p>投票活动标题 | Poll title<input type="text" id="BEAN_POLL_TTL" value="投票活动标题 | Poll title"/></p>
+		<p>候选名称(使用'|'分隔) | Nominate names(saperated by '|')<input type="text" id="BEAN_POLL_NOM" value="张三|李四|Peter|Mary"/></p>
+		<p>每张选票可投人数 | Nominate per vote<input type="number" id="BEAN_POLL_SEL" value="2"/></p>
+		<p>选票是否必须投满可投人数 | Exact nominate per vote?<input type="checkbox" id="BEAN_POLL_EXA" checked="checked"/></p>
+		<button style="font-size: 2em;" onclick="B_func_initValue_CH()">开始投票</button>
+		<hr />
+		<button style="font-size: 2em;" onclick="B_func_initValue()">Start Poll</button>
+		</var>
+		
+    </body>
+</html>

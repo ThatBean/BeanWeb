@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<body>
+<script>
+//Binary is stored in String
+function Float_DecToBin(srcNum,maxDep) {
+	if(srcNum==0) return "0, and WHY?";
+	
+	var iterL=1;
+	var iterR=1;
+	var binL=1;
+	var binR=0.5;
+	var getBinText=(srcNum>0?"+":"-");
+	var getBinTextL="";
+	var getBinTextR="";
+	var tempNum=(srcNum>0?srcNum:-srcNum);
+	
+	//alert(typeof(maxDep) + typeof(srcNum) );
+	maxDep=(maxDep?parseInt(maxDep):30);
+	
+	//find max bit
+	while(tempNum>=binL) {
+		binL=binL*2;
+		iterL=iterL+1;
+	}
+	//cut over added
+	binL=binL/2;
+	iterL=iterL-1;
+	//get rid of the Left part
+	while(tempNum>=1 || iterL>0) {
+		if(tempNum>=binL) {
+			tempNum=tempNum-binL;
+			getBinTextL=getBinTextL+"1";
+		}
+		else {
+			getBinTextL=getBinTextL+"0";
+		}
+		binL=binL/2;
+		iterL=iterL-1;
+	}
+	if(tempNum==0) {
+		getBinText=getBinText+getBinTextL;
+		return getBinText;
+	}
+	//now the Right part
+	while(tempNum!=0 && iterR<=maxDep) {
+		if(tempNum>=binR) {
+			tempNum=tempNum-binR;
+			getBinTextR=getBinTextR+"1";
+		}
+		else {
+			getBinTextR=getBinTextR+"0";
+		}
+		binR=binR/2;
+		iterR=iterR+1;
+	}
+	if (getBinTextL) {
+		getBinText=getBinText+getBinTextL+"."+getBinTextR;
+	}
+	else {
+		getBinText=getBinText+"0."+getBinTextR;
+	}
+	return getBinText;
+}
+
+
+
+
+
+
+//suppose the input text be like: +/- 1100101010 . 101010100010
+function Float_BinToDec(srcNumText) {
+	if(srcNumText==0) return "0, and WHY?";
+	
+	var iter=0;
+	var maxDep=srcNumText.length;
+	var detL=0;
+	var detR=1;
+	var getDetNum=0;
+	var getSign=(srcNumText>0?0:1);	//0 for +; 1 for -
+	
+	//alert(typeof(maxDep) + typeof(srcNumText) );
+	
+	//find first 0/1
+	while(srcNumText[iter]!='0' && srcNumText[iter]!='1') iter=iter+1;
+	
+	//get Left Decimal
+	while(srcNumText[iter]!='.' && iter<maxDep) {
+		detL=detL*2;
+		if(srcNumText[iter]=='1') detL=detL+1;
+		iter=iter+1;
+	}
+	
+	//check if no '.' (Right Decimal)
+	if(iter==maxDep) {
+		getDetNum=(getSign?-detL:detL);
+		return getDetNum;
+	}
+	
+	//find Second first 0/1
+	while(srcNumText[iter]!='0' && srcNumText[iter]!='1') iter=iter+1;
+	
+	//get Right Decimal
+	getDetNum=detL;
+	while(iter<maxDep) {
+		detR=detR/2;
+		if(srcNumText[iter]=='1') getDetNum=getDetNum+detR;
+		iter=iter+1;
+	}
+	
+	getDetNum=(getSign?-getDetNum:getDetNum);
+	return getDetNum;
+}
+
+function setValueDtoB(){
+	//alert(document.getElementById("inpDecNum").value + " | " + document.getElementById("inpMaxDep").value);
+	document.getElementById("spanBinText").innerHTML=Float_DecToBin(document.getElementById("inpDecNum").value,document.getElementById("inpMaxDep").value);
+}
+
+function setValueBtoD(){
+	//alert(document.getElementById("inpBinNum").value + " | ";
+	document.getElementById("spanDecNum").innerHTML=Float_BinToDec(document.getElementById("inpBinText").value);
+}
+
+function setValueMultipB(){
+	document.getElementById("spanMultipBinText1").innerHTML=Float_BinToDec(document.getElementById("inpBinText1").value) + " | " + Float_BinToDec(document.getElementById("inpBinText2").value);
+	document.getElementById("spanMultipBinText2").innerHTML=(Float_BinToDec(document.getElementById("inpBinText1").value) * Float_BinToDec(document.getElementById("inpBinText2").value));
+	document.getElementById("spanMultipBinText3").innerHTML=Float_DecToBin(Float_BinToDec(document.getElementById("inpBinText1").value) * Float_BinToDec(document.getElementById("inpBinText2").value));
+}
+</script>
+<table style="border: 2px solid #B8B8B8;">
+	<tr>
+		<td style="padding:0 0.5em;border: 1px solid #B8B8B8;">
+			<p>Trans Decimal to Binary</p>
+			<p>Dec here: <input value=0.0 id="inpDecNum" /></p>
+			<p>Get: <span id="spanBinText">0</span></p>
+			<p><button onclick="setValueDtoB()">Convert!</button> Max Mantissa<input value=20 id="inpMaxDep" style="width:3em;"/></p>
+		</td>
+		<td rowspan="2" style="padding:0 0.5em;border: 1px solid #B8B8B8;">
+			<p>Binary Multiplication</p>
+			<p><input value=0.0 id="inpBinText1" />x<input value=0.0 id="inpBinText2" /></p>
+			<p>Dec: <span id="spanMultipBinText1"> </span></p>
+			<p>Mul: <span id="spanMultipBinText2"> </span></p>
+			<p>Get: <span id="spanMultipBinText3"> </span></p>
+			<p><button onclick="setValueMultipB()">Multiply!</button></p>
+		</td>
+	</tr>
+	<tr>
+		<td style="padding:0 0.5em;border: 1px solid #B8B8B8;">
+			<p>Trans Binary to Decimal</p>
+			<p>Bin here: <input value=00.00 id="inpBinText" /></p>
+			<p>Get: <span id="spanDecNum">0</span></p>
+			<p><button onclick="setValueBtoD()">Convert!</button></p>
+		</td>
+	</tr>
+</table>
+</body>
+</html>
