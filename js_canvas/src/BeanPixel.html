@@ -1,0 +1,69 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<title>BeanPixel</title>
+	<style>
+		html, body, div, span,
+		/*h1, h2, h3, h4, h5, h6, */
+		p, pre,
+		a, code, em, img,
+		small, strong, sub, sup, tt, var,
+		b, u, i, center,
+		dl, dt, dd, ol, ul, li,
+		form, label,
+		table, caption, tbody, tfoot, thead, tr, th, td,
+		canvas, footer, header, menu, nav {
+			margin: 0;
+			padding: 0;
+			border: 0;
+			font-size: 100%;
+			font: inherit;
+			vertical-align: baseline;
+			font-family:Tahoma,Monospace,Geneva;
+			overflow: hidden;
+		}
+		ol, ul {
+			list-style: none;
+		}
+		table {
+			border-collapse: collapse;
+			border-spacing: 0;
+		}
+		
+		
+		canvas {
+			background-color: #FF00FF;
+			margin: 0;
+			padding: 0;
+			border: 0;
+			/*border: solid 4px #222; */
+			/*width: 100%;
+			height: 100%;*/
+			image-rendering: optimizeSpeed;
+			image-rendering: -moz-crisp-edges;
+			image-rendering: -webkit-optimize-contrast;
+			image-rendering: optimize-contrast;
+			-ms-interpolation-mode: nearest-neighbor;
+		}
+	</style>
+	<!-- load page utility script -->
+	<script src="scripts/_page_common/utility.js"></script>
+	<!-- load page specific script -->
+	<script src="scripts/BeanPixel.image.js"></script>
+	<!-- load page specific script -->
+	<script src="scripts/BeanPixel.main.js"></script>
+</head>
+<body>
+	<canvas id="BeanMainCanvas"></canvas>
+	<div style="display:;position:fixed;top:0;right:0;background-color:#BBBBBB;">
+		<p>This page is for <b>develop</b> use</p>
+		<br />
+		<button onclick="Switch('Loop')">Switch Render</button>
+		<br />
+		Current FPS: <span id="currentFPS"></span>
+		Average FPS: <span id="averageFPS"></span>
+		<br />
+		<p id="Log"></p>
+	</div>
+</body>
+</html>

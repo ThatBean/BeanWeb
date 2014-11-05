@@ -1,0 +1,43 @@
+ABCDEFGHIJKLMNOPQRSTUVWXYZ
+ 
+abcdefghijklmnopqrstuvwxyz
+0123456789
+.,""''"?!@_*#$%&()+-/:;<=>[\]^`{|}~
+
+
+
+ABCDEFGHIJKLMNOPQRSTUVWXYZ
+ 
+abcdefghijklmnopqrstuvwxyz
+0123456789
+.,""''"?!@_*#$%&()+-/:;<=>[\]^`{|}~
+
+var a = ""
+for (var i = 0; i < 129; i++) {
+	a += String.fromCharCode(i)
+}
+console.log(a)
+
+ASCII
+32 - 126
+" !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
+
+
+
+
+createElement = function (element_parent,element_type,element_id) {
+	var new_element= document.createElement(element_type);
+	new_element.id = element_id;
+	element_parent.appendChild(new_element);
+	return new_element;
+}
+
+var a = createElement(document.body, "canvas", "bean_test")
+
+var a_ctx = a.getContext('2d');
+
+
+
+
+
+
