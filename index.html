@@ -1,48 +1,62 @@
 <html>
-
-<script language="javascript" type="text/javascript"> 
-	function switch_to_url (target_url) {
-		window.location.href=target_url;
-	}
-	
-	function set_body_padding () {
-		var page_header = document.getElementById("page-header");
-		var padding_header = (page_header ? page_header.offsetHeight : 0) + "px";
-		var page_footer = document.getElementById("page-footer");
-		var padding_footer = (page_footer ? page_footer.offsetHeight : 0) + "px";
-		
-		document.body.style.paddingTop = padding_header;
-		document.body.style.paddingBottom = padding_footer;
-		
-		console.log("set_body_padding", padding_header, padding_footer);
-		
-		//add watch
-		document.body.onresize = set_body_padding;
-	}
-	
-	window.onload = function () {
-		set_body_padding();
-	}
-	
-	
-</script>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 
 <head>
-	<title>
-		Welcome to thatbean.com
-	</title>
+	<meta charset="UTF-8">
+	<meta name="title" content="Welcome to ThatBean.com!">
+	<meta name="keywords" content="thatbean,Dr.Eames,Bean,Personal">
+	<meta name="description" content="This is a web build by Bean/Dr.Eames">
+	<title>Welcome to ThatBean.com!</title>
+	
+	<!--<link href="Bean_files/Bean_css.css" rel="stylesheet" type="text/css">
+	<script src="Bean_files/Bean_js.js"></script>-->
+	
+	<script type="text/javascript">
+		var site_url = "jp.thatbean.com";
+		
+		if(top != window){
+			top.location.href = site_url;
+		}
+		window["PATHS_PASSPORT"] = site_url;
+	</script>
+	
+	<script type="text/javascript"> 
+		function switch_to_url (target_url) {
+			window.location.href=target_url;
+		}
+		
+		function set_body_padding () {
+			var page_header = document.getElementById("page-header");
+			var padding_header = (page_header ? page_header.offsetHeight : 0) + "px";
+			var page_footer = document.getElementById("page-footer");
+			var padding_footer = (page_footer ? page_footer.offsetHeight : 0) + "px";
+			
+			document.body.style.paddingTop = padding_header;
+			document.body.style.paddingBottom = padding_footer;
+			
+			console.log("set_body_padding", padding_header, padding_footer);
+			
+			//add watch
+			document.body.onresize = set_body_padding;
+		}
+		
+		window.onload = function () {
+			set_body_padding();
+		}
+	</script>
 
 	<style>
 		body, div { padding: 0; margin: 0; border: 0; width: 100%; }
 		
-		* { font-family: monaco, consolas, monospace; font-size: 10pt; COLOR: #999; }
-		.font-big { font-size: 15pt; COLOR: #aaa; }
-		.font-biggest { font-size: 20pt; COLOR: #bbb; }
-		.font-small { font-size: 8pt; COLOR: #888; }
-		.font-smallest { font-size: 5pt; COLOR: #666; }
+		* { font-family: monaco, consolas, monospace; font-size: 1em; COLOR: #999; }
+		.font-big { font-size: 1.3em; COLOR: #aaa; }
+		.font-bigger { font-size: 1.7em; COLOR: #aaa; }
+		.font-biggest { font-size: 2em; COLOR: #bbb; }
+		.font-small { font-size: 0.8em; COLOR: #888; }
+		.font-smallest { font-size: 0.4em; COLOR: #666; }
 		
 		b { font-weight: bold; }
-		td { text-align: left; padding: 5; border-left: 1em solid #222; border-right: 1em solid #222; }
+		td { text-align: left; padding: 0.1em; border-left: 1em solid #222; border-right: 1em solid #222; }
 		
 		button, .button { border: 0.1em solid #444; background: #555; }
 		button:hover, .button:hover { border: 0.1em solid #666; background: #777; }
@@ -51,14 +65,19 @@
 		.fix-top, .fix-bottom { position: fixed; background: #222; }
 		.fix-top { top: 0; }
 		.fix-bottom { bottom: 0; }
+		
+		.width-75 { width: 75%; }
+		
+		.align-center { margin-left: auto; margin-right: auto; }
+		.align-left { margin-left: 0; margin-right: auto; }
+		.text-center { text-align: center; }
+		.text-left { text-align: left; }
 	</style>
 </head>
+
 <body>
-<center>
-<br />
 	<div id="page-header" class="fix-top">
-		<center>
-		<table>
+		<table class="align-center">
 			<tr>
 				<td rowspan=2>
 					<b class="font-big">Goto:</b>
@@ -79,83 +98,73 @@
 				</td>
 			</tr>
 		</table>
-		</center>
 	</div>
 	<div id="page-footer" class="fix-bottom">
-		<center>
-		<table>
+		<table class="align-center">
 			<tr>
-				<td>
-					Welcome to the entry of <a href="index.html"><b>thatbean.com</b></a>
+				<td class="font-small">
+					<a href="mailto:Bean@ThatBean.com">Bean@ThatBean.com</a> | 
+					<a href="https://github.com/ThatBean">Bean in Git</a> | 
+					<a href="http://steamcommunity.com/id/dreames">Dr.Eames in Steam</a> | 
+					<a href="http://thatbean.com">thatbean.com</a> | 
+					&clubs;&infin; Copywrong 2015 by <b class="font-big">Bean/Dr.Eames</b>.
 				</td>
 			</tr>
 		</table>
-		</center>
 	</div>
 	
-	<div id="page-content">
-		<b class="font-biggest">Welcome !</b><br />
-		<hr />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-		<hr />
-		<b class="font-biggest">Bye !</b><br />
+	<div id="page-content" class="align-center text-center">
+			<br />
+			<b class="font-biggest">Welcome to <span class="font-big">ThatBean.com!</span></b>
+			<hr />
+			
+			<p class="width-75 align-center text-center">
+				Welcome! It's always good to have a visitor!<br />
+				This site is under construction, temporarily or permanently.<br />
+				So, what should I say?<br />
+				<br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+			</p>
+			
+			<hr />
+			<b>
+				Welcome to the entry of <a href="index.html"><b>thatbean.com</b></a>
+			</b>
 	</div>
 <br />
 </body>
