@@ -42,11 +42,40 @@
 		
 		window.onload = function () {
 			set_body_padding();
+			
+			var canvas = document.getElementById("canvas");
+			var ctx = canvas.getContext("2d");
+			ctx.font = "bold 20px monaco, consolas, monospace";
+			ctx.textAlign = "right";
+			ctx.textBaseline = "top";
+			ctx.fillStyle = "#888";
+			ctx.fillText("Test Canvas 640 x 480", 640, 0);
+			
+			for (var i = 0; i < 10; i++) {
+				ctx.font = "bold " + (48 - i * 4).toString() + "px monaco, consolas, monospace";
+				ctx.textAlign = "left";
+				ctx.textBaseline = "bottom";
+				ctx.fillStyle = "#" + (99 - i * 9).toString() + (99 - i * 9).toString() + (99 - i * 9).toString();
+				ctx.fillText("Hello Canvas World!", 0, 480 - 48 * i);
+			}
 		}
 	</script>
 
 	<style>
 		td { text-align: left; padding: 0.1em; border-left: 1em solid #222; border-right: 1em solid #222; }
+		canvas {
+			background-color: #aaa;
+			margin: 0;
+			padding: 0;
+			border: solid 4px #999;
+			/*width: 100%;
+			height: 100%;*/
+			image-rendering: optimizeSpeed;
+			image-rendering: -moz-crisp-edges;
+			image-rendering: -webkit-optimize-contrast;
+			image-rendering: optimize-contrast;
+			-ms-interpolation-mode: nearest-neighbor;
+		}
 	</style>
 </head>
 
@@ -97,44 +126,12 @@
 				Welcome! It's always good to have a visitor!<br />
 				This site is under construction, temporarily or permanently.<br />
 				So, what should I say?<br />
-				<br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
-				<b>Test Bold Test Bold Test Bold Test Bold</b><br />
 			</p>
+			
+			<br />
+			<canvas id="canvas" width=640 height=480 class="align-center text-center">This should be a canvas element. If you're seeing this, consider upgrade your browser</canvas>
+			<br />
+			<br />
 			
 			<hr />
 			<b>

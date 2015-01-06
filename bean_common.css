@@ -1,6 +1,6 @@
 body, div { padding: 0; margin: 0; border: 0; width: 100%; }
 		
-* { font-family: monaco, consolas, monospace; font-size: 1em; COLOR: #999; }
+* { font-family: monaco, consolas, monospace; font-size: 12pt; COLOR: #999; }
 .font-big { font-size: 1.3em; COLOR: #aaa; }
 .font-bigger { font-size: 1.7em; COLOR: #aaa; }
 .font-biggest { font-size: 2em; COLOR: #bbb; }
