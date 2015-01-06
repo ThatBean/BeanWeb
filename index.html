@@ -3,7 +3,28 @@
 <script language="javascript" type="text/javascript"> 
 	function switch_to_url (target_url) {
 		window.location.href=target_url;
-	}	
+	}
+	
+	function set_body_padding () {
+		var page_header = document.getElementById("page-header");
+		var padding_header = (page_header ? page_header.offsetHeight : 0) + "px";
+		var page_footer = document.getElementById("page-footer");
+		var padding_footer = (page_footer ? page_footer.offsetHeight : 0) + "px";
+		
+		document.body.style.paddingTop = padding_header;
+		document.body.style.paddingBottom = padding_footer;
+		
+		console.log("set_body_padding", padding_header, padding_footer);
+		
+		//add watch
+		document.body.onresize = set_body_padding;
+	}
+	
+	window.onload = function () {
+		set_body_padding();
+	}
+	
+	
 </script>
 
 <head>
@@ -12,25 +33,131 @@
 	</title>
 
 	<style>
-	* { font-family: verdana; font-size: 10pt; COLOR: gray; }
-	b { font-weight: bold; }
-	table { height: 50%; border: 1px solid gray;}
-	td { text-align: center; padding: 25;}
-
+		body, div { padding: 0; margin: 0; border: 0; width: 100%; }
+		
+		* { font-family: monaco, consolas, monospace; font-size: 10pt; COLOR: #999; }
+		.font-big { font-size: 15pt; COLOR: #aaa; }
+		.font-biggest { font-size: 20pt; COLOR: #bbb; }
+		.font-small { font-size: 8pt; COLOR: #888; }
+		.font-smallest { font-size: 5pt; COLOR: #666; }
+		
+		b { font-weight: bold; }
+		td { text-align: left; padding: 5; border-left: 1em solid #222; border-right: 1em solid #222; }
+		
+		button, .button { border: 0.1em solid #444; background: #555; }
+		button:hover, .button:hover { border: 0.1em solid #666; background: #777; }
+		button:active, .button:active { border: 0.1em solid #333; background: #111; }
+		
+		.fix-top, .fix-bottom { position: fixed; background: #222; }
+		.fix-top { top: 0; }
+		.fix-bottom { bottom: 0; }
 	</style>
 </head>
 <body>
 <center>
-<br><br><br><br>
-	<table>
-	<tr><td>Welcome to the home of <b>thatbean.com</b></td></tr>
-	<b>Re-directing to...</b>
-	<button onclick="switch_to_url('html/index.html')">HTML</button>
-	<button onclick="switch_to_url('files/')">Files</button>
-	</table>
-<br><br>
-
-</center>
+<br />
+	<div id="page-header" class="fix-top">
+		<center>
+		<table>
+			<tr>
+				<td rowspan=2>
+					<b class="font-big">Goto:</b>
+				</td>
+				<td>
+					<button onclick="switch_to_url('html/index.html')"><b>HTML</b></button>
+				</td>
+				<td>
+					<button onclick="switch_to_url('files/')"><b>Files</b></button>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<b class="font-smallest"> - the web site</b>
+				</td>
+				<td>
+					<b class="font-smallest"> - something useful for download</b>
+				</td>
+			</tr>
+		</table>
+		</center>
+	</div>
+	<div id="page-footer" class="fix-bottom">
+		<center>
+		<table>
+			<tr>
+				<td>
+					Welcome to the entry of <a href="index.html"><b>thatbean.com</b></a>
+				</td>
+			</tr>
+		</table>
+		</center>
+	</div>
+	
+	<div id="page-content">
+		<b class="font-biggest">Welcome !</b><br />
+		<hr />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<b>Test Bold Test Bold Test Bold Test Bold</b><br />
+		<hr />
+		<b class="font-biggest">Bye !</b><br />
+	</div>
+<br />
 </body>
 
 </html>
