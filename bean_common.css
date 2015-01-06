@@ -1,0 +1,23 @@
+body, div { padding: 0; margin: 0; border: 0; width: 100%; }
+		
+* { font-family: monaco, consolas, monospace; font-size: 1em; COLOR: #999; }
+.font-big { font-size: 1.3em; COLOR: #aaa; }
+.font-bigger { font-size: 1.7em; COLOR: #aaa; }
+.font-biggest { font-size: 2em; COLOR: #bbb; }
+.font-small { font-size: 0.8em; COLOR: #888; }
+.font-smallest { font-size: 0.4em; COLOR: #666; }
+
+button, .button { border: 0.1em solid #444; background: #555; }
+button:hover, .button:hover { border: 0.1em solid #666; background: #777; }
+button:active, .button:active { border: 0.1em solid #333; background: #111; }
+
+.fix-top, .fix-bottom { position: fixed; background: #222; }
+.fix-top { top: 0; }
+.fix-bottom { bottom: 0; }
+
+.width-75 { width: 75%; }
+
+.align-center { margin-left: auto; margin-right: auto; }
+.align-left { margin-left: 0; margin-right: auto; }
+.text-center { text-align: center; }
+.text-left { text-align: left; }
