@@ -1,0 +1,146 @@
+<html>
+<pre>
+<code><h1>AI - Logic / Action Design Notes</h1>
+
+Logic - Change Logic / Action State by Actor's Data
+<hr />
+	<b>Logic Procedure</b>
+	{LOOP} Logic Update
+		{CHOOSE ONE TO RUN} Global Logic Control
+			Manual (Accept user control)
+				Manual-Move-Place
+				Manual-Move-Target
+				? Manual-Attack-Normal -- not directly ?
+				Manual-Attack-Skill
+				? Manual-Defend ?
+				
+				[method] Actor Touch Logic
+				[data] Actor Touch Position
+				[data] Actor Touch Target (Enemy / Ally)
+				[data] Actor Touch Skill
+				
+			Auto   (Issue command automatically)
+				Auto-Character
+				Auto-Monster
+				Auto-Chaos   (Timed - Attack Ally)
+		
+				[method] Auto Search Position Logic
+				[method] Auto Search Target Logic
+				[method] Auto Activate Skill Logic
+				[data] Auto Position
+				[data] Auto Target (Enemy / Ally)
+				? [data] Auto Skill ?
+				
+			[data] Global Logic Control Type
+				
+		{ALWAYS RUN} Update AttackRangeTrigger
+			[if] Melee -- Warrior / Knight
+			[if] Range -- Archer / Wizard
+			[if] Healing -- Priest
+			[if] Boss
+			[if] Upgrade to Stronger version ? (Normal - Strong Attack)
+			? [if] Monster () ?
+		
+		
+		{ALWAYS RUN} Logic State Change Check
+			{ALWAYS RUN} Active State Change Check
+				[if] Mute move
+				[if] Mute attack
+				? [if] Mute defend ?
+			
+			{ALWAYS RUN} Passive State Change Check
+				[if] Immune attacked
+					{CHOOSE ONE TO RUN} Condition Check
+						Affected
+							[if] Cancelled  (Instant - Abandon Current State)
+						Ignored
+			
+			{ALWAYS RUN} Actor Status Caused State Change Check
+				[if] Actor Die
+				[if] Actor Born
+			
+			[data] Actor Is Mute Move
+			[data] Actor Is Mute Attack
+			? [data] Actor Is Mute Defend ?
+			[data] Actor Is Immune Attacked
+			[data] Actor Is Born
+			[data] Actor Is Dead
+			
+		
+		{CHOOSE ONE TO RUN} Logic State
+			Idle
+				CheckAttackRangeTrigger (Check enemy)
+				
+				[data] Actor Attack Range Trigger
+			
+			Move
+				Position
+				Target
+				
+				CheckAttackRangeTrigger (Check enemy)
+				
+				[data] Actor Attack Range Trigger
+
+			? Defend ?
+				(Increase defence, no move no attack)
+			
+			Attack / Active
+				AttackPrepare
+					[if] Melee -- Warrior / Knight
+					[if] Range -- Archer / Wizard
+					[if] Healing -- Priest
+					[if] Boss
+					[if] Upgrade to Stronger version ? (Normal - Strong Attack)
+					? [if] Monster () ?
+				Trigger  (Init skill object)
+				Active   (Lasting skill)
+				Finish   (Leave skill control - skill object may still remain)
+			
+			Special (Uncontrollable)
+				Combinable
+					[if] Delayed    (Timed - Appers Idle / Attacked, Then Resume Last State)
+					[if] Freezed    (Timed - Keep Motion State, Stop Motion)
+					[if] Colored    (Timed - Colored)
+					[if] Fear       (Timed - Run Back)
+				Pushed   (Timed / Distance - Pushed Back)
+				Celebrate
+			
+			Born
+				MoveTo
+				PlaceAt
+				Reborn
+			
+			Dead
+				Meet Pre-set Condition
+				No Health
+				Self Destruct
+				TimeUp
+			
+			[data] Actor Born Type
+			[data] Actor Dead Type
+			
+		
+	[data] Actor Logic Current State
+	[data] Actor Logic Last State
+	[data] Actor Logic Next State
+
+Action - Modify Actor's Position / Animation
+<hr />
+	<b>Action State Procedure</b>
+	{LOOP} Action Update
+		{ALWAYS RUN} Action State Change Check
+		
+		{CHOOSE ONE TO RUN} Action State
+			Idle
+			Move
+			? Defend ?
+			Attack / Active
+			Special (Uncontrollable)
+				Can process Sub State combination
+			Born
+			Dead
+	
+	[data] Actor Action State
+</code>
+</pre>
+</html>
