@@ -1,8 +1,8 @@
 <html>
 <pre>
-<code><h1>AI - Logic / Action Design Notes</h1>
+<code><h1>AI - Logic / Motion Design Notes</h1>
 
-Logic - Change Logic / Action State by Actor's Data
+Logic - Change Logic / Motion State by Actor's Data
 <hr />
 	<b>Logic Procedure</b>
 	{LOOP} Logic Update
@@ -124,13 +124,13 @@ Logic - Change Logic / Action State by Actor's Data
 	[data] Actor Logic Last State
 	[data] Actor Logic Next State
 
-Action - Modify Actor's Position / Animation
+Motion - Modify Actor's Position / Animation
 <hr />
-	<b>Action State Procedure</b>
-	{LOOP} Action Update
-		{ALWAYS RUN} Action State Change Check
+	<b>Motion State Procedure</b>
+	{LOOP} Motion Update
+		{ALWAYS RUN} Motion State Change Check
 		
-		{CHOOSE ONE TO RUN} Action State
+		{CHOOSE ONE TO RUN} Motion State
 			Idle
 			Move
 			? Defend ?
@@ -140,7 +140,7 @@ Action - Modify Actor's Position / Animation
 			Born
 			Dead
 	
-	[data] Actor Action State
+	[data] Actor Motion State
 </code>
 </pre>
 </html>
