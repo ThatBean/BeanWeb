@@ -65,10 +65,12 @@ var Dr = (typeof Dr == "function" && Dr.author == DrAuthor && Dr.verion >= DrVer
 		};
 	}
 	
-	
+	//the private functions & data
+	var dr = {};
 	
 	// Required Non-Standard-JavaScript Methods
-	var required = DrCollectRequired();
+	var dr_required_native = DrCollectRequired();
+	var dr_required_system = DrCollectRequired();
 	
 	
 	// Dr Initialize
@@ -103,9 +105,18 @@ var Dr = (typeof Dr == "function" && Dr.author == DrAuthor && Dr.verion >= DrVer
 		}
 	};
 	
-	Dr.now = Date.now;
+	Dr.now = dr_required_native.getUTCTimeStamp;
 	Dr.startTimestamp = Dr.now();
 	Dr.clock = function () { return (Dr.now() - Dr.startTimestamp); }
+	
+	
+	Dr.declare =  function (module_name) {}
+	Dr.implement =  function (module_name) {}
+	Dr.require =  function (module_name) {}
+	
+	
+	
+	
 	
 	Dr.Time = (function () {
 		var Time = function () {
@@ -122,6 +133,7 @@ var Dr = (typeof Dr == "function" && Dr.author == DrAuthor && Dr.verion >= DrVer
 		
 		return TimeBuffer;
 	})()
+	
 	
 	
 	return Dr;
