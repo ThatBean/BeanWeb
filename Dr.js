@@ -111,7 +111,7 @@ var Dr = (typeof Dr == "function" && Dr.author == DrAuthor && Dr.verion >= DrVer
 	
 	
 	Dr.declare =  function (module_name) {}
-	Dr.implement =  function (module_name) {}
+	Dr.implement =  function (module_name, module_implement_func) {}
 	Dr.require =  function (module_name) {}
 	
 	
