@@ -8,7 +8,7 @@ Logic - Change Logic / Motion State by Actor's Data
 	{LOOP} Logic Update
 		{CHOOSE ONE TO RUN} Global Logic Control
 			Manual (Accept user control)
-				Manual-Move-Place
+				Manual-Move-Position
 				Manual-Move-Target
 				? Manual-Attack-Normal -- not directly ?
 				Manual-Attack-Skill
@@ -32,17 +32,19 @@ Logic - Change Logic / Motion State by Actor's Data
 				? [data] Auto Skill ?
 				
 			[data] Global Logic Control Type
-				
+		
+		
+		
 		{ALWAYS RUN} Update AttackRangeTrigger
 			[if] Melee -- Warrior / Knight
 			[if] Range -- Archer / Wizard
 			[if] Healing -- Priest
 			[if] Boss
-			[if] Upgrade to Stronger version ? (Normal - Strong Attack)
 			? [if] Monster () ?
 		
 		
-		{ALWAYS RUN} Logic State Change Check
+		
+		{ALWAYS RUN} When Logic State Change Check
 			{ALWAYS RUN} Active State Change Check
 				[if] Mute move
 				[if] Mute attack
@@ -55,14 +57,17 @@ Logic - Change Logic / Motion State by Actor's Data
 							[if] Cancelled  (Instant - Abandon Current State)
 						Ignored
 			
-			{ALWAYS RUN} Actor Status Caused State Change Check
-				[if] Actor Die
-				[if] Actor Born
-			
 			[data] Actor Is Mute Move
 			[data] Actor Is Mute Attack
 			? [data] Actor Is Mute Defend ?
 			[data] Actor Is Immune Attacked
+			
+			
+		{ALWAYS RUN} When Logic State Update Check
+			{ALWAYS RUN} Actor Status Caused State Change Check
+				[if] Actor Die
+				[if] Actor Born
+			
 			[data] Actor Is Born
 			[data] Actor Is Dead
 			
