@@ -111,11 +111,12 @@ var Dr = (typeof Dr == "function" && Dr.author == DrAuthor && Dr.verion >= DrVer
 	
 	
 	Dr.declare =  function (module_name) {}
-	Dr.implement =  function (module_name) {}
-	Dr.require =  function (module_name) {}
+	Dr.implement =  function (module_name, module_implement_func) {}
+	Dr.require =  function (module_name, required_module_name) {}
 	
-	
-	
+	Dr.module_pool = {}
+	Dr.module_get = function (module_name) { return Dr.module_pool[module_name]; }
+	Dr.module_set = function (module_name, module_instance) { Dr.module_pool[module_name] = module_instance; }
 	
 	
 	Dr.Time = (function () {
