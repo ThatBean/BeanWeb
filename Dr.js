@@ -110,7 +110,13 @@ var Dr = (typeof Dr == "function" && Dr.author == DrAuthor && Dr.verion >= DrVer
 	Dr.clock = function () { return (Dr.now() - Dr.startTimestamp); }
 	
 	
-	Dr.declare =  function (module_name) {}
+	/*
+		Dr Module can be a function or an object
+		
+		module_type can be: function, object, ...
+	*/
+	
+	Dr.declare =  function (module_name, module_type) {}
 	Dr.implement =  function (module_name, module_implement_func) {}
 	Dr.require =  function (module_name, required_module_name) {}
 	
@@ -118,7 +124,15 @@ var Dr = (typeof Dr == "function" && Dr.author == DrAuthor && Dr.verion >= DrVer
 	Dr.module_get = function (module_name) { return Dr.module_pool[module_name]; }
 	Dr.module_set = function (module_name, module_instance) { Dr.module_pool[module_name] = module_instance; }
 	
-	
+	/*
+	//this will be called when all required module implementation is get
+	module_implement_func = function (module_global_object, required_module_get_func) {
+		var module_play = required_module_get_func("module_play");
+		var module_stop = required_module_get_func("module_stop");
+		
+		//implementation
+	}
+	*/
 	Dr.Time = (function () {
 		var Time = function () {
 			
