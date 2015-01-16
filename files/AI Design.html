@@ -19,7 +19,7 @@ Logic - Change Logic / Motion State by Actor's Data
 				[data] Actor Touch Target (Enemy / Ally)
 				[data] Actor Touch Skill
 				
-			Auto   (Issue command automatically)
+			Auto   (Issue command automatically, currently only when actor is idle)
 				Auto-Character
 				Auto-Monster
 				Auto-Chaos   (Timed - Attack Ally)
@@ -146,6 +146,208 @@ Motion - Modify Actor's Position / Animation
 			Dead
 	
 	[data] Actor Motion State
+	
+	
+	
+	
+	
+	
+debug_script_pool.func_debug_actor_routine_prototype = function ()
+	
+	--[[
+	?enter_condition:
+	end_condition: duration / to logic state / specific status (health %)
+		ie: Time / ActorData / Logic&Motion State
+
+	?next_routine:
+
+	routine_duration
+	routine_target
+	
+	
+	#currently, routine update function only called when actor logic state == idle & auto control
+	
+	routine_type/id: routine to use(defined in lua)
+	enter_condition_type: 
+		Time:
+			since battle start
+			since creation
+			countdown
+		ActorData:
+			Health > 50%
+			Position.x > 50%
+		???Logic&Motion State:??? (if in use, will trigger not only in idle)
+			Logic State == Attack(??more like special skill??)
+	enter_condition:
+		<string> predefined function, will be replaced with function
+		<function> if return true, then enter routine
+		
+	end_condition_type, 
+	end_condition, 
+	
+	routing_data:
+		Override Update Function: 
+			will override preset update()
+		Target Position To Move To:
+			...
+		And so on...
+		
+		
+		
+		
+		
+		
+  // a predefined set of routines to apply to logic  
+  class ActorRoutineData
+  {
+    
+  }
+
+  //A routine need data:
+  
+  routine_type
+  ?enter_condition:
+  end_condition: duration / to logic state / specific status (health %)
+    ie: Time / ActorData / Logic&Motion State
+	
+  ?next_routine:
+	
+  routine_duration
+  routine_target
+  
+  
+  
+		
+	--]]
+	
+	local preset_condition_list = {}
+	local preset_condition_check_function_list = {}
+	local preset_update_function_list = {}
+	
+	
+	
+	function routing_pre_processor (routine_setting_data)
+	{
+		
+	}
+	
+	
+	
+	ActorRoutineData = {
+		current_routine_part = routine_part_data,
+		current_routine = routine_data,
+		
+		routine_parts = {
+			{
+				routine_data,
+				routine_data,
+				routine_data,
+				routine_data,
+			},
+			{
+				routine_data,
+				routine_data,
+				routine_data,
+				routine_data,
+			},
+		}
+	}
+	
+	
+	
+	--routine_data
+	local sample_routine_data = {
+		start_condition_check_function, 
+		end_condition_check_function, 
+		update_function, 
+		routing_data,
+		
+		is_part_only_entry,
+		is_part_only_exit,
+		is_once,  -- will delete after use
+	}
+	
+	local notice = "{routine_type/id, enter_condition_type, enter_condition, end_condition_type, end_condition, routing_data, routine_part, priority_level}"
+	local notice = "will be translated to {enter_condition_check_function, end_condition_check_function, update_function, routing_data}"
+	local notice = "Time conditioned routine will be checked separately"
+	local actor_routine_setting = {
+		{MonsterPawnRoutine.Walk, RoutineCondition.Time, },
+		{},
+		
+	}
+	
+	local sample_enemy_boss_routine_config = {
+		routine_part_arrangement = {
+			{ROUTINE_START, "P1", NO_CONDITION},
+			{"P1", "P2", NO_CONDITION},
+			{"P2", {"P3", "P4"}, RANDOM},
+			{"P3", "P2", NO_CONDITION},
+			--{"P4", {"P2", "P_END"}, HEALTH_PERCENT({1, 0.2}, {0.2, 0})},
+			{"P4", {"P2", "P_END"}, HEALTH_PERCENT({1, 0.2}, {0.2, 0})},
+			{ROUTINE_TRIGGER, "P_END", HEALTH_PERCENT({0.2, 0})},  ??
+			{ROUTINE_TRIGGER_IDLE, "P_END", HEALTH_PERCENT({0.2, 0})},  ??
+			{"P_END", ROUTINE_END, NO_CONDITION},
+		},
+		routine_part = {
+			P1 = {	--Boss Born
+				{
+					routine_preset = MonsterBossRoutine.Born("place_at"),
+					enter_condition = RoutineCondition.NoCondition,
+					end_condition = RoutineCondition.Time("countdown", 5 * 60),
+				},
+				{
+					routine_preset = MonsterBossRoutine.Walk(CCPoint(5, 5)),
+					enter_condition = RoutineCondition.Time("since_battle_start", 5 * 60),
+					end_condition = RoutineCondition.ActorData("reach_position", CCPoint(5, 5)),
+				},
+			},
+			P2 = {	--Guard And Attack
+				{
+					routine_preset = MonsterBossRoutine.Guard,
+					enter_condition = RoutineCondition.NoCondition,
+					end_condition = RoutineCondition.Time("countdown", 1 * 60),
+				},
+			},
+			P3 = {	--Use Some Skill Combo
+				{
+					routine_preset = MonsterBossRoutine.Skill("boss_sk_0001"),
+					enter_condition = RoutineCondition.NoCondition,
+					end_condition = RoutineCondition.UpdateFinish,
+				},
+				{
+					routine_preset = MonsterBossRoutine.Skill("boss_sk_0002"),
+					enter_condition = RoutineCondition.NoCondition,
+					end_condition = RoutineCondition.UpdateFinish,
+				},
+			},
+			P4 = {	--Move and Attack Single Actor
+				{
+					routine_preset = MonsterBossRoutine.SearchAndAttack("enemy", "condition_health_min", "boss_sk_0003"),
+					enter_condition = RoutineCondition.NoCondition,
+					end_condition = RoutineCondition.UpdateFinish,
+				},
+			},
+			P_END = {
+				{
+					routine_update = function() 
+						MonsterBossRoutine.LockHealth(0.001)
+						MonsterBossRoutine.PlayDrama("boss_drama_0001")
+					end,
+					enter_condition = RoutineCondition.NoCondition,
+					end_condition = function ()
+						return (RoutineCondition.UpdateFinish or RoutineCondition.Time("countdown", 5 * 60))
+					end,
+				},
+			},
+		}
+	}
+	
+	
+	
+end
+
+	
+	
 </code>
 </pre>
 </html>
