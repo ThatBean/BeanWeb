@@ -101,14 +101,14 @@ Logic - Change Logic / Motion State by Actor's Data
 				Active   (Lasting skill)
 				Finish   (Leave skill control - skill object may still remain)
 			
-			Special (Uncontrollable)
-				Combinable
+			Special (Incontrollable)
+				Combinable(caused by buff)
 					[if] Delayed    (Timed - Appers Idle / Attacked, Then Resume Last State)
 					[if] Freezed    (Timed - Keep Motion State, Stop Motion)
 					[if] Colored    (Timed - Colored)
 					[if] Fear       (Timed - Run Back)
-				Pushed   (Timed / Distance - Pushed Back)
-				Celebrate
+				Pushed(caused by attack)   (Timed / !Distance! - Pushed Back)
+				Celebrate(caused by system)
 			
 			Born
 				MoveTo
@@ -140,7 +140,7 @@ Motion - Modify Actor's Position / Animation
 			Move
 			? Defend ?
 			Attack / Active
-			Special (Uncontrollable)
+			Special (Incontrollable)
 				Can process Sub State combination
 			Born
 			Dead
