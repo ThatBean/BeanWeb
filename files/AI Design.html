@@ -282,10 +282,10 @@ debug_script_pool.func_debug_actor_routine_prototype = function ()
 			{"P1", "P2", NO_CONDITION},
 			{"P2", {"P3", "P4"}, RANDOM},
 			{"P3", "P2", NO_CONDITION},
-			--{"P4", {"P2", "P_END"}, HEALTH_PERCENT({1, 0.2}, {0.2, 0})},
-			{"P4", {"P2", "P_END"}, HEALTH_PERCENT({1, 0.2}, {0.2, 0})},
-			{ROUTINE_TRIGGER, "P_END", HEALTH_PERCENT({0.2, 0})},  ??
-			{ROUTINE_TRIGGER_IDLE, "P_END", HEALTH_PERCENT({0.2, 0})},  ??
+			--{"P4", {"P2", "P_END"}, HEALTH_PERCENT({100, 20}, {20, 0})},
+			{"P4", {"P2", "P_END"}, HEALTH_PERCENT({100, 20}, {20, 0})},
+			{ROUTINE_TRIGGER, "P_END", HEALTH_PERCENT({20, 0})},  ??
+			{ROUTINE_TRIGGER_IDLE, "P_END", HEALTH_PERCENT({20, 0})},  ??
 			{"P_END", ROUTINE_END, NO_CONDITION},
 		},
 		routine_part = {
