@@ -120,7 +120,7 @@ var Dr = (typeof Dr == "function" && Dr.author == DrAuthor && Dr.verion >= DrVer
 		
 		module_manager._module_pool = {};
 		
-		module_manager._module_init = function (module_name) { 
+		module_manager._module_init = function (module_name, module_type) { 
 			this._module_pool[module_name] = {
 				status: "declared",
 				require: [],
@@ -152,7 +152,7 @@ var Dr = (typeof Dr == "function" && Dr.author == DrAuthor && Dr.verion >= DrVer
 				return;
 			};
 			
-			this._module_init(module_name);
+			this._module_init(module_name, module_type);
 		};
 		module_manager.implement =  function (module_name, module_implement_func) {
 			if (!this._module_pool[module_name]) {
@@ -214,6 +214,7 @@ var Dr = (typeof Dr == "function" && Dr.author == DrAuthor && Dr.verion >= DrVer
 		return module_manager;
 	})()
 	
+	/*
 	Dr.Time = (function () {
 		var Time = function () {
 			
@@ -229,8 +230,17 @@ var Dr = (typeof Dr == "function" && Dr.author == DrAuthor && Dr.verion >= DrVer
 		
 		return TimeBuffer;
 	})()
-	
+	*/
 	
 	
 	return Dr;
 })(window);
+
+
+Dr.module_manager.declare("test_module", "class");
+Dr.module_manager.implement("test_module", function (global, module_get) {
+	console.log("testing...");
+	return Dr;
+});
+Dr.module_manager.require("test_module", "aaa");
+Dr.module_manager.load("test_module");
