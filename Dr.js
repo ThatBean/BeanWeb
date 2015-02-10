@@ -197,6 +197,32 @@ var Dr = (typeof Dr == "function" && Dr.author == DrAuthor && Dr.verion >= DrVer
 			else
 				return;
 		};
+		module_manager.loop_load =  function () {
+			var left_to_load = -1;
+			var last_left_to_load = 0;
+			
+			while(left_to_load != 0) {
+				if (last_left_to_load == left_to_load) {
+					alert("last_left_to_load == left_to_load, infinite loop load?");
+					break;
+				}
+				
+				last_left_to_load = left_to_load;
+				left_to_load = 0;
+				
+				for (var module_name in this._module_pool) {
+					var module_data = this._module_pool[module_name];
+					if (module_data.status != "loaded") {
+						this.load(module_name);
+						if (module_data.status == "loaded")
+							console.log("loaded", module_name)
+						else
+							left_to_load += 1;
+					}
+				}
+			}
+			
+		};
 		
 		/*
 		//this will be called when all required module implementation is get
@@ -243,4 +269,5 @@ Dr.module_manager.implement("test_module", function (global, module_get) {
 	return Dr;
 });
 Dr.module_manager.require("test_module", "aaa");
-Dr.module_manager.load("test_module");
+//Dr.module_manager.load("test_module");
+Dr.module_manager.loop_load();
