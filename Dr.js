@@ -202,6 +202,8 @@ var Dr = (typeof Dr == "function" && Dr.author == DrAuthor && Dr.verion >= DrVer
 			var last_left_to_load = 0;
 			
 			while(left_to_load != 0) {
+				console.log("load loop===", left_to_load, last_left_to_load);
+				
 				if (last_left_to_load == left_to_load) {
 					alert("last_left_to_load == left_to_load, infinite loop load?");
 					break;
@@ -265,9 +267,24 @@ var Dr = (typeof Dr == "function" && Dr.author == DrAuthor && Dr.verion >= DrVer
 
 Dr.module_manager.declare("test_module", "class");
 Dr.module_manager.implement("test_module", function (global, module_get) {
-	console.log("testing...");
+	console.log("testing... test_module");
+	
+	var aaa = module_get("aaa");
+	console.log("testing... module_get", aaa);
+	
 	return Dr;
 });
 Dr.module_manager.require("test_module", "aaa");
 //Dr.module_manager.load("test_module");
+
+
+
+Dr.module_manager.declare("aaa", "class");
+Dr.module_manager.implement("aaa", function (global, module_get) {
+	console.log("testing... aaa");
+	return Dr;
+});
+//Dr.module_manager.require("aaa");
+//Dr.module_manager.load("test_module");
+
 Dr.module_manager.loop_load();
