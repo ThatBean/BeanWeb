@@ -131,6 +131,7 @@ var Dr = (typeof Dr == "function" && Dr.author == DrAuthor && Dr.verion >= DrVer
 			};
 		};
 		module_manager._module_get = function (module_name) { 
+			console.log("_module_get", module_name, this._module_pool);
 			if (this._module_pool[module_name] && this._module_pool[module_name].status == "loaded")
 				return this._module_pool[module_name].module;
 			else
@@ -191,7 +192,10 @@ var Dr = (typeof Dr == "function" && Dr.author == DrAuthor && Dr.verion >= DrVer
 			}
 			
 			if (all_required_implemented) {
-				var module = this._module_pool[module_name].implement_func(this.global, this._module_get);
+				var _this = this;	//for module get closure
+				var module = this._module_pool[module_name].implement_func(this.global, function (module_name) {
+					return _this._module_get(module_name);
+				});
 				this._module_set(module_name, module);
 			}
 			else
