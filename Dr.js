@@ -182,13 +182,21 @@ var Dr = (typeof Dr == "function" && Dr.author == DrAuthor && Dr.verion >= DrVer
 				return;
 			}
 			
+			console.log("load module", module_name);
+			
 			//loop for all required
 			var require_name_list = this._module_pool[module_name].require;
 			var all_required_implemented = true;
 			for (var i in require_name_list) {
 				if (!this._module_get(require_name_list[i])) {
+					console.log("missing module", i, require_name_list[i], "for loading module", module_name);
 					all_required_implemented = false;
 				}
+			}
+			
+			if (typeof(this._module_pool[module_name].implement_func) != "function") {
+				console.log("missing module implement func", this._module_pool[module_name].implement_func, "for loading module", module_name);
+				all_required_implemented = false;
 			}
 			
 			if (all_required_implemented) {
