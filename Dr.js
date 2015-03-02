@@ -85,6 +85,8 @@ var Dr = (typeof Dr == "function" && Dr.author == DrAuthor && Dr.verion >= DrVer
 	Dr.verion = DrVersion;
 	
 	Dr.global = window;	//normally window
+	Dr.window = window;	//normally window, always in fact
+	Dr.document = document;	//normally document, always in fact
 	
 	Dr.objectConstructor = {
 		Array: Array,
@@ -119,6 +121,7 @@ var Dr = (typeof Dr == "function" && Dr.author == DrAuthor && Dr.verion >= DrVer
 		var module_manager = {};
 		
 		module_manager._module_pool = {};
+		module_manager._loaded_module_pool = {};
 		
 		module_manager._module_init = function (module_name, module_type) { 
 			this._module_pool[module_name] = {
@@ -129,9 +132,13 @@ var Dr = (typeof Dr == "function" && Dr.author == DrAuthor && Dr.verion >= DrVer
 				type: module_type,
 				name: module_name,
 			};
+			
+			this._loaded_module_pool[module_name] = "just declared";
 		};
 		module_manager._module_get = function (module_name) { 
-			console.log("_module_get", module_name, this._module_pool);
+			//console.log("_module_get", module_name, this._module_pool);
+			//return this._loaded_module_pool[module_name];
+			
 			if (this._module_pool[module_name] && this._module_pool[module_name].status == "loaded")
 				return this._module_pool[module_name].module;
 			else
@@ -145,6 +152,8 @@ var Dr = (typeof Dr == "function" && Dr.author == DrAuthor && Dr.verion >= DrVer
 			}
 			this._module_pool[module_name].module = module; 
 			this._module_pool[module_name].status = "loaded";
+			
+			this._loaded_module_pool[module_name] = module;
 		};
 		
 		module_manager.declare =  function (module_name, module_type) {
@@ -182,14 +191,14 @@ var Dr = (typeof Dr == "function" && Dr.author == DrAuthor && Dr.verion >= DrVer
 				return;
 			}
 			
-			console.log("load module", module_name);
+			console.log("try load module", module_name);
 			
 			//loop for all required
 			var require_name_list = this._module_pool[module_name].require;
 			var all_required_implemented = true;
 			for (var i in require_name_list) {
 				if (!this._module_get(require_name_list[i])) {
-					console.log("missing module", i, require_name_list[i], "for loading module", module_name);
+					console.log("missing required module", i, require_name_list[i], "for loading module", module_name);
 					all_required_implemented = false;
 				}
 			}
@@ -205,6 +214,7 @@ var Dr = (typeof Dr == "function" && Dr.author == DrAuthor && Dr.verion >= DrVer
 					return _this._module_get(module_name);
 				});
 				this._module_set(module_name, module);
+				console.log("loaded", module_name);
 			}
 			else
 				return;
@@ -229,7 +239,7 @@ var Dr = (typeof Dr == "function" && Dr.author == DrAuthor && Dr.verion >= DrVer
 					if (module_data.status != "loaded") {
 						this.load(module_name);
 						if (module_data.status == "loaded")
-							console.log("loaded", module_name)
+							console.log("loop loaded", module_name);
 						else
 							left_to_load += 1;
 					}
@@ -313,7 +323,7 @@ Dr.module_manager.implement("aaa", function (global, module_get) {
 
 //Switch utility
 //A switch that save and flip the value
-Dr.module_manager.declare("Switch", "closure function");
+Dr.module_manager.declare("Switch", "class");
 Dr.module_manager.implement("Switch", function (global, module_get) {
 	var Switch = function () {
 		
@@ -333,7 +343,7 @@ Dr.module_manager.implement("Switch", function (global, module_get) {
 //Log utility
 //Maintain a log of recent 'listMax' number
 //the log is updated to 'logTag'
-Dr.module_manager.declare("TagLog", "closure function");
+Dr.module_manager.declare("TagLog", "class");
 Dr.module_manager.implement("TagLog", function (global, module_get) {
 	var TagLog = function() {
 		this.List = [];		//store history logs
@@ -351,7 +361,7 @@ Dr.module_manager.implement("TagLog", function (global, module_get) {
 		//remove excessive log
 		if (this.List.length > this.listMax) this.List.length = this.listMax;
 		//record tag, so you don't need to set it next time
-		if (logTagId) this.logTag = document.getElementById(logTagId);
+		if (logTagId) this.logTag = Dr.document.getElementById(logTagId);
 		//update tag object html
 		if (this.logTag) {
 			var HTMLtext = this.List.join(this.logSeperator);
@@ -365,113 +375,106 @@ Dr.module_manager.implement("TagLog", function (global, module_get) {
 
 //FPS utility
 //display the FPS or step to record
-var FPS = function (tagCurrentId, tagAverageId) {
-	var step = FPS.step();
-	//record tag, so you don't need to set it next time
-	if (tagCurrentId) FPS.tagCurrent = document.getElementById(tagCurrentId);
-	if (tagAverageId) FPS.tagAverage = document.getElementById(tagAverageId);
-	//get average
-	var totalValues = 0;
-	for (var i = 0; i < FPS.List.length; i++) totalValues += FPS.List[i];
-	var averageFPS = totalValues / FPS.List.length;
-	//display
-	FPS.tagCurrent.innerHTML = FPS.List[0].toFixed(2);
-	FPS.tagAverage.innerHTML = averageFPS.toFixed(2);
-	return step;
-}
-FPS.step = function () {
-	//get step
-	var now = Date.now();
-	var step = (now - FPS.lastTime);
-	FPS.lastTime = now;
-	//get stepFPS
-	var stepFPS = 1000 / step;
-	//save to list
-	FPS.List.unshift(stepFPS);
-	if (FPS.List.length > FPS.listMax) FPS.List.length = FPS.listMax;
-	return step;
-}
-FPS.tagCurrent;
-FPS.tagAverage;
-FPS.lastTime = Date.now();
-FPS.List = [];
-FPS.listMax = 20;			//max history to maintain
-
-
-var B_Toolbox = B_Toolbox || {}
-
-B_Toolbox.getPageSize = function () {
-	var xScroll,yScroll;
-	if (window.innerHeight && window.scrollMaxY) {
-		xScroll = document.body.scrollWidth;
-		yScroll = window.innerHeight + window.scrollMaxY;
-	} else if (document.body.scrollHeight > document.body.offsetHeight) {
-		xScroll = document.body.scrollWidth;
-		yScroll = document.body.scrollHeight;
-	} else {
-		xScroll = document.body.offsetWidth;
-		yScroll = document.body.offsetHeight;
+Dr.module_manager.declare("FPS", "class");
+Dr.module_manager.implement("FPS", function (global, module_get) {
+	var FPS = function (tagCurrentId, tagAverageId) {
+		//record tag, so you don't need to set it next time
+		if (tagCurrentId) this.tagCurrent = Dr.document.getElementById(tagCurrentId);
+		if (tagAverageId) this.tagAverage = Dr.document.getElementById(tagAverageId);
+		
+		this.lastTime = Dr.now();
+		this.List = [];
+		this.listMax = 20;			//max history to maintain
 	}
-	var windowWidth,windowHeight;
-	if (window.innerHeight) {
-		windowWidth = window.innerWidth;
-		windowHeight = window.innerHeight;
-	} else if (document.documentElement && document.documentElement.clientHeight) {
-		windowWidth = document.documentElement.clientWidth;
-		windowHeight = document.documentElement.clientHeight;
-	} else if (document.body) {
-		windowWidth = document.body.clientWidth;
-		windowHeight = document.body.clientHeight;
+	FPS.prototype.FPS = function (tagCurrentId, tagAverageId) {
+		var step = this.step();
+		//record tag, so you don't need to set it next time
+		if (tagCurrentId) this.tagCurrent = Dr.document.getElementById(tagCurrentId);
+		if (tagAverageId) this.tagAverage = Dr.document.getElementById(tagAverageId);
+		//get average
+		var totalValues = 0;
+		for (var i = 0; i < this.List.length; i++) totalValues += this.List[i];
+		var averageFPS = totalValues / this.List.length;
+		//display
+		this.tagCurrent.innerHTML = this.List[0].toFixed(2);
+		this.tagAverage.innerHTML = averageFPS.toFixed(2);
+		return step;
 	}
-	var pageWidth,pageHeight
-	pageHeight = ( (yScroll < windowHeight) ? windowHeight : yScroll );
-	pageWidth = ( (xScroll < windowWidth) ? windowWidth : xScroll );
-	return {'pageX':pageWidth,'pageY':pageHeight,'winX':windowWidth,'winY':windowHeight};
-}
-
-B_Toolbox.setSize = function(element, width, height) {
-	if (!element) {
-		alert('[B_Toolbox.setSize] get null, ' + element);
-		return;
+	FPS.prototype.step = function () {
+		//get step
+		var now = Dr.now();
+		var step = (now - this.lastTime);
+		this.lastTime = now;
+		//get stepFPS
+		var stepFPS = 1000 / step;
+		//save to list
+		this.List.unshift(stepFPS);
+		if (this.List.length > this.listMax) this.List.length = this.listMax;
+		return step;
 	}
-	console.log(element)
-	element.width = width;
-	element.style.width = width + 'px';
-	element.style.minWidth = width + 'px';
-	element.style.maxWidth = width + 'px';
-	element.height = height;
-	element.style.height = height + 'px';
-	element.style.minHeight = height + 'px';
-	element.style.maxHeight = height + 'px';
-}
-
-B_Toolbox.resizeEventListener = function(func) {
-	var evt = 'onorientationchange' in window ? 'orientationchange' : 'resize';
-	window.addEventListener(evt, func);
-}
-
-B_Toolbox.createElement = function (element_parent,element_type,element_id) {
-	var new_element= document.createElement(element_type);
-	new_element.id = element_id;
-	element_parent.appendChild(new_element);
-	return new_element;
-}
+	return FPS;
+});
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Dr.module_manager.declare("Toolbox", "function pack");
+Dr.module_manager.implement("Toolbox", function (global, module_get) {
+	var Toolbox = {}
+	Toolbox.getPageSize = function () {
+		var xScroll,yScroll;
+		if (Dr.window.innerHeight && Dr.window.scrollMaxY) {
+			xScroll = Dr.document.body.scrollWidth;
+			yScroll = Dr.window.innerHeight + Dr.window.scrollMaxY;
+		} else if (Dr.document.body.scrollHeight > Dr.document.body.offsetHeight) {
+			xScroll = Dr.document.body.scrollWidth;
+			yScroll = Dr.document.body.scrollHeight;
+		} else {
+			xScroll = Dr.document.body.offsetWidth;
+			yScroll = Dr.document.body.offsetHeight;
+		}
+		var windowWidth,windowHeight;
+		if (Dr.window.innerHeight) {
+			windowWidth = Dr.window.innerWidth;
+			windowHeight = Dr.window.innerHeight;
+		} else if (Dr.document.documentElement && Dr.document.documentElement.clientHeight) {
+			windowWidth = Dr.document.documentElement.clientWidth;
+			windowHeight = Dr.document.documentElement.clientHeight;
+		} else if (Dr.document.body) {
+			windowWidth = Dr.document.body.clientWidth;
+			windowHeight = Dr.document.body.clientHeight;
+		}
+		var pageWidth,pageHeight
+		pageHeight = ( (yScroll < windowHeight) ? windowHeight : yScroll );
+		pageWidth = ( (xScroll < windowWidth) ? windowWidth : xScroll );
+		return {'pageX':pageWidth,'pageY':pageHeight,'winX':windowWidth,'winY':windowHeight};
+	}
+	Toolbox.setSize = function(element, width, height) {
+		if (!element) {
+			alert('[Toolbox.setSize] get null, ' + element);
+			return;
+		}
+		console.log(element)
+		element.width = width;
+		element.style.width = width + 'px';
+		element.style.minWidth = width + 'px';
+		element.style.maxWidth = width + 'px';
+		element.height = height;
+		element.style.height = height + 'px';
+		element.style.minHeight = height + 'px';
+		element.style.maxHeight = height + 'px';
+	}
+	Toolbox.resizeEventListener = function(func) {
+		var evt = 'onorientationchange' in Dr.window ? 'orientationchange' : 'resize';
+		Dr.window.addEventListener(evt, func);
+	}
+	Toolbox.createElement = function (element_data) {
+		var new_element= Dr.document.createElement(element_data.type);
+		if (element_data.parent) element_data.parent.appendChild(new_element);
+		if (element_data.id) new_element.id = element_data.id;
+		if (element_data.name) new_element.name = element_data.name;
+		return new_element;
+	}
+	return Toolbox;
+});
 
 
 
