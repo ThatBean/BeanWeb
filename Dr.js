@@ -377,27 +377,24 @@ Dr.module_manager.implement("TagLog", function (global, module_get) {
 //display the FPS or step to record
 Dr.module_manager.declare("FPS", "class");
 Dr.module_manager.implement("FPS", function (global, module_get) {
-	var FPS = function (tagCurrentId, tagAverageId) {
-		//record tag, so you don't need to set it next time
-		if (tagCurrentId) this.tagCurrent = Dr.document.getElementById(tagCurrentId);
-		if (tagAverageId) this.tagAverage = Dr.document.getElementById(tagAverageId);
-		
+	var FPS = function (output_func) {
+		//record putput func, so you don't need to set it next time
+		if (output_func) this.output_func = output_func;
+		//output_func(averageFPS, currentFPS)
 		this.lastTime = Dr.now();
 		this.List = [];
 		this.listMax = 20;			//max history to maintain
 	}
-	FPS.prototype.FPS = function (tagCurrentId, tagAverageId) {
+	FPS.prototype.FPS = function (output_func) {
 		var step = this.step();
 		//record tag, so you don't need to set it next time
-		if (tagCurrentId) this.tagCurrent = Dr.document.getElementById(tagCurrentId);
-		if (tagAverageId) this.tagAverage = Dr.document.getElementById(tagAverageId);
+		if (output_func) this.output_func = output_func;
 		//get average
 		var totalValues = 0;
 		for (var i = 0; i < this.List.length; i++) totalValues += this.List[i];
 		var averageFPS = totalValues / this.List.length;
 		//display
-		this.tagCurrent.innerHTML = this.List[0].toFixed(2);
-		this.tagAverage.innerHTML = averageFPS.toFixed(2);
+		if (this.output_func) output_func(averageFPS, this.List[0]);
 		return step;
 	}
 	FPS.prototype.step = function () {
