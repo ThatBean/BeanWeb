@@ -19,6 +19,7 @@ var Dr = (typeof Dr == "function" && Dr.author == DrAuthor && Dr.verion >= DrVer
 	
 	// Add Date.now fall-back
 	Date.now = Date.now || function() { return new Date().getTime(); };
+	var clock_per_sec = 1000;
 	
 	// Add setTime/Interval fall-back
 	(function (wraper) {
@@ -36,8 +37,14 @@ var Dr = (typeof Dr == "function" && Dr.author == DrAuthor && Dr.verion >= DrVer
 	console.log("[Dr] Collecting Required...");
 	var DrCollectRequired = function () {
 		return {
-			getUTCTimeStamp: Date.now,
-			onScreenUpdate: window.requestAnimationFrame,
+			clock: Date.now,
+			clock_per_sec: clock_per_sec,
+			getUTCTimeStamp: function () {
+				return Date.now / 1000;
+			},
+			onScreenUpdate: function (callback) {
+				return window.requestAnimationFrame(callback);
+			},
 			setDelayCallback: function (callback, delay, is_once) { 
 				var set_func;
 				var clear_func;
@@ -109,9 +116,13 @@ var Dr = (typeof Dr == "function" && Dr.author == DrAuthor && Dr.verion >= DrVer
 		}
 	};
 	
-	Dr.now = dr_required_native.getUTCTimeStamp;
-	Dr.startTimestamp = Dr.now();
-	Dr.clock = function () { return (Dr.now() - Dr.startTimestamp); };
+	Dr.now = dr_required_native.clock;
+	Dr.getTimeStamp = dr_required_native.getUTCTimeStamp;
+	Dr.startClock = Dr.now();
+	Dr.startTimestamp = Dr.getTimeStamp();
+	Dr.clock = function () { return (Dr.now() - Dr.startClock); };
+	Dr.clock_per_sec = dr_required_native.clock_per_sec;
+	Dr.onUpdate = dr_required_native.onScreenUpdate;
 	
 	Dr.module_manager = (function () {
 		/*
@@ -219,7 +230,7 @@ var Dr = (typeof Dr == "function" && Dr.author == DrAuthor && Dr.verion >= DrVer
 			else
 				return;
 		};
-		module_manager.loop_load =  function () {
+		module_manager.loop_load = function () {
 			var left_to_load = -1;
 			var last_left_to_load = 0;
 			
@@ -261,17 +272,32 @@ var Dr = (typeof Dr == "function" && Dr.author == DrAuthor && Dr.verion >= DrVer
 		}
 		*/
 		
+		module_manager.get = function (module_name) {
+			if (module_name) {
+				return module_manager._loaded_module_pool[module_name];
+			}
+		};
+		
 		return module_manager;
 	})()
 	
-	/*
-	Dr.Time = (function () {
-		var Time = function () {
-			
-		}
+	Dr.UpdateList = [];
+	Dr._last_update_clock = Dr.clock();
+	var _update_func = function () {
+		var _current_update_clock = Dr.clock()
+		var delta_sec = (_current_update_clock - Dr._last_update_clock) / Dr.clock_per_sec;
+		Dr._last_update_clock = _current_update_clock
 		
-		return Time;
-	})()
+		//console.log("Dr.Update", delta_sec);
+		
+		for (index in Dr.UpdateList) {
+			Dr.UpdateList[index](delta_sec);
+		}
+		Dr.onUpdate(_update_func);
+	}
+	
+	Dr.onUpdate(_update_func);
+	/*
 	
 	Dr.TimeBuffer = (function () {
 		var TimeBuffer = function (interval) {
@@ -394,7 +420,7 @@ Dr.module_manager.implement("FPS", function (global, module_get) {
 		for (var i = 0; i < this.List.length; i++) totalValues += this.List[i];
 		var averageFPS = totalValues / this.List.length;
 		//display
-		if (this.output_func) output_func(averageFPS, this.List[0]);
+		if (this.output_func) this.output_func(averageFPS, this.List[0]);
 		return step;
 	}
 	FPS.prototype.step = function () {
@@ -476,3 +502,5 @@ Dr.module_manager.implement("Toolbox", function (global, module_get) {
 
 
 Dr.module_manager.loop_load();
+
+

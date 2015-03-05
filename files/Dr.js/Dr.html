@@ -3,12 +3,13 @@
 
 <head>
 	<meta charset="UTF-8">
-	<meta name="title" content="Welcome to ThatBean.com!">
-	<meta name="keywords" content="Bean,Dr.Eames,thatbean,DrEames,Personal">
+	<meta name="title" content="Welcome to Dr.js!">
+	<meta name="keywords" content="Dr.js,Bean,Dr.Eames,thatbean,DrEames,Personal">
 	<meta name="description" content="This is a web build by Bean/Dr.Eames">
-	<title>Welcome to ThatBean.com!</title>
+	<title>Welcome to Dr.js!</title>
 	
 	<link href="bean_common.css" rel="stylesheet" type="text/css">
+	<script src="Dr.js"></script>
 	
 	<script type="text/javascript">
 		var site_url = "jp.thatbean.com";
@@ -32,9 +33,7 @@
 			
 			document.body.style.paddingTop = padding_header;
 			document.body.style.paddingBottom = padding_footer;
-			
 			console.log("set_body_padding", padding_header, padding_footer);
-			
 			//add watch
 			document.body.onresize = set_body_padding;
 		}
@@ -55,6 +54,27 @@
 				ctx.fillStyle = "#" + (99 - i * 9).toString() + (99 - i * 9).toString() + (99 - i * 9).toString();
 				ctx.fillText("Hello Canvas World!", 0, 480 - 48 * i);
 			}
+			
+			
+			
+			var FPS = Dr.module_manager.get("FPS")
+			var a = new FPS(function (averageFPS, currentFPS) {
+				document.getElementById("Log").innerHTML = "AvgFPS:" + averageFPS.toFixed(2) + ", CurFPS:" + currentFPS.toFixed(2);
+			})
+			a.FPS()
+			
+			Dr.UpdateList.push(function (delta_time) { 
+				a.FPS(); 
+			})
+			/*
+			var _accu_time = 0
+			Dr.UpdateList.push(function (delta_time) { 
+				_accu_time += delta_time;
+				if (_accu_time >= 1 / 6) {
+					a.FPS(); 
+					_accu_time = 0;
+				}
+			})*/
 		}
 		
 		window.onload = function () {
@@ -83,33 +103,7 @@
 
 <body>
 	<div id="page-header" class="fix-top">
-		<table class="align-center">
-			<tr>
-				<td rowspan=2>
-					<b class="font-big">Goto:</b>
-				</td>
-				<td>
-					<button onclick="switch_to_url('html/index.html')"><b>HTML</b></button>
-				</td>
-				<td>
-					<button onclick="switch_to_url('files/')"><b>Files</b></button>
-				</td>
-				<td>
-					<button onclick="switch_to_url('files/Dr.js/Dr.html')"><b>Dr.js</b></button>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<b class="font-small"> - the web site</b>
-				</td>
-				<td>
-					<b class="font-small"> - something useful for download</b>
-				</td>
-				<td>
-					<b class="font-small"> - test for Dr.js</b>
-				</td>
-			</tr>
-		</table>
+		<p class="text-center">The test Html of dr.js</p>
 	</div>
 	<div id="page-footer" class="fix-bottom">
 		<table class="align-center">
@@ -127,25 +121,15 @@
 	</div>
 	
 	<div id="page-content" class="align-center text-center">
-			<br />
-			<b class="font-biggest">Welcome to <span class="font-big">ThatBean.com!</span></b>
-			<hr />
-			
-			<p class="width-75 align-center text-center">
-				Welcome! It's always good to have a visitor!<br />
-				This site is under construction, temporarily or permanently.<br />
-				So, what should I say?<br />
-			</p>
-			
-			<br />
-			<canvas id="canvas" width=640 height=480 class="align-center text-center">This should be a canvas element. If you're seeing this, consider upgrade your browser</canvas>
-			<br />
-			<br />
-			
-			<hr />
-			<b>
-				Welcome to the entry of <a href="index.html"><b>thatbean.com</b></a>
-			</b>
+		<canvas id="canvas" width=640 height=480 class="align-center text-center">
+			This should be a canvas element. If you're seeing this, consider upgrade your browser
+		</canvas>
+		
+		<hr />
+		
+		<p id="Log">
+			Log here
+		</p>
 	</div>
 <br />
 </body>
