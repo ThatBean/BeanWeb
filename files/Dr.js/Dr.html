@@ -10,6 +10,7 @@
 	
 	<link href="bean_common.css" rel="stylesheet" type="text/css">
 	<script src="Dr.js"></script>
+	<script src="Dr.base_module.js"></script>
 	
 	<script type="text/javascript">
 		var site_url = "jp.thatbean.com";
@@ -58,28 +59,38 @@
 			
 			
 			var FPS = Dr.module_manager.get("FPS")
-			var a = new FPS(function (averageFPS, currentFPS) {
-				document.getElementById("Log").innerHTML = "AvgFPS:" + averageFPS.toFixed(2) + ", CurFPS:" + currentFPS.toFixed(2);
+			var fps = new FPS(function (averageFPS, currentFPS) {
+				document.getElementById("FPS").innerHTML = "AvgFPS:" + averageFPS.toFixed(2) + ", CurFPS:" + currentFPS.toFixed(2);
 			})
-			a.FPS()
+			Dr.UpdateList.push(function (delta_time) { 
+				fps.FPS(); 
+			})
 			
-			Dr.UpdateList.push(function (delta_time) { 
-				a.FPS(); 
+			var TagLog = Dr.module_manager.get("TagLog")
+			var tag_log = new TagLog(function (log_text) {
+				document.getElementById("Log").innerHTML = log_text;
 			})
-			/*
-			var _accu_time = 0
 			Dr.UpdateList.push(function (delta_time) { 
-				_accu_time += delta_time;
-				if (_accu_time >= 1 / 6) {
-					a.FPS(); 
-					_accu_time = 0;
-				}
-			})*/
+				tag_log.Log("update log " + Dr.now()); 
+			})
 		}
 		
 		window.onload = function () {
 			set_body_padding();
 			set_canvas_script();
+		}
+		
+		//for a global accessible func to toggle
+		toggleWin = function (obj, command) {
+			var layer = 0;
+			while (obj.parentElement) {
+				obj = obj.parentElement;
+				if (obj.Window) {
+					return obj.Window.toggle(command);
+				}
+				layer++;
+				if (layer > 2) return alert('No win object found to ' + command);
+			}
 		}
 	</script>
 
@@ -105,6 +116,7 @@
 	<div id="page-header" class="fix-top">
 		<p class="text-center">The test Html of dr.js</p>
 	</div>
+	
 	<div id="page-footer" class="fix-bottom">
 		<table class="align-center">
 			<tr>
@@ -121,12 +133,19 @@
 	</div>
 	
 	<div id="page-content" class="align-center text-center">
+		<br />
+		
 		<canvas id="canvas" width=640 height=480 class="align-center text-center">
 			This should be a canvas element. If you're seeing this, consider upgrade your browser
 		</canvas>
 		
+		<br />
+		
 		<hr />
 		
+		<p id="FPS">
+			FPS here
+		</p>
 		<p id="Log">
 			Log here
 		</p>
