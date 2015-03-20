@@ -2,8 +2,8 @@
 
 //Switch utility
 //A switch that save and flip the value
-Dr.module_manager.declare("Switch", "class");
-Dr.module_manager.implement("Switch", function (global, module_get) {
+Dr.ModuleManager.declare('Switch', 'class');
+Dr.ModuleManager.implement('Switch', function (global, module_get) {
 	var Switch = function () {
 		
 	}
@@ -22,8 +22,8 @@ Dr.module_manager.implement("Switch", function (global, module_get) {
 //Log utility
 //Maintain a log of recent 'listMax' number
 //the log is updated to 'logTag'
-Dr.module_manager.declare("TagLog", "class");
-Dr.module_manager.implement("TagLog", function (global, module_get) {
+Dr.ModuleManager.declare('TagLog', 'class');
+Dr.ModuleManager.implement('TagLog', function (global, module_get) {
 	var TagLog = function(output_func) {
 		//record putput func, so you don't need to set it next time
 		if (output_func) this.output_func = output_func;
@@ -56,8 +56,8 @@ Dr.module_manager.implement("TagLog", function (global, module_get) {
 
 //FPS utility
 //display the FPS or step to record
-Dr.module_manager.declare("FPS", "class");
-Dr.module_manager.implement("FPS", function (global, module_get) {
+Dr.ModuleManager.declare('FPS', 'class');
+Dr.ModuleManager.implement('FPS', function (global, module_get) {
 	var FPS = function (output_func) {
 		//record putput func, so you don't need to set it next time
 		if (output_func) this.output_func = output_func;
@@ -94,8 +94,8 @@ Dr.module_manager.implement("FPS", function (global, module_get) {
 });
 
 
-Dr.module_manager.declare("Toolbox", "function pack");
-Dr.module_manager.implement("Toolbox", function (global, module_get) {
+Dr.ModuleManager.declare('Toolbox', 'function pack');
+Dr.ModuleManager.implement('Toolbox', function (global, module_get) {
 	var Toolbox = {}
 	Toolbox.getPageSize = function () {
 		var xScroll,yScroll;
@@ -154,4 +154,4 @@ Dr.module_manager.implement("Toolbox", function (global, module_get) {
 	return Toolbox;
 });
 
-Dr.module_manager.loop_load();
+Dr.ModuleManager.loop_load();

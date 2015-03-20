@@ -58,7 +58,7 @@
 			
 			
 			
-			var FPS = Dr.module_manager.get("FPS")
+			var FPS = Dr.ModuleManager.get("FPS")
 			var fps = new FPS(function (averageFPS, currentFPS) {
 				document.getElementById("FPS").innerHTML = "AvgFPS:" + averageFPS.toFixed(2) + ", CurFPS:" + currentFPS.toFixed(2);
 			})
@@ -66,7 +66,7 @@
 				fps.FPS(); 
 			})
 			
-			var TagLog = Dr.module_manager.get("TagLog")
+			var TagLog = Dr.ModuleManager.get("TagLog")
 			var tag_log = new TagLog(function (log_text) {
 				document.getElementById("Log").innerHTML = log_text;
 			})
