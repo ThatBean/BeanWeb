@@ -6,12 +6,22 @@
 	<meta name="title" content="Welcome to Dr.js!">
 	<meta name="keywords" content="Dr.js,Bean,Dr.Eames,thatbean,DrEames,Personal">
 	<meta name="description" content="This is a web build by Bean/Dr.Eames">
-	<title>Welcome to Dr.js!</title>
 	
+	<title>Welcome to ThatBean.com!</title>
+	
+    <link rel="shortcut icon" href="favicon.png">
 	<link href="bean_common.css" rel="stylesheet" type="text/css">
 	<script src="Dr.js"></script>
+	<!-- -- >
 	<script src="Dr.base_module.js"></script>
+	<!-- -->
+	<!-- -->
+	<script type="text/javascript">
+		
+		Dr.loadScript('Dr.base_module.js');
 	
+	</script>
+	<!-- -->
 	<script type="text/javascript">
 		var site_url = "jp.thatbean.com";
 		
@@ -62,17 +72,21 @@
 			var fps = new FPS(function (averageFPS, currentFPS) {
 				document.getElementById("FPS").innerHTML = "AvgFPS:" + averageFPS.toFixed(2) + ", CurFPS:" + currentFPS.toFixed(2);
 			})
-			Dr.UpdateList.push(function (delta_time) { 
+			Dr.UpdateLoop.add(function (delta_time) { 
 				fps.FPS(); 
+				return true;
 			})
 			
 			var TagLog = Dr.ModuleManager.get("TagLog")
 			var tag_log = new TagLog(function (log_text) {
 				document.getElementById("Log").innerHTML = log_text;
 			})
-			Dr.UpdateList.push(function (delta_time) { 
+			Dr.UpdateLoop.add(function (delta_time) { 
 				tag_log.Log("update log " + Dr.now()); 
+				return true;
 			})
+			
+			Dr.UpdateLoop.start();
 		}
 		
 		window.onload = function () {

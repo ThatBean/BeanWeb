@@ -1,6 +1,6 @@
 // Js Dr Bean Dr.Eames
 var DrAuthor = 'Bean/Dr.Eames';
-var DrVersion = '0.1';
+var DrVersion = '0.11';
 
 var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVersion) ? Dr : (function (window, undefined) {
 	
@@ -67,6 +67,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 				}
 			},
 			loadScript: function (script_src, onload_script_string) {
+				console.log('Loading Script:', script_src);
 				var script_element = document.createElement('script');
 				script_element.type = 'text/javascript';
 				script_element.async = true;
@@ -82,6 +83,9 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			
 		};
 	}
+	
+	
+	
 	
 	// Required Non-Standard-JavaScript Methods
 	console.log('[Dr] Collecting Required...');
@@ -111,6 +115,9 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 	Dr.clock = function () { return (Dr.now() - Dr.startClock); };
 	Dr.clock_per_sec = _required_native.clock_per_sec;
 	Dr.onNextScreenUpdate = _required_native.onNextScreenUpdate;
+	Dr.loadScript = _required_native.loadScript;
+	Dr.getArgumentArray = _required_native.getArgumentArray;
+	
 	
 	
 	Dr.inspect = function (target) {
@@ -156,19 +163,27 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			callback_list.push(callback);
 		}
 		
-		Event.prototype.Unsubscribe = function (event_key, callback) {
+		Event.prototype.Unsubscribe = function (event_key, org_callback) {
 			this._key_callback_list[event_key] = this._key_callback_list[event_key] || [];
 			var callback_list = this._key_callback_list[event_key]
 			for (var i in callback_list) {
-				if (callback_list[i] = callback) {
+				if (callback_list[i] = org_callback) {
 					callback_list.splice(i, 1);
 					return;
 				}
 			}
 		}
 		
+		Event.prototype.UnsubscribeKey = function (event_key) {
+			this._key_callback_list[event_key] = [];
+		}
+		
+		Event.prototype.UnsubscribeAll = function () {
+			this._key_callback_list = [];
+		}
+		
 		Event.prototype.Emit = function (event_key) {
-			var args = Array.prototype.slice.call(arguments, 1);
+			var args = Dr.getArgumentArray(arguments, 1);
 			args.unshift(event_key);
 			
 			this._key_callback_list[event_key] = this._key_callback_list[event_key] || [];
@@ -188,98 +203,107 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			module_type can be: function, object, ...
 		*/
 		var ModuleManager = function () {
-			this._module_pool = {};
-			this._loaded_module_pool = {};
+			this._module_data_pool = {};
 		}
 		
 		ModuleManager.prototype._module_init = function (module_name, module_type) { 
-			this._module_pool[module_name] = {
-				status: 'declared',
+			this._module_data_pool[module_name] = {
+				status: {
+					declare: false,
+					implement: false,
+					load: false,
+				},
 				require: [],
 				module: null,
 				implement_func: null,
 				type: module_type,
 				name: module_name,
 			};
-			
-			this._loaded_module_pool[module_name] = 'just declared';
 		};
 		ModuleManager.prototype._module_get = function (module_name) { 
-			//console.log('_module_get', module_name, this._module_pool);
-			//return this._loaded_module_pool[module_name];
-			
-			if (this._module_pool[module_name] && this._module_pool[module_name].status == 'loaded')
-				return this._module_pool[module_name].module;
+			//console.log('_module_get', module_name, this._module_data_pool);
+			if (module_name 
+				&& this._module_data_pool[module_name] 
+				&& this._module_data_pool[module_name].status.load == true)
+				return this._module_data_pool[module_name].module;
 			else
 				return null;
-				//alert('get module failed! name: ' + module_name);
 		};
 		ModuleManager.prototype._module_set = function (module_name, module) {
-			if (!this._module_pool[module_name]) {
+			if (!this._module_data_pool[module_name]) {
 				alert('module not declared');
 				return;
 			}
-			this._module_pool[module_name].module = module; 
-			this._module_pool[module_name].status = 'loaded';
-			
-			this._loaded_module_pool[module_name] = module;
+			this._module_data_pool[module_name].module = module; 
+			this._module_data_pool[module_name].status.load = true;
 		};
 		
 		ModuleManager.prototype.declare =  function (module_name, module_type) {
-			if (this._module_pool[module_name] && module_type != this._module_pool[module_name].type) {
+			if (!module_name) {
+				alert('error declare nameless module');
+				return;
+			};
+			if (this._module_data_pool[module_name] && module_type != this._module_data_pool[module_name].type) {
 				alert('re-declare type mismatch');
 				return;
 			};
 			
 			this._module_init(module_name, module_type);
+			this._module_data_pool[module_name].status.declare = true;
 		};
 		ModuleManager.prototype.implement =  function (module_name, module_implement_func) {
-			if (!this._module_pool[module_name]) {
+			if (!this._module_data_pool[module_name] 
+				|| !this._module_data_pool[module_name].status.declare) {
 				alert('module not declared');
 				return;
 			}
 			
-			this._module_pool[module_name].implement_func = module_implement_func;
-			this._module_pool[module_name].status = 'implemented';
+			this._module_data_pool[module_name].implement_func = module_implement_func;
+			this._module_data_pool[module_name].status.implement = true;
 		};
 		ModuleManager.prototype.require =  function (module_name, required_module_name) {
-			if (!this._module_pool[module_name]) {
+			if (!this._module_data_pool[module_name] 
+				|| !this._module_data_pool[module_name].status.declare) {
 				alert('module not declared');
 				return;
 			}
 			
-			this._module_pool[module_name].require.push(required_module_name);
-			this._module_pool[module_name].status = 'required';
+			this._module_data_pool[module_name].require.push(required_module_name);
+			this._module_data_pool[module_name].status = 'required';
 		};
 		ModuleManager.prototype.load =  function (module_name) {
-			if (!this._module_pool[module_name]) {
+			if (!this._module_data_pool[module_name] 
+				|| !this._module_data_pool[module_name].status.declare) {
 				alert('module not declared');
 				return;
 			}
-			if (this._module_pool[module_name].status == 'loaded') {
+			
+			var module_data = this._module_data_pool[module_name];
+			
+			if (module_data.status.load) {
 				return;
 			}
 			
 			console.log('try load module', module_name);
 			
 			//loop for all required
-			var require_name_list = this._module_pool[module_name].require;
-			var all_required_implemented = true;
+			var require_name_list = module_data.require;
+			var all_requirment_meet = true;
 			for (var i in require_name_list) {
 				if (!this._module_get(require_name_list[i])) {
 					console.log('missing required module', i, require_name_list[i], 'for loading module', module_name);
-					all_required_implemented = false;
+					all_requirment_meet = false;
 				}
 			}
 			
-			if (typeof(this._module_pool[module_name].implement_func) != 'function') {
-				console.log('missing module implement func', this._module_pool[module_name].implement_func, 'for loading module', module_name);
-				all_required_implemented = false;
+			if (typeof(module_data.implement_func) != 'function') {
+				console.log('missing module implement func', module_data.implement_func, 'for loading module', module_name);
+				all_requirment_meet = false;
 			}
 			
-			if (all_required_implemented) {
+			if (all_requirment_meet) {
 				var _this = this;	//for module get closure
-				var module = this._module_pool[module_name].implement_func(this.global, function (module_name) {
+				var module = module_data.implement_func(this.global, function (module_name) {
 					return _this._module_get(module_name);
 				});
 				this._module_set(module_name, module);
@@ -303,11 +327,11 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 				last_left_to_load = left_to_load;
 				left_to_load = 0;
 				
-				for (var module_name in this._module_pool) {
-					var module_data = this._module_pool[module_name];
-					if (module_data.status != 'loaded') {
+				for (var module_name in this._module_data_pool) {
+					var module_data = this._module_data_pool[module_name];
+					if (module_data.status.load == false) {
 						this.load(module_name);
-						if (module_data.status == 'loaded')
+						if (module_data.status.load == true)
 							console.log('loop loaded', module_name);
 						else
 							left_to_load += 1;
@@ -317,57 +341,73 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			
 		};
 		
-		/*
-		//this will be called when all required module implementation is get
-		
-		module_implement_func = function (global, required__module_get_func) {
-			var module_play = required__module_get_func('module_play');
-			var module_stop = required__module_get_func('module_stop');
-			
-			//global usually means window
-			
-			//implementation
-		}
-		*/
-		
 		ModuleManager.prototype.get = function (module_name) {
-			if (module_name) {
-				return this._loaded_module_pool[module_name];
-			}
+			return this._module_get(module_name);
 		};
 		
 		return new ModuleManager;
 	})()
 	
-	Dr.UpdateList = [];
-	Dr._last_update_clock = Dr.clock();
-	var _update_func = function () {
-		var current_update_clock = Dr.clock()
-		var delta_sec = (current_update_clock - Dr._last_update_clock) / Dr.clock_per_sec;
-		Dr._last_update_clock = current_update_clock
-		
-		//console.log('Dr.Update', delta_sec);
-		
-		for (index in Dr.UpdateList) {
-			Dr.UpdateList[index](delta_sec);
-		}
-		Dr.onNextScreenUpdate(_update_func);
-	}
-	Dr.onNextScreenUpdate(_update_func);
 	
 	
-	
-	
-	/*
-	
-	Dr.TimeBuffer = (function () {
-		var TimeBuffer = function (interval) {
-			this.interval;
+	Dr.UpdateLoop = (function () {
+		var UpdateLoop = function () {
+			this._update_list = [];	//non-constant, will be refreshed on every update
+			this._last_update_clock = Dr.clock();
+			this._is_active = false;
+			
+			//prepare a update closure
+			var o_this = this;
+			this._update_func = function () {
+				o_this.update();
+			}
 		}
 		
-		return TimeBuffer;
+		UpdateLoop.prototype.update = function () {
+			var current_update_clock = Dr.clock()
+			var delta_sec = (current_update_clock - this._last_update_clock) / Dr.clock_per_sec;
+			this._last_update_clock = current_update_clock
+			
+			//console.log('Dr.Update', delta_sec);
+			var next_update_list = [];
+			for (index in this._update_list) {
+				var is_keep_update = this._update_list[index](delta_sec);
+				if (is_keep_update) {
+					next_update_list.push(this._update_list[index]);
+				}
+			}
+			this._update_list = next_update_list;
+			//console.log('Dr.Update', delta_sec);
+			
+			if (this._is_active)
+				Dr.onNextScreenUpdate(this._update_func);
+			else
+				console.log('[UpdateLoop] Stopped');
+		}
+		
+		
+		UpdateLoop.prototype.start = function () {
+			if (this._is_active)
+				return;
+			
+			this._is_active = true;
+			this._update_func();
+		}
+		
+		UpdateLoop.prototype.stop = function () {
+			this._is_active = false;
+		}
+		
+		UpdateLoop.prototype.clear = function () {
+			this._update_list = [];
+		}
+		
+		UpdateLoop.prototype.add = function (update_func) {
+			this._update_list.push(update_func);
+		}
+		
+		return new UpdateLoop;
 	})()
-	*/
 	
 	
 	return Dr;
