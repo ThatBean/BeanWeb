@@ -130,7 +130,7 @@ Dr.ModuleManager.implement('Toolbox', function (global, module_get) {
 			alert('[Toolbox.setSize] get null, ' + element);
 			return;
 		}
-		console.log(element)
+		Dr.log(element)
 		element.width = width;
 		element.style.width = width + 'px';
 		element.style.minWidth = width + 'px';

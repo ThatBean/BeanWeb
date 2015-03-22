@@ -77,10 +77,20 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 				exist_script_element.parentNode.insertBefore(script_element, exist_script_element);
 			},
 			getArgumentArray: function (src_args, omit_arg) {
-				var omit_arg = omit_arg || 0;
-				return Array.prototype.slice.call(src_args, omit_arg);
+				return Array.prototype.slice.call(src_args, omit_arg || 0);
 			},
-			
+			logList: (function () {
+				if (console.log.apply) {
+					return function (arg_list) {
+						console.log.apply(console, arg_list);
+					}
+				}
+				else {
+					return function (arg_list) {
+						console.log(arg_list);
+					}
+				}
+			})(),
 		};
 	}
 	
@@ -96,8 +106,8 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 	console.log('[Dr] Initializing...');
 	
 	var Dr = function () {
-		console.log('[Dr] A Frame by ' + DrAuthor);
-		console.log('[Dr] Version ' + DrVersion);
+		Dr.log('[Dr] A Frame by ' + DrAuthor);
+		Dr.log('[Dr] Version ' + DrVersion);
 	}
 	
 	Dr.author = DrAuthor;
@@ -106,6 +116,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 	Dr.global = window;	//normally window
 	Dr.window = window;	//normally window, always in fact
 	Dr.document = document;	//normally document, always in fact
+	
 	
 	
 	Dr.now = _required_native.clock;
@@ -117,12 +128,33 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 	Dr.onNextScreenUpdate = _required_native.onNextScreenUpdate;
 	Dr.loadScript = _required_native.loadScript;
 	Dr.getArgumentArray = _required_native.getArgumentArray;
+	Dr.logList = _required_native.logList;
+	Dr.Log = (function () {
+		var Log = function () {
+			this._log_history = [];
+		}
+		
+		Log.prototype.log = function () {
+			var arg_list = Dr.getArgumentArray(arguments);
+			arg_list.unshift('[' + ((Dr.now() - Dr.startClock) / Dr.clock_per_sec) + 'sec]');
+			this._log_history.push(arg_list);
+			Dr.logList(arg_list);
+		}
+		
+		Log.prototype.get_history = function () {
+			return this._log_history;
+		}
+		
+		return new Log;
+	})()
 	
-	
+	Dr.log = function () {
+		Dr.Log.log.apply(Dr.Log, Dr.getArgumentArray(arguments));
+	}
 	
 	Dr.inspect = function (target) {
-		console.log('[Inspect]', target);
-		console.log('type: <' + typeof(target) + '>');
+		Dr.log('[Inspect]', target);
+		Dr.log('type: <' + typeof(target) + '>');
 		
 		var object_constructor = {
 			Array: Array,
@@ -134,7 +166,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			//Name - Instance Creator
 			for (var i in object_constructor) {
 				if (target instanceof object_constructor[i]) {
-					console.log('Instance of: <' + i + '>')
+					Dr.log('Instance of: <' + i + '>')
 				}
 			}
 		}
@@ -147,7 +179,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 		
 		Event.prototype.Subscribe = function (event_key, callback) {
 			if (!callback && typeof(callback) != 'function') {
-				console.log('callback error', callback);
+				Dr.log('callback error', callback);
 				return;
 			}
 			
@@ -155,7 +187,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			var callback_list = this._key_callback_list[event_key]
 			for (var i in callback_list) {
 				if (callback_list[i] = callback) {
-					console.log('callback already exist');
+					Dr.log('callback already exist');
 					return;
 				}
 			}
@@ -221,7 +253,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			};
 		};
 		ModuleManager.prototype._module_get = function (module_name) { 
-			//console.log('_module_get', module_name, this._module_data_pool);
+			//Dr.log('_module_get', module_name, this._module_data_pool);
 			if (module_name 
 				&& this._module_data_pool[module_name] 
 				&& this._module_data_pool[module_name].status.load == true)
@@ -243,11 +275,15 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 				alert('error declare nameless module');
 				return;
 			};
-			if (this._module_data_pool[module_name] && module_type != this._module_data_pool[module_name].type) {
-				alert('re-declare type mismatch');
-				return;
-			};
-			
+			if (this._module_data_pool[module_name]) {
+				if (module_type != this._module_data_pool[module_name].type) {
+					alert('re-declare type mismatch');
+					return;
+				}
+				else {
+					Dr.log('re-declare', module_name, module_type);
+				}
+			}
 			this._module_init(module_name, module_type);
 			this._module_data_pool[module_name].status.declare = true;
 		};
@@ -284,20 +320,20 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 				return;
 			}
 			
-			console.log('try load module', module_name);
+			Dr.log('try load module', module_name);
 			
 			//loop for all required
 			var require_name_list = module_data.require;
 			var all_requirment_meet = true;
 			for (var i in require_name_list) {
 				if (!this._module_get(require_name_list[i])) {
-					console.log('missing required module', i, require_name_list[i], 'for loading module', module_name);
+					Dr.log('missing required module', i, require_name_list[i], 'for loading module', module_name);
 					all_requirment_meet = false;
 				}
 			}
 			
 			if (typeof(module_data.implement_func) != 'function') {
-				console.log('missing module implement func', module_data.implement_func, 'for loading module', module_name);
+				Dr.log('missing module implement func', module_data.implement_func, 'for loading module', module_name);
 				all_requirment_meet = false;
 			}
 			
@@ -307,7 +343,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 					return _this._module_get(module_name);
 				});
 				this._module_set(module_name, module);
-				console.log('loaded', module_name);
+				Dr.log('loaded', module_name);
 			}
 			else
 				return;
@@ -317,7 +353,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			var last_left_to_load = 0;
 			
 			while(left_to_load != 0) {
-				//console.log('load loop===', left_to_load, last_left_to_load);
+				//Dr.log('load loop===', left_to_load, last_left_to_load);
 				
 				if (last_left_to_load == left_to_load) {
 					alert('last_left_to_load == left_to_load, infinite loop load?');
@@ -332,7 +368,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 					if (module_data.status.load == false) {
 						this.load(module_name);
 						if (module_data.status.load == true)
-							console.log('loop loaded', module_name);
+							Dr.log('loop loaded', module_name);
 						else
 							left_to_load += 1;
 					}
@@ -368,7 +404,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			var delta_sec = (current_update_clock - this._last_update_clock) / Dr.clock_per_sec;
 			this._last_update_clock = current_update_clock
 			
-			//console.log('Dr.Update', delta_sec);
+			//Dr.log('Dr.Update', delta_sec);
 			var next_update_list = [];
 			for (index in this._update_list) {
 				var is_keep_update = this._update_list[index](delta_sec);
@@ -377,12 +413,12 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 				}
 			}
 			this._update_list = next_update_list;
-			//console.log('Dr.Update', delta_sec);
+			//Dr.log('Dr.Update', delta_sec);
 			
 			if (this._is_active)
 				Dr.onNextScreenUpdate(this._update_func);
 			else
-				console.log('[UpdateLoop] Stopped');
+				Dr.log('[UpdateLoop] Stopped');
 		}
 		
 		
@@ -416,10 +452,10 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 /*
 Dr.ModuleManager.declare('test_module', 'class');
 Dr.ModuleManager.implement('test_module', function (global, module_get) {
-	console.log('testing... test_module');
+	Dr.log('testing... test_module');
 	
 	var aaa = module_get('aaa');
-	console.log('testing... module_get', aaa);
+	Dr.log('testing... module_get', aaa);
 	
 	return Dr;
 });
@@ -430,7 +466,7 @@ Dr.ModuleManager.require('test_module', 'aaa');
 
 Dr.ModuleManager.declare('aaa', 'class');
 Dr.ModuleManager.implement('aaa', function (global, module_get) {
-	console.log('testing... aaa');
+	Dr.log('testing... aaa');
 	return Dr;
 });
 //Dr.ModuleManager.require('aaa');
