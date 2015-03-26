@@ -459,30 +459,23 @@ function drawingLoop(delta_time) {
 		}
 	}
 	
-	
-	
-	
-	
 	if (!Switch.Render) {
 		var renderData = animation.getRenderData(delta_time * 1000);
-		var renderZoom = animation.currentZoom * _zoom_modifier;
+		var renderZoom = animation.currentZoom;
 		
-		if (!Switch.Model) { 
-			if (Switch.Skeleton) 
-				device.render(renderZoom, camera, renderData, "skeleton");
-			else
-				device.render(renderZoom, camera, renderData);
-		}
-		else
-			device.render(zoom, camera, model_data);
-
+		device.render(
+			renderZoom * _zoom_modifier, 
+			camera, 
+			(Switch.Model ?  model_data : renderData), 
+			(Switch.Skeleton ? "skeleton" : null)
+		);
+		
 		// TODO: Add Editor Marking
 		//BlockEditor.editorMark(device, renderZoom, camera, renderData, "skeleton");
 		// or add a mesh?
 		
 		device.present();
 	}
-	
 	
 	return true;
 }
