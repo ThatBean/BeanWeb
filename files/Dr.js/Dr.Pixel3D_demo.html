@@ -1,11 +1,15 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-	<title>Bean2D Engine Test Page</title>
+	<title>Dr.Pixel3D Demo Page</title>
+	
 	<style>
+		td { text-align: left; padding: 0.1em; border-left: 1em solid #222; border-right: 1em solid #222; }
 		canvas {
-			background-color: white;
-			border: solid 4px #222; 
+			background-color: #aaa;
+			margin: 0;
+			padding: 0;
+			border: solid 4px #999;
 			/*width: 100%;
 			height: 100%;*/
 			image-rendering: optimizeSpeed;
@@ -15,6 +19,9 @@
 			-ms-interpolation-mode: nearest-neighbor;
 		}
 	</style>
+	
+    <link rel="shortcut icon" href="favicon.png">
+	<link href="bean_common.css" rel="stylesheet" type="text/css">
 	<!-- load page utility script -->
 	<script src="Dr.js"></script>
 	<script type="text/javascript">
@@ -29,25 +36,80 @@
 			Dr.log("All script loaded");
 		})
 	</script>
+	
+	
+	<script type="text/javascript"> 
+		function set_body_padding () {
+			var page_header = document.getElementById("page-header");
+			var padding_header = (page_header ? page_header.offsetHeight : 0) + "px";
+			var page_footer = document.getElementById("page-footer");
+			var padding_footer = (page_footer ? page_footer.offsetHeight : 0) + "px";
+			
+			document.body.style.paddingTop = padding_header;
+			document.body.style.paddingBottom = padding_footer;
+			console.log("set_body_padding", padding_header, padding_footer);
+			//add watch
+			document.body.onresize = set_body_padding;
+		}
+		
+		window.onload = function () {
+			set_body_padding();
+		}
+	</script>
 </head>
 <body>
-	<div>
-		<p>This page is for <b>engine develop</b> use</p>
+	<div id="page-header" class="fix-top">
+		<p class="text-center">The Demo Html of Dr.Pixel3D</p>
 	</div>
-	<div>
-		<button onclick="Switch('Log')">Switch Log(broken)</button>
-		<button onclick="Switch('Loop')">Switch Render</button>
-		<button onclick="Switch('Zoom')">Switch Zoom</button>
-		<button onclick="Switch('Rotate')">Switch Rotate</button>
+	
+	<div id="page-footer" class="fix-bottom">
+		<table class="align-center">
+			<tr>
+				<td class="font-small text-center">
+					<a href="mailto:Bean@ThatBean.com">Bean@ThatBean.com</a> | 
+					<a href="https://github.com/ThatBean">Bean in Git</a> | 
+					<a href="http://steamcommunity.com/id/dreames">Dr.Eames in Steam</a> | 
+					<a href="http://thatbean.com">thatbean.com</a>
+					<br /> 
+					&clubs;&infin; Copywrong 2015 by <b class="font-big">Bean/Dr.Eames</b>
+				</td>
+			</tr>
+		</table>
 	</div>
-	<div>
-		<canvas id="frontBuffer" width="400" height="400"></canvas>
+	
+	<div id="page-content" class="align-center text-center">
+		<div>
+		<p>This page is for <b>Dr.Pixel3D develop</b> use</p>
+		</div>
+		
+		<div>
+			<button onclick="Switch.Switch('Log')">Switch Log</button>
+			<button onclick="Switch.Switch('Render')">Switch Render</button>
+			<button onclick="Switch.Switch('Skeleton')">Switch Skeleton</button>
+			<br />
+			<br />
+			<button onclick="Switch.Switch('Model')">Switch Model</button>
+			<button onclick="Switch.Switch('Zoom')">Switch Zoom</button>
+			<button onclick="Switch.Switch('Rotate')">Switch Rotate</button>
+		</div>
+		
+		<br />
+		
+		<div>
+			<canvas id="frontBuffer" width="400" height="400"></canvas>
+		</div>
+		
+		<br />
+		
+		<hr />
+		
+		<p id="FPS">
+			FPS here
+		</p>
+		<p id="Log">
+			Log here
+		</p>
 	</div>
-	<div>
-		FPS: <span id="FPS"></span>
-	</div>
-	<div>
-		<p id="Log"></p>
-	</div>
+<br />
 </body>
 </html>

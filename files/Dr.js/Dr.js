@@ -218,7 +218,10 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 	Dr.startTimestamp = Dr.getUTCTimeStamp();
 	Dr.clock = function () { return (Dr.now() - Dr.startClock); };
 	Dr.clock_per_sec = _required_native.clock_per_sec;
+	Dr.get_random_int = _required_native.get_random_int;
+	Dr.get_random_int_multi = _required_native.get_random_int_multi;
 	Dr.onNextScreenUpdate = _required_native.onNextScreenUpdate;
+	Dr.createTextDownload = _required_native.createTextDownload;
 	Dr.loadScript = _required_native.loadScript;
 	Dr.loadScriptByList = function (script_src_list, callback) {
 		var loop_load_script = function () {

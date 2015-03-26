@@ -35,13 +35,14 @@ var zoom = blockScale * workingPixelScale / screenPixelWidth;
 //		when zoom == 0.05, the projected size is 20 x 20 (half blocks on the edge)
 //		when zoom == 0.005, the projected size is 200 x 200
 
-//var zoomTrigger=0.0005;
+var _zoom_modifier = 1.0;
+var _zoom_modify_speed = 0.5;
 
 
 
-var Switch = new Dr.Get("Switch");
-
-
+var Switch = new (Dr.Get("Switch"));
+Dr.log(Switch);
+Switch.Switch("Test");
 
 
 
@@ -66,7 +67,9 @@ function init() {
 		document.getElementById("Log").innerHTML = log_text;
 	})
 	Dr.UpdateLoop.add(function (delta_time) { 
-		tag_log.Log("update log " + Dr.now()); 
+		if (!Switch.Log) {
+			tag_log.Log("update log " + Dr.now()); 
+		}
 		return true;
 	})
 	
@@ -433,41 +436,53 @@ function drawingLoop(delta_time) {
 		meshes[0].Rotation.x += 0.0002*delta_time;
 		meshes[0].Rotation.z += 0.0005*delta_time;
 		/**/
-		/** /
+		/**/
 		
 		for (var i = 0; i < meshes.length; i++) {
-			meshes[i].Rotation.y += 0.001*delta_time;
-			meshes[i].Rotation.x += 0.0002*delta_time;
+			meshes[i].Rotation.y += 1 * delta_time;
+			meshes[i].Rotation.x += 0.2 * delta_time;
 		}
 		/**/
 		//camera.rotatePosition(0.001*delta_time, 0, 0.0005*delta_time);
 		//camera.rotateTarget(0, 0.001*delta_time, 0, 0);
 	}
-	/** /
+	
 	if (Switch.Zoom) {	
-		zoom += zoom*delta_time*zoomTrigger;
-		if (zoom>0.5) {
-			zoomTrigger=-zoomTrigger;
-			zoom=0.5;
+		_zoom_modifier += _zoom_modifier * delta_time * _zoom_modify_speed;
+		if (_zoom_modifier > 10) {
+			_zoom_modify_speed = -_zoom_modify_speed;
+			_zoom_modifier = 10;
 		}
-		if (zoom<0.005) {
-			zoomTrigger=-zoomTrigger;
-			zoom=0.005;
+		if (_zoom_modifier < 0.1) {
+			_zoom_modify_speed = -_zoom_modify_speed;
+			_zoom_modifier = 0.1;
 		}
 	}
-	/**/
 	
-	var renderData = animation.getRenderData(delta_time * 1000);
-	var renderZoom = animation.currentZoom;
-	//device.render(renderZoom, camera, renderData, "skeleton");
-	device.render(renderZoom, camera, renderData);
-	//device.render(zoom, camera, model_data);
+	
+	
+	
+	
+	if (!Switch.Render) {
+		var renderData = animation.getRenderData(delta_time * 1000);
+		var renderZoom = animation.currentZoom * _zoom_modifier;
+		
+		if (!Switch.Model) { 
+			if (Switch.Skeleton) 
+				device.render(renderZoom, camera, renderData, "skeleton");
+			else
+				device.render(renderZoom, camera, renderData);
+		}
+		else
+			device.render(zoom, camera, model_data);
 
-	// TODO: Add Editor Marking
-	//BlockEditor.editorMark(device, renderZoom, camera, renderData, "skeleton");
-	// or add a mesh?
+		// TODO: Add Editor Marking
+		//BlockEditor.editorMark(device, renderZoom, camera, renderData, "skeleton");
+		// or add a mesh?
+		
+		device.present();
+	}
 	
-	device.present();
 	
 	return true;
 }

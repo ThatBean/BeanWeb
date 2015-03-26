@@ -3,10 +3,12 @@
 Dr.Declare('Switch', 'class');
 Dr.Implement('Switch', function (global, module_get) {
 	var Switch = function () {
-		
+		Dr.log('[Switch] init');
 	}
 	
 	Switch.prototype.Switch = function (key, value) {
+		Dr.log('[Switch]', key, value);
+		
 		if (value == undefined)
 			this[key] = !this[key];
 		else

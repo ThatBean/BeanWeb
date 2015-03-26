@@ -93,19 +93,6 @@
 			set_body_padding();
 			set_canvas_script();
 		}
-		
-		//for a global accessible func to toggle
-		toggleWin = function (obj, command) {
-			var layer = 0;
-			while (obj.parentElement) {
-				obj = obj.parentElement;
-				if (obj.Window) {
-					return obj.Window.toggle(command);
-				}
-				layer++;
-				if (layer > 2) return alert('No win object found to ' + command);
-			}
-		}
 	</script>
 
 	<style>
@@ -128,7 +115,7 @@
 
 <body>
 	<div id="page-header" class="fix-top">
-		<p class="text-center">The test Html of dr.js</p>
+		<p class="text-center">The test Html of Dr.js</p>
 	</div>
 	
 	<div id="page-footer" class="fix-bottom">
