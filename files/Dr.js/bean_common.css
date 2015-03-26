@@ -21,3 +21,6 @@ button:active, .button:active { border: 0.1em solid #333; background: #111; }
 .align-left { margin-left: 0; margin-right: auto; }
 .text-center { text-align: center; }
 .text-left { text-align: left; }
+
+#FPS { font-size: 14pt; COLOR: #900; }
+#Log { font-size: 12pt; COLOR: #666; }
