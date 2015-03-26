@@ -1,0 +1,53 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<title>Bean2D Engine Test Page</title>
+	<style>
+		canvas {
+			background-color: white;
+			border: solid 4px #222; 
+			/*width: 100%;
+			height: 100%;*/
+			image-rendering: optimizeSpeed;
+			image-rendering: -moz-crisp-edges;
+			image-rendering: -webkit-optimize-contrast;
+			image-rendering: optimize-contrast;
+			-ms-interpolation-mode: nearest-neighbor;
+		}
+	</style>
+	<!-- load page utility script -->
+	<script src="Dr.js"></script>
+	<script type="text/javascript">
+		Dr.loadScriptByList([
+			'Dr.base_module.js',
+			'Dr.Pixel3D/math.js',
+			'Dr.Pixel3D/data.js',
+			'Dr.Pixel3D/engine.js',
+			'Dr.Pixel3D/animation.js',
+			'Dr.Pixel3D/sample_code.js'
+		], function () {
+			Dr.log("All script loaded");
+		})
+	</script>
+</head>
+<body>
+	<div>
+		<p>This page is for <b>engine develop</b> use</p>
+	</div>
+	<div>
+		<button onclick="Switch('Log')">Switch Log(broken)</button>
+		<button onclick="Switch('Loop')">Switch Render</button>
+		<button onclick="Switch('Zoom')">Switch Zoom</button>
+		<button onclick="Switch('Rotate')">Switch Rotate</button>
+	</div>
+	<div>
+		<canvas id="frontBuffer" width="400" height="400"></canvas>
+	</div>
+	<div>
+		FPS: <span id="FPS"></span>
+	</div>
+	<div>
+		<p id="Log"></p>
+	</div>
+</body>
+</html>

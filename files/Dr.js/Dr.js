@@ -32,14 +32,125 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 	  };
 	})();
 	
+	//this will not auto swap
+	var _get_random_int = function (from, to) {
+		//var from = range_smaller;
+		//var to = range_bigger;
+		var res = Math.floor(Math.random() * (to - from + 1) + from);
+		if (res == to + 1) return _get_random_int(from, to);
+		return res;
+	}
+	
+	
 	// Pack required
 	var _collect_required = function () {
 		return {
+			//JavaScript only
 			clock: Date.now,
 			clock_per_sec: 1000,
 			getUTCTimeStamp: function () {
 				return Math.floor(Date.now() / 1000);
 			},
+			getArgumentArray: function (src_args, omit_arg) {
+				return Array.prototype.slice.call(src_args, omit_arg || 0);
+			},
+			logList: (function () {
+				if (console.log.apply) {
+					return function (arg_list) {
+						console.log.apply(console, arg_list);
+					}
+				}
+				else {
+					return function (arg_list) {
+						console.log(arg_list);
+					}
+				}
+			})(),
+			get_random_int: function (range_01, range_02) {
+				var from = Math.min(range_01, range_02);
+				var to = Math.max(range_01, range_02);
+				return _get_random_int(from, to);
+			},
+			get_random_int_multi: function (range_01, range_02, count) {
+				var from = Math.min(range_01, range_02);
+				var to = Math.max(range_01, range_02);
+				var count = Math.min(count, (to - from));
+				
+				var res = new Array();
+				for (var i = 0; i < count; i++) {
+					var new_rand = _get_random_int(from, to - i);
+					var j;
+					for (j = 0; j < res.length; j++) {
+						if (res[j] <= new_rand) 
+							new_rand++;
+						else 
+							break;
+					}
+					res.splice(j, 0, new_rand);
+				}
+				return res;
+			},
+
+			
+			
+			
+			
+			
+			//document related
+			loadScript: function (script_src, callback) {
+				console.log('Loading Script:', script_src);
+				var script_element = document.createElement('script');
+				script_element.type = 'text/javascript';
+				script_element.async = true;
+				script_element.src = script_src;
+				script_element.onload = callback;
+				//script_element.onload = 'Dr.log("sdfsdfdsfdsfdsfdsf")';
+				//script_element.onload = function () {
+				//	Dr.log("sdfsdfdsfdsfdsfdsf")	
+				//};
+				//script_element.onload = onload_script_string; //'Dr.Event.Emit("Loaded", ' + event_key + ')';
+				var exist_script_element = document.getElementsByTagName('script')[0];
+				exist_script_element.parentNode.insertBefore(script_element, exist_script_element);
+			},
+			addPastTextListener: function (callback) {
+				document.addEventListener("paste", function(event) {
+					//get content
+					var content;
+					if (event.clipboardData) {
+						content = (event.originalEvent || event).clipboardData.getData('text/plain');
+					}
+					else if (window.clipboardData) {
+						content = window.clipboardData.getData('Text');
+					}
+					
+					//pass on
+					callback(event, content);
+					
+					var sample_process_func = function (event, content) {
+						//cut the text content off the event chain
+						event.preventDefault();
+						
+						theClipBoardData = content;
+						alert("get Pasted ClipBoard Data!");
+						
+						var appendInfo = "[All Data is here]";
+						
+						if (theClipBoardData.length > 200) {appendInfo = "[Displayed only part of data for speed]"}
+						
+						document.getElementById('B_DataA').value = "[Data from ClipBoard] \n" + theClipBoardData.slice(0, 200) + "\n" + appendInfo;
+					};
+				});
+			},
+			createTextDownload: function (filename, text) {
+				var tag = document.createElement('a');
+				tag.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+				tag.setAttribute('download', filename);
+				tag.click();
+			},
+			
+			
+			
+			//window related
 			onNextScreenUpdate: function (callback) {
 				return window.requestAnimationFrame(callback);
 			},
@@ -66,34 +177,16 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 					window.clearInterval();
 				}
 			},
-			loadScript: function (script_src, onload_script_string) {
-				console.log('Loading Script:', script_src);
-				var script_element = document.createElement('script');
-				script_element.type = 'text/javascript';
-				script_element.async = true;
-				script_element.src = script_src;
-				script_element.onload = onload_script_string; //'Dr.Event.Emit("Loaded", ' + event_key + ')';
-				var exist_script_element = document.getElementsByTagName('script')[0];
-				exist_script_element.parentNode.insertBefore(script_element, exist_script_element);
+			addWindowResizeListener: function (callback) {
+				var event = "onorientationchange" in window ? "orientationchange" : "resize";
+				window.addEventListener(event, callback);
 			},
-			getArgumentArray: function (src_args, omit_arg) {
-				return Array.prototype.slice.call(src_args, omit_arg || 0);
-			},
-			logList: (function () {
-				if (console.log.apply) {
-					return function (arg_list) {
-						console.log.apply(console, arg_list);
-					}
-				}
-				else {
-					return function (arg_list) {
-						console.log(arg_list);
-					}
-				}
-			})(),
 		};
 	}
 	
+	
+	
+
 	
 	
 	
@@ -127,6 +220,17 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 	Dr.clock_per_sec = _required_native.clock_per_sec;
 	Dr.onNextScreenUpdate = _required_native.onNextScreenUpdate;
 	Dr.loadScript = _required_native.loadScript;
+	Dr.loadScriptByList = function (script_src_list, callback) {
+		var loop_load_script = function () {
+			Dr.log("[loadScriptByList]", script_src_list);
+			if (script_src_list.length <= 0) 
+				callback();
+			else
+				Dr.loadScript(script_src_list.shift(), loop_load_script);
+		}
+		//start loop
+		loop_load_script();
+	};
 	Dr.getArgumentArray = _required_native.getArgumentArray;
 	Dr.logList = _required_native.logList;
 	Dr.Log = (function () {
@@ -174,17 +278,23 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 	
 	Dr.Event = (function () {
 		var Event = function () {
-			this._key_callback_list = {};
+			this._key_callback_list = [];
 		}
 		
-		Event.prototype.Subscribe = function (event_key, callback) {
+		Event.prototype.subscribe = function (event_key, callback) {
 			if (!callback && typeof(callback) != 'function') {
 				Dr.log('callback error', callback);
 				return;
 			}
 			
-			this._key_callback_list[event_key] = this._key_callback_list[event_key] || [];
-			var callback_list = this._key_callback_list[event_key]
+			if (event_key) {
+				this._key_callback_list[event_key] = this._key_callback_list[event_key] || [];
+			}
+			else {
+				event_key = this._key_callback_list.push([]) - 1;	//get a vacant key
+			}
+			
+			var callback_list = this._key_callback_list[event_key];
 			for (var i in callback_list) {
 				if (callback_list[i] = callback) {
 					Dr.log('callback already exist');
@@ -193,28 +303,33 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			}
 			
 			callback_list.push(callback);
+			
+			return event_key;
 		}
 		
-		Event.prototype.Unsubscribe = function (event_key, org_callback) {
+		Event.prototype.unsubscribe = function (event_key, org_callback) {
 			this._key_callback_list[event_key] = this._key_callback_list[event_key] || [];
 			var callback_list = this._key_callback_list[event_key]
 			for (var i in callback_list) {
 				if (callback_list[i] = org_callback) {
 					callback_list.splice(i, 1);
-					return;
+					return org_callback;
 				}
 			}
+			return null;
 		}
 		
-		Event.prototype.UnsubscribeKey = function (event_key) {
-			this._key_callback_list[event_key] = [];
+		Event.prototype.unsubscribeKey = function (event_key) {
+			this._key_callback_list[event_key] = null;
 		}
 		
-		Event.prototype.UnsubscribeAll = function () {
+		Event.prototype.unsubscribeAll = function () {
 			this._key_callback_list = [];
 		}
 		
-		Event.prototype.Emit = function (event_key) {
+		Event.prototype.emit = function (event_key) {
+			Dr.log("[Event.prototype.emit] Get", event_key)
+			
 			var args = Dr.getArgumentArray(arguments, 1);
 			args.unshift(event_key);
 			
@@ -263,7 +378,8 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 		};
 		ModuleManager.prototype._module_set = function (module_name, module) {
 			if (!this._module_data_pool[module_name]) {
-				alert('module not declared');
+				alert('[ModuleManager.prototype._module_set] module not declared', module_name, module);
+				debugger;
 				return;
 			}
 			this._module_data_pool[module_name].module = module; 
@@ -290,7 +406,9 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 		ModuleManager.prototype.implement =  function (module_name, module_implement_func) {
 			if (!this._module_data_pool[module_name] 
 				|| !this._module_data_pool[module_name].status.declare) {
-				alert('module not declared');
+				alert('[ModuleManager.prototype.implement] module not declared', module_name, module_implement_func);
+				
+				debugger;
 				return;
 			}
 			
@@ -300,17 +418,20 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 		ModuleManager.prototype.require =  function (module_name, required_module_name) {
 			if (!this._module_data_pool[module_name] 
 				|| !this._module_data_pool[module_name].status.declare) {
-				alert('module not declared');
+				alert('[ModuleManager.prototype.require] module not declared', module_name, required_module_name);
+				
+				debugger;
 				return;
 			}
 			
 			this._module_data_pool[module_name].require.push(required_module_name);
-			this._module_data_pool[module_name].status = 'required';
 		};
 		ModuleManager.prototype.load =  function (module_name) {
 			if (!this._module_data_pool[module_name] 
 				|| !this._module_data_pool[module_name].status.declare) {
-				alert('module not declared');
+				alert('[ModuleManager.prototype.load] module not declared', module_name);
+				
+				debugger;
 				return;
 			}
 			
@@ -348,12 +469,12 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			else
 				return;
 		};
-		ModuleManager.prototype.loop_load = function () {
+		ModuleManager.prototype.loadAll = function () {
 			var left_to_load = -1;
 			var last_left_to_load = 0;
 			
 			while(left_to_load != 0) {
-				//Dr.log('load loop===', left_to_load, last_left_to_load);
+				Dr.log('[loadAll] start', left_to_load, last_left_to_load);
 				
 				if (last_left_to_load == left_to_load) {
 					alert('last_left_to_load == left_to_load, infinite loop load?');
@@ -384,7 +505,11 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 		return new ModuleManager;
 	})()
 	
-	
+	Dr.Declare = function (module_name, module_type) { Dr.ModuleManager.declare(module_name, module_type); }
+	Dr.Require = function (module_name, required_module_name) { Dr.ModuleManager.require(module_name, required_module_name); }
+	Dr.Implement = function (module_name, module_implement_func) { Dr.ModuleManager.implement(module_name, module_implement_func); }
+	Dr.LoadAll = function () { Dr.ModuleManager.loadAll(); }
+	Dr.Get = function (module_name) { return Dr.ModuleManager.get(module_name); }
 	
 	Dr.UpdateLoop = (function () {
 		var UpdateLoop = function () {
@@ -472,6 +597,6 @@ Dr.ModuleManager.implement('aaa', function (global, module_get) {
 //Dr.ModuleManager.require('aaa');
 //Dr.ModuleManager.load('test_module');
 
-Dr.ModuleManager.loop_load();
+Dr.ModuleManager.loadAll();
 */
 
