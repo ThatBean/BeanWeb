@@ -4,7 +4,9 @@ var canvas;
 
 var device;		//the engine, the stage
 var camera;		//the camera-view point-eye
-var Pixel3D_Data;	//the model
+var model_data;	//the model
+var model_data2;	//the model 2
+var model_data3;	//the model 3
 var animation;	//the animation object
 
 ///The concept of size and ratio in this engine
@@ -104,12 +106,13 @@ function init() {
 	//device.LoadJSONFileAsync("monkey.Pixel3D_Math", loadJSONCompleted);
 	
 	
-	model_data = new Pixel3D_Data.Data();
-	var meshes = model_data.meshes;
-	var lightsGlobal = model_data.lightsGlobal;
-	var lightsDot = model_data.lightsDot;
 	
-	/** /
+	
+	/**/
+	model_data2 = new Pixel3D_Data.Data();
+	var meshes = model_data2.meshes;
+	var lightsGlobal = model_data2.lightsGlobal;
+	var lightsDot = model_data2.lightsDot;
 	
 	var rTime = 1000;
 	var rX = 100;
@@ -129,11 +132,21 @@ function init() {
 	meshes.push(mesh);
 	/**/
 	
-	/** /
+	
+	
+	
+	
+	
+	/**/
+	model_data3 = new Pixel3D_Data.Data();
+	var meshes = model_data3.meshes;
+	var lightsGlobal = model_data3.lightsGlobal;
+	var lightsDot = model_data3.lightsDot;
+	
 	mesh= new Pixel3D_Data.BlockMesh("Cube", 12); 
 	for (var i = 0; i < 3; i++) {
 		for (var j = 1; j <= 4; j++) {
-			mesh.Blocks[i*4+j-1] = new Block(
+			mesh.Blocks[i*4+j-1] = new Pixel3D_Data.Block(
 				new Pixel3D_Math.Vector3(j*(i==0?1:0), j*(i==1?1:0), j*(i==2?1:0)),
 				new Pixel3D_Math.Color4(1*(i==0?1:0), 1*(i==1?1:0), 1*(i==2?1:0), 1)
 			);
@@ -141,9 +154,51 @@ function init() {
 		}
 	}
 	meshes.push(mesh);
+	
+	
+	lightsGlobal.push(new Pixel3D_Data.Light(
+		new Pixel3D_Math.Vector3(1, 0, 0),
+		new Pixel3D_Math.Color4(0, 0, 1, 1),
+		"Blue"
+	));
+	lightsGlobal.push(new Pixel3D_Data.Light(
+		new Pixel3D_Math.Vector3(-1, 0, 0),
+		new Pixel3D_Math.Color4(1, 0, 0, 1),
+		"Red"
+	));
+	lightsGlobal.push(new Pixel3D_Data.Light(
+		new Pixel3D_Math.Vector3(0, -1, 0),
+		new Pixel3D_Math.Color4(0, 1, 0, 1),
+		"Green"
+	));
+	
+	
+	lightsDot.push(new Pixel3D_Data.Light(
+		new Pixel3D_Math.Vector3(0, 0, 0),
+		new Pixel3D_Math.Color4(1, 0, 1, 1),
+		"RedD"
+	));
 	/**/
 	
 	/**/
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	model_data = new Pixel3D_Data.Data();
+	var meshes = model_data.meshes;
+	var lightsGlobal = model_data.lightsGlobal;
+	var lightsDot = model_data.lightsDot;
+	
 	
 	//The bean logo
 	//0:nothing |8:#111111(0, 0, 0) |1:#FFAE63(255, 174, 99)
@@ -255,6 +310,18 @@ function init() {
 		new Pixel3D_Math.Color4(1, 0, 1, 1),
 		"RedD"
 	));
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
@@ -459,44 +526,81 @@ function drawingLoop(delta_time) {
 	//Dr.log("drawingLoop", delta_time);
 	
 	device.clear();
-	var meshes = model_data.meshes;
-	if (Switch.Rotate) {
-		/** /
-		meshes[0].Rotation.y += 0.001*delta_time;
-		meshes[0].Rotation.x += 0.0002*delta_time;
-		meshes[0].Rotation.z += 0.0005*delta_time;
-		/**/
-		/**/
-		
-		for (var i = 0; i < meshes.length; i++) {
-			meshes[i].Rotation.y += 1 * delta_time;
-			meshes[i].Rotation.x += 0.2 * delta_time;
-		}
-		/**/
-		//camera.rotatePosition(0.001*delta_time, 0, 0.0005*delta_time);
-		//camera.rotateTarget(0, 0.001*delta_time, 0, 0);
-	}
 	
-	if (Switch.Zoom) {	
-		_zoom_modifier += _zoom_modifier * delta_time * _zoom_modify_speed;
-		if (_zoom_modifier > 10) {
-			_zoom_modify_speed = -_zoom_modify_speed;
-			_zoom_modifier = 10;
-		}
-		if (_zoom_modifier < 0.1) {
-			_zoom_modify_speed = -_zoom_modify_speed;
-			_zoom_modifier = 0.1;
-		}
-	}
 	
 	if (!Switch.Render) {
-		var renderData = animation.getRenderData(delta_time * 1000);
-		var renderZoom = animation.currentZoom;
+		
+		var target_zoom;
+		var target_model_data;
+		
+		if (Switch.Model) {
+			switch (Switch.Model_Type) {
+				case 3:
+					target_model_data = model_data3;
+					break;
+				case 2:
+					target_model_data = model_data2;
+					break;
+				default:
+					target_model_data = model_data;
+					break;
+			}
+			target_zoom = zoom;
+		}
+		else {
+			var renderData = animation.getRenderData(delta_time * 1000);
+			var renderZoom = animation.currentZoom;
+			target_model_data = renderData;
+			target_zoom = renderZoom;
+		}
+		
+		
+		
+		var meshes = target_model_data.meshes;
+		if (Switch.Rotate) {
+			/** /
+			meshes[0].Rotation.y += 0.001*delta_time;
+			meshes[0].Rotation.x += 0.0002*delta_time;
+			meshes[0].Rotation.z += 0.0005*delta_time;
+			/**/
+			/**/
+			
+			for (var i = 0; i < meshes.length; i++) {
+				meshes[i].Rotation.y += 1 * delta_time;
+				meshes[i].Rotation.x += 0.2 * delta_time;
+			}
+			/**/
+			//camera.rotatePosition(0.001*delta_time, 0, 0.0005*delta_time);
+			//camera.rotateTarget(0, 0.001*delta_time, 0, 0);
+		}
+		
+		if (Switch.Zoom) {	
+			_zoom_modifier += _zoom_modifier * delta_time * _zoom_modify_speed;
+			if (_zoom_modifier > 10) {
+				_zoom_modify_speed = -_zoom_modify_speed;
+				_zoom_modifier = 10;
+			}
+			if (_zoom_modifier < 0.1) {
+				_zoom_modify_speed = -_zoom_modify_speed;
+				_zoom_modifier = 0.1;
+			}
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		device.render(
-			renderZoom * _zoom_modifier, 
+			target_zoom * _zoom_modifier, 
 			camera, 
-			(Switch.Model ?  model_data : renderData), 
+			target_model_data, 
 			(Switch.Skeleton ? "skeleton" : null)
 		);
 		
