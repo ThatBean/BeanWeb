@@ -26,7 +26,7 @@ var animation;	//the animation object
 //should always keep a 4 based size
 ///set these value
 var screenPixelWidth = 400;		//the width of on-screen canvas
-var blockScale = 4;	//(how many pixel for one block in working pixel)
+var blockScale = 10;	//(how many pixel for one block in working pixel)
 var workingPixelScale = 4;	//(how many pixel on screen for one pixel in working pixel)
 
 
@@ -130,6 +130,24 @@ function init() {
 	}
 	mesh.removeInvisible();	//mark invisible faces
 	meshes.push(mesh);
+	
+	
+	lightsGlobal.push(new Pixel3D_Data.Light(
+		new Pixel3D_Math.Vector3(1, 0, 0),
+		new Pixel3D_Math.Color4(0, 0, 1, 1),
+		"Blue"
+	));
+	lightsGlobal.push(new Pixel3D_Data.Light(
+		new Pixel3D_Math.Vector3(-1, 0, 0),
+		new Pixel3D_Math.Color4(1, 0, 0, 1),
+		"Red"
+	));
+	lightsGlobal.push(new Pixel3D_Data.Light(
+		new Pixel3D_Math.Vector3(0, -1, 0),
+		new Pixel3D_Math.Color4(0, 1, 0, 1),
+		"Green"
+	));
+	
 	/**/
 	
 	
