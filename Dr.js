@@ -228,6 +228,12 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 				};
 				return image_element;
 			},
+			createDownload: function (filename, file_src) {
+				var tag = document.createElement('a');
+				tag.setAttribute('href', file_src);
+				tag.setAttribute('download', filename);
+				tag.click();
+			},
 			createTextDownload: function (filename, text) {
 				var tag = document.createElement('a');
 				tag.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
@@ -349,6 +355,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 	Dr.get_random_int = _required_native.get_random_int;
 	Dr.get_random_int_multi = _required_native.get_random_int_multi;
 	Dr.onNextScreenUpdate = _required_native.onNextScreenUpdate;
+	Dr.createDownload = _required_native.createDownload;
 	Dr.createTextDownload = _required_native.createTextDownload;
 	Dr.loadScript = _required_native.loadScript;
 	Dr.loadScriptByList = function (script_src_list, callback) {

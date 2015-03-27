@@ -1,0 +1,123 @@
+<script>
+//proto test
+var proto_1 = function () {
+	this.name = 'proto_1';
+	this.value_1 = 1;
+}
+proto_1.log = function () {
+	console.log('[proto_1]log', this);
+}
+proto_1.func_1 = function () {
+	console.log('[proto_1]func_1', this);
+}
+proto_1.prototype.getName = function () {
+	return this.name;
+}
+proto_1.prototype.getValue1 = function () {
+	return this.value_1;
+}
+
+var proto_2 = function () {
+	this.name = 'proto_2';
+	this.value_2 = 2;
+}
+proto_2.log = function () {
+	console.log('[proto_2]log', this);
+}
+proto_2.func_2 = function () {
+	console.log('[proto_2]func_2', this);
+}
+proto_2.prototype = new proto_1;
+proto_2.prototype.getName = function () {
+	return this.name;
+}
+proto_2.prototype.getValue2 = function () {
+	return this.value_2;
+}
+
+var proto_3 = function () {
+	this.name = 'proto_3';
+	this.value_3 = 3;
+}
+proto_3.log = function () {
+	console.log('[proto_3]log', this);
+}
+proto_3.func_3 = function () {
+	console.log('[proto_3]func_3', this);
+}
+proto_3.prototype = new proto_2;
+proto_3.prototype.getName = function () {
+	return this.name;
+}
+proto_3.prototype.getValue3 = function () {
+	return this.value_3;
+}
+
+var instance_1 = new proto_1;
+var instance_2 = new proto_2;
+var instance_3 = new proto_3;
+</script>
+
+<h1>Check carefully what method, value the instance has from the console</h1>
+
+<pre>
+</code>
+//proto test
+var proto_1 = function () {
+	this.name = 'proto_1';
+	this.value_1 = 1;
+}
+proto_1.log = function () {
+	console.log('[proto_1]log', this);
+}
+proto_1.func_1 = function () {
+	console.log('[proto_1]func_1', this);
+}
+proto_1.prototype.getName = function () {
+	return this.name;
+}
+proto_1.prototype.getValue1 = function () {
+	return this.value_1;
+}
+
+var proto_2 = function () {
+	this.name = 'proto_2';
+	this.value_2 = 2;
+}
+proto_2.log = function () {
+	console.log('[proto_2]log', this);
+}
+proto_2.func_2 = function () {
+	console.log('[proto_2]func_2', this);
+}
+proto_2.prototype = new proto_1;
+proto_2.prototype.getName = function () {
+	return this.name;
+}
+proto_2.prototype.getValue2 = function () {
+	return this.value_2;
+}
+
+var proto_3 = function () {
+	this.name = 'proto_3';
+	this.value_3 = 3;
+}
+proto_3.log = function () {
+	console.log('[proto_3]log', this);
+}
+proto_3.func_3 = function () {
+	console.log('[proto_3]func_3', this);
+}
+proto_3.prototype = new proto_2;
+proto_3.prototype.getName = function () {
+	return this.name;
+}
+proto_3.prototype.getValue3 = function () {
+	return this.value_3;
+}
+
+var instance_1 = new proto_1;
+var instance_2 = new proto_2;
+var instance_3 = new proto_3;
+</code>
+</pre>
