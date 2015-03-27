@@ -20,18 +20,18 @@
 		}
 	</style>
 	
-    <link rel="shortcut icon" href="favicon.png">
-	<link href="bean_common.css" rel="stylesheet" type="text/css">
+    <link href="../../favicon.png" rel="shortcut icon">
+	<link href="../../bean_common.css" rel="stylesheet" type="text/css">
 	<!-- load page utility script -->
-	<script src="Dr.js"></script>
+	<script src="../../Dr.js"></script>
 	<script type="text/javascript">
 		Dr.loadScriptByList([
-			'Dr.base_module.js',
-			'Dr.Pixel3D/math.js',
-			'Dr.Pixel3D/data.js',
-			'Dr.Pixel3D/engine.js',
-			'Dr.Pixel3D/animation.js',
-			'Dr.Pixel3D/sample_code.js'
+			'../../Dr.base_module.js',
+			'math.js',
+			'data.js',
+			'engine.js',
+			'animation.js',
+			'sample_code.js'
 		], function () {
 			Dr.log("All script loaded");
 		})
@@ -93,8 +93,8 @@
 			<button onclick="Switch.Switch('Rotate')">Switch Rotate</button>
 			<br />
 			<br />
-			<button onclick="Dr.Event.emit('KEY_LEFT')"><<</button>
-			<button onclick="Dr.Event.emit('KEY_RIGHT')">>></button>
+			<button onclick="Dr.Event.emit('KEY_UP', null, 'KEY_LEFT')"><<</button>
+			<button onclick="Dr.Event.emit('KEY_UP', null, 'KEY_RIGHT')">>></button>
 		</div>
 		
 		<br />

@@ -399,7 +399,37 @@ function init() {
 	
 	animation.Frames.push(frame);
 	
+	var adjust_func = function (event_key, event, key_def) {
+		var meshes = model_data.meshes;
+		Dr.log('==================', key_def);
+		if (key_def == 'KEY_LEFT') {
+			for (var i = 0; i < meshes.length; i++) {
+				meshes[i].Position.x -= 1;
+			}
+		}
+		if (key_def == 'KEY_RIGHT') {
+			for (var i = 0; i < meshes.length; i++) {
+				meshes[i].Position.x += 1;
+			}
+		}
+		if (key_def == 'KEY_UP') {
+			for (var i = 0; i < meshes.length; i++) {
+				meshes[i].Position.y += 1;
+			}
+		}
+		if (key_def == 'KEY_DOWN') {
+			for (var i = 0; i < meshes.length; i++) {
+				meshes[i].Position.y -= 1;
+			}
+		}
+		
+		if (event) {
+			event.preventDefault();
+		}
+	};
 	
+	Dr.Event.subscribe('KEY_UP', adjust_func);
+	Dr.Event.subscribe('KEY_DOWN', adjust_func);
 	
 	/** /
 	var tjs = animation.toJSON();

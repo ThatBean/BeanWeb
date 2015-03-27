@@ -44,6 +44,112 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 	
 	// Pack required
 	var _collect_required = function () {
+		var _key_def_list = [];
+		_key_def_list[8] = 'KEY_BACKSPACE';
+		_key_def_list[9] = 'KEY_TAB';
+		_key_def_list[12] = 'KEY_CLEAR';
+		_key_def_list[13] = 'KEY_ENTER';
+		_key_def_list[16] = 'KEY_SHIFT';
+		_key_def_list[17] = 'KEY_CTRL';
+		_key_def_list[18] = 'KEY_ALT';
+		_key_def_list[19] = 'KEY_PAUSE';
+		//_key_def_list[20] = 'KEY_CAPS_LOCK';
+		_key_def_list[27] = 'KEY_ESC';
+		_key_def_list[32] = 'KEY_SPACE';
+		//_key_def_list[33] = 'KEY_PRIOR';
+		//_key_def_list[34] = 'KEY_NEXT';
+		_key_def_list[35] = 'KEY_END';
+		_key_def_list[36] = 'KEY_HOME';
+		_key_def_list[37] = 'KEY_LEFT';
+		_key_def_list[38] = 'KEY_UP';
+		_key_def_list[39] = 'KEY_RIGHT';
+		_key_def_list[40] = 'KEY_DOWN';
+		//_key_def_list[41] = 'KEY_Select';
+		//_key_def_list[42] = 'KEY_Print';
+		//_key_def_list[43] = 'KEY_Execute';
+		_key_def_list[45] = 'KEY_INSERT';
+		_key_def_list[46] = 'KEY_DELETE';
+		//_key_def_list[47] = 'KEY_Help';
+		_key_def_list[48] = 'KEY_0';
+		_key_def_list[49] = 'KEY_1';
+		_key_def_list[50] = 'KEY_2';
+		_key_def_list[51] = 'KEY_3';
+		_key_def_list[52] = 'KEY_4';
+		_key_def_list[53] = 'KEY_5';
+		_key_def_list[54] = 'KEY_6';
+		_key_def_list[55] = 'KEY_7';
+		_key_def_list[56] = 'KEY_8';
+		_key_def_list[57] = 'KEY_9';
+		_key_def_list[65] = 'KEY_A';
+		_key_def_list[66] = 'KEY_B';
+		_key_def_list[67] = 'KEY_C';
+		_key_def_list[68] = 'KEY_D';
+		_key_def_list[69] = 'KEY_E';
+		_key_def_list[70] = 'KEY_F';
+		_key_def_list[71] = 'KEY_G';
+		_key_def_list[72] = 'KEY_H';
+		_key_def_list[73] = 'KEY_I';
+		_key_def_list[74] = 'KEY_J';
+		_key_def_list[75] = 'KEY_K';
+		_key_def_list[76] = 'KEY_L';
+		_key_def_list[77] = 'KEY_M';
+		_key_def_list[78] = 'KEY_N';
+		_key_def_list[79] = 'KEY_O';
+		_key_def_list[80] = 'KEY_P';
+		_key_def_list[81] = 'KEY_Q';
+		_key_def_list[82] = 'KEY_R';
+		_key_def_list[83] = 'KEY_S';
+		_key_def_list[84] = 'KEY_T';
+		_key_def_list[85] = 'KEY_U';
+		_key_def_list[86] = 'KEY_V';
+		_key_def_list[87] = 'KEY_W';
+		_key_def_list[88] = 'KEY_X';
+		_key_def_list[89] = 'KEY_Y';
+		_key_def_list[90] = 'KEY_Z';
+		/*
+		_key_def_list[96] = 'KEY_KP_0 KP_0';
+		_key_def_list[97] = 'KEY_KP_1 KP_1';
+		_key_def_list[98] = 'KEY_KP_2 KP_2';
+		_key_def_list[99] = 'KEY_KP_3 KP_3';
+		_key_def_list[100] = 'KEY_KP_4 KP_4';
+		_key_def_list[101] = 'KEY_KP_5 KP_5';
+		_key_def_list[102] = 'KEY_KP_6 KP_6';
+		_key_def_list[103] = 'KEY_KP_7 KP_7';
+		_key_def_list[104] = 'KEY_KP_8 KP_8';
+		_key_def_list[105] = 'KEY_KP_9 KP_9';
+		_key_def_list[106] = 'KEY_KP_Multiply KP_Multiply';
+		_key_def_list[107] = 'KEY_KP_Add KP_Add';
+		_key_def_list[108] = 'KEY_KP_Separator KP_Separator';
+		_key_def_list[109] = 'KEY_KP_Subtract KP_Subtract';
+		_key_def_list[110] = 'KEY_KP_Decimal KP_Decimal';
+		_key_def_list[111] = 'KEY_KP_Divide KP_Divide';
+		*/
+		_key_def_list[112] = 'KEY_F1';
+		_key_def_list[113] = 'KEY_F2';
+		_key_def_list[114] = 'KEY_F3';
+		_key_def_list[115] = 'KEY_F4';
+		_key_def_list[116] = 'KEY_F5';
+		_key_def_list[117] = 'KEY_F6';
+		_key_def_list[118] = 'KEY_F7';
+		_key_def_list[119] = 'KEY_F8';
+		_key_def_list[120] = 'KEY_F9';
+		_key_def_list[121] = 'KEY_F10';
+		_key_def_list[122] = 'KEY_F11';
+		_key_def_list[123] = 'KEY_F12';
+		/*
+		_key_def_list[124] = 'KEY_F13';
+		_key_def_list[125] = 'KEY_F14';
+		_key_def_list[126] = 'KEY_F15';
+		_key_def_list[127] = 'KEY_F16';
+		_key_def_list[128] = 'KEY_F17';
+		_key_def_list[129] = 'KEY_F18';
+		_key_def_list[130] = 'KEY_F19';
+		_key_def_list[131] = 'KEY_F20';
+		_key_def_list[132] = 'KEY_F21';
+		_key_def_list[133] = 'KEY_F22';
+		_key_def_list[134] = 'KEY_F23';
+		_key_def_list[135] = 'KEY_F24';
+		*/
 		return {
 			//JavaScript only
 			clock: Date.now,
@@ -122,35 +228,6 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 				};
 				return image_element;
 			},
-			addPastTextListener: function (callback) {
-				document.addEventListener("paste", function(event) {
-					//get content
-					var content;
-					if (event.clipboardData) {
-						content = (event.originalEvent || event).clipboardData.getData('text/plain');
-					}
-					else if (window.clipboardData) {
-						content = window.clipboardData.getData('Text');
-					}
-					
-					//pass on
-					callback(event, content);
-					
-					var sample_process_func = function (event, content) {
-						//cut the text content off the event chain
-						event.preventDefault();
-						
-						theClipBoardData = content;
-						alert("get Pasted ClipBoard Data!");
-						
-						var appendInfo = "[All Data is here]";
-						
-						if (theClipBoardData.length > 200) {appendInfo = "[Displayed only part of data for speed]"}
-						
-						document.getElementById('B_DataA').value = "[Data from ClipBoard] \n" + theClipBoardData.slice(0, 200) + "\n" + appendInfo;
-					};
-				});
-			},
 			createTextDownload: function (filename, text) {
 				var tag = document.createElement('a');
 				tag.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
@@ -163,6 +240,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 				canvas.height = height;
 				return canvas;
 			},
+			
 			
 			//window related
 			onNextScreenUpdate: function (callback) {
@@ -191,124 +269,13 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 					window.clearInterval();
 				}
 			},
-			addWindowResizeListener: function (callback) {
-				var event = "onorientationchange" in window ? "orientationchange" : "resize";
-				window.addEventListener(event, callback);
-			},
 			getKeyDefination: function (key_code) {
-				return key_def_list[key_code] || 'KEY_UNDEFINED';
+				return _key_def_list[key_code] || 'KEY_UNDEFINED';
 			}
 		};
 	}
 	
-	var _key_def_list = [];
-	_key_def_list[21] = 'KEY_';
 	
-	/*
-	
-	_key_def_list[8] = 'KEY_BACKSPACE';
-_key_def_list[9] = 'KEY_TAB';
-_key_def_list[12] = 'KEY_CLEAR';
-_key_def_list[13] = 'KEY_ENTER';
-_key_def_list[16] = 'KEY_SHIFT';
-_key_def_list[17] = 'KEY_CTRL';
-_key_def_list[18] = 'KEY_ALT';
-_key_def_list[19] = 'KEY_PAUSE';
-_key_def_list[20] = 'KEY_CAPS_LOCK';
-_key_def_list[27] = 'KEY_ESC';
-_key_def_list[32] = 'KEY_SPACE';
-_key_def_list[33] = 'KEY_PRIOR';
-_key_def_list[34] = 'KEY_NEXT';
-_key_def_list[35] = 'KEY_END';
-_key_def_list[36] = 'KEY_Home';
-_key_def_list[37] = 'KEY_Left';
-_key_def_list[38] = 'KEY_Up';
-_key_def_list[39] = 'KEY_Right';
-_key_def_list[40] = 'KEY_Down';
-_key_def_list[41] = 'KEY_Select';
-_key_def_list[42] = 'KEY_Print';
-_key_def_list[43] = 'KEY_Execute';
-_key_def_list[45] = 'KEY_Insert';
-_key_def_list[46] = 'KEY_Delete';
-_key_def_list[47] = 'KEY_Help';
-_key_def_list[48] = 'KEY_0 equal braceright';
-_key_def_list[49] = 'KEY_1 exclam onesuperior';
-_key_def_list[50] = 'KEY_2 quotedbl twosuperior';
-_key_def_list[51] = 'KEY_3 section threesuperior';
-_key_def_list[52] = 'KEY_4 dollar';
-_key_def_list[53] = 'KEY_5 percent';
-_key_def_list[54] = 'KEY_6 ampersand';
-_key_def_list[55] = 'KEY_7 slash braceleft';
-_key_def_list[56] = 'KEY_8 parenleft bracketleft';
-_key_def_list[57] = 'KEY_9 parenright bracketright';
-_key_def_list[65] = 'KEY_a A';
-_key_def_list[66] = 'KEY_b B';
-_key_def_list[67] = 'KEY_c C';
-_key_def_list[68] = 'KEY_d D';
-_key_def_list[69] = 'KEY_e E EuroSign';
-_key_def_list[70] = 'KEY_f F';
-_key_def_list[71] = 'KEY_g G';
-_key_def_list[72] = 'KEY_h H';
-_key_def_list[73] = 'KEY_i I';
-_key_def_list[74] = 'KEY_j J';
-_key_def_list[75] = 'KEY_k K';
-_key_def_list[76] = 'KEY_l L';
-_key_def_list[77] = 'KEY_m M mu';
-_key_def_list[78] = 'KEY_n N';
-_key_def_list[79] = 'KEY_o O';
-_key_def_list[80] = 'KEY_p P';
-_key_def_list[81] = 'KEY_q Q at';
-_key_def_list[82] = 'KEY_r R';
-_key_def_list[83] = 'KEY_s S';
-_key_def_list[84] = 'KEY_t T';
-_key_def_list[85] = 'KEY_u U';
-_key_def_list[86] = 'KEY_v V';
-_key_def_list[87] = 'KEY_w W';
-_key_def_list[88] = 'KEY_x X';
-_key_def_list[89] = 'KEY_y Y';
-_key_def_list[90] = 'KEY_z Z';
-_key_def_list[96] = 'KEY_KP_0 KP_0';
-_key_def_list[97] = 'KEY_KP_1 KP_1';
-_key_def_list[98] = 'KEY_KP_2 KP_2';
-_key_def_list[99] = 'KEY_KP_3 KP_3';
-keycode 100] = 'KEY_KP_4 KP_4';
-keycode 101] = 'KEY_KP_5 KP_5';
-keycode 102] = 'KEY_KP_6 KP_6';
-keycode 103] = 'KEY_KP_7 KP_7';
-keycode 104] = 'KEY_KP_8 KP_8';
-keycode 105] = 'KEY_KP_9 KP_9';
-keycode 106] = 'KEY_KP_Multiply KP_Multiply';
-keycode 107] = 'KEY_KP_Add KP_Add';
-keycode 108] = 'KEY_KP_Separator KP_Separator';
-keycode 109] = 'KEY_KP_Subtract KP_Subtract';
-keycode 110] = 'KEY_KP_Decimal KP_Decimal';
-keycode 111] = 'KEY_KP_Divide KP_Divide';
-keycode 112] = 'KEY_F1';
-keycode 113] = 'KEY_F2';
-keycode 114] = 'KEY_F3';
-keycode 115] = 'KEY_F4';
-keycode 116] = 'KEY_F5';
-keycode 117] = 'KEY_F6';
-keycode 118] = 'KEY_F7';
-keycode 119] = 'KEY_F8';
-keycode 120] = 'KEY_F9';
-keycode 121] = 'KEY_F10';
-keycode 122] = 'KEY_F11';
-keycode 123] = 'KEY_F12';
-keycode 124] = 'KEY_F13';
-keycode 125] = 'KEY_F14';
-keycode 126] = 'KEY_F15';
-keycode 127] = 'KEY_F16';
-keycode 128] = 'KEY_F17';
-keycode 129] = 'KEY_F18';
-keycode 130] = 'KEY_F19';
-keycode 131] = 'KEY_F20';
-keycode 132] = 'KEY_F21';
-keycode 133] = 'KEY_F22';
-keycode 134] = 'KEY_F23';
-keycode 135] = 'KEY_F24
-	
-	*/
 	
 	
 	
@@ -334,18 +301,44 @@ keycode 135] = 'KEY_F24
 	
 	
 	Dr.document.onkeydown = function (event) {
-		Dr.log("[document.onkeydown]", event.keyCode, event.which);
-		Dr.Event.emit("KEY_DOWN", event);
+		Dr.log("[document.onkeydown]", event.keyCode, event.which, Dr.getKeyDefination(event.keyCode || event.which));
+		Dr.Event.emit("KEY_DOWN", event, Dr.getKeyDefination(event.keyCode || event.which));
 	};
-	Dr.document.onkeypress = function (event) {
-		Dr.log("[document.onkeypress]", event.keyCode, event.which);
-		Dr.Event.emit("KEY_PRESS", event);
-	};
+	//Dr.document.onkeypress = function (event) {
+	//	Dr.log("[document.onkeypress]", event.keyCode, event.which, Dr.getKeyDefination(event.keyCode || event.which));
+	//	Dr.Event.emit("KEY_PRESS", Dr.getKeyDefination(event.keyCode || event.which));
+	//};
 	Dr.document.onkeyup = function (event) {
-		Dr.log("[document.onkeyup]", event.keyCode, event.which);
-		Dr.Event.emit("KEY_UP", event);
+		Dr.log("[document.onkeyup]", event.keyCode, event.which, Dr.getKeyDefination(event.keyCode || event.which));
+		Dr.Event.emit("KEY_UP", event, Dr.getKeyDefination(event.keyCode || event.which));
 	};
 	
+	Dr.document.onpaste = function (event) {
+		//get content
+		var content;
+		if (event.clipboardData) {
+			content = (event.originalEvent || event).clipboardData.getData('text/plain');
+		}
+		else if (window.clipboardData) {
+			content = window.clipboardData.getData('Text');
+		}
+		
+		//pass on
+		Dr.Event.emit("PASTE", event, content);
+		
+		var sample_process_func = function (event_key, event, content) {
+			//cut the text content off the event chain
+			event.preventDefault();
+			theClipBoardData = content;
+			alert("get Pasted ClipBoard Data!");
+			var appendInfo = "[All Data is here]";
+			if (theClipBoardData.length > 200) {appendInfo = "[Displayed only part of data for speed]"}
+			document.getElementById('B_DataA').value = "[Data from ClipBoard] \n" + theClipBoardData.slice(0, 200) + "\n" + appendInfo;
+		};
+	};
+	Dr.window.addEventListener(("onorientationchange" in window ? "orientationchange" : "resize"), function (event) {
+		Dr.Event.emit("WINDOW_RESIZE", event);
+	});
 	
 	Dr.now = _required_native.clock;
 	Dr.getUTCTimeStamp = _required_native.getUTCTimeStamp;
@@ -370,6 +363,7 @@ keycode 135] = 'KEY_F24
 		loop_load_script();
 	};
 	Dr.getArgumentArray = _required_native.getArgumentArray;
+	Dr.getKeyDefination = _required_native.getKeyDefination;
 	
 	
 	Dr.logList = _required_native.logList;
