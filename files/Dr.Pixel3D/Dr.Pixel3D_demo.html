@@ -93,8 +93,12 @@
 			<button onclick="Switch.Switch('Rotate')">Switch Rotate</button>
 			<br />
 			<br />
-			<button onclick="Dr.Event.emit('KEY_UP', null, 'KEY_LEFT')"><<</button>
-			<button onclick="Dr.Event.emit('KEY_UP', null, 'KEY_RIGHT')">>></button>
+			<button onclick="Dr.Event.emit('KEY_UP', null, 'K_LEFT')">[Left]</button>
+			<button onclick="Dr.Event.emit('KEY_UP', null, 'K_RIGHT')">[Right]</button>
+			<button onclick="Dr.Event.emit('KEY_UP', null, 'K_UP')">[ Up ]</button>
+			<button onclick="Dr.Event.emit('KEY_UP', null, 'K_DOWN')">[Down]</button>
+			<br />
+			<br />
 			<button onclick="Switch.Switch('Model_Type', 1)">Model 1</button>
 			<button onclick="Switch.Switch('Model_Type', 2)">Model 2</button>
 			<button onclick="Switch.Switch('Model_Type', 3)">Model 3</button>

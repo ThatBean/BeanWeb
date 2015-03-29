@@ -44,111 +44,111 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 	
 	// Pack required
 	var _collect_required = function () {
-		var _key_def_list = [];
-		_key_def_list[8] = 'KEY_BACKSPACE';
-		_key_def_list[9] = 'KEY_TAB';
-		_key_def_list[12] = 'KEY_CLEAR';
-		_key_def_list[13] = 'KEY_ENTER';
-		_key_def_list[16] = 'KEY_SHIFT';
-		_key_def_list[17] = 'KEY_CTRL';
-		_key_def_list[18] = 'KEY_ALT';
-		_key_def_list[19] = 'KEY_PAUSE';
-		//_key_def_list[20] = 'KEY_CAPS_LOCK';
-		_key_def_list[27] = 'KEY_ESC';
-		_key_def_list[32] = 'KEY_SPACE';
-		//_key_def_list[33] = 'KEY_PRIOR';
-		//_key_def_list[34] = 'KEY_NEXT';
-		_key_def_list[35] = 'KEY_END';
-		_key_def_list[36] = 'KEY_HOME';
-		_key_def_list[37] = 'KEY_LEFT';
-		_key_def_list[38] = 'KEY_UP';
-		_key_def_list[39] = 'KEY_RIGHT';
-		_key_def_list[40] = 'KEY_DOWN';
-		//_key_def_list[41] = 'KEY_Select';
-		//_key_def_list[42] = 'KEY_Print';
-		//_key_def_list[43] = 'KEY_Execute';
-		_key_def_list[45] = 'KEY_INSERT';
-		_key_def_list[46] = 'KEY_DELETE';
-		//_key_def_list[47] = 'KEY_Help';
-		_key_def_list[48] = 'KEY_0';
-		_key_def_list[49] = 'KEY_1';
-		_key_def_list[50] = 'KEY_2';
-		_key_def_list[51] = 'KEY_3';
-		_key_def_list[52] = 'KEY_4';
-		_key_def_list[53] = 'KEY_5';
-		_key_def_list[54] = 'KEY_6';
-		_key_def_list[55] = 'KEY_7';
-		_key_def_list[56] = 'KEY_8';
-		_key_def_list[57] = 'KEY_9';
-		_key_def_list[65] = 'KEY_A';
-		_key_def_list[66] = 'KEY_B';
-		_key_def_list[67] = 'KEY_C';
-		_key_def_list[68] = 'KEY_D';
-		_key_def_list[69] = 'KEY_E';
-		_key_def_list[70] = 'KEY_F';
-		_key_def_list[71] = 'KEY_G';
-		_key_def_list[72] = 'KEY_H';
-		_key_def_list[73] = 'KEY_I';
-		_key_def_list[74] = 'KEY_J';
-		_key_def_list[75] = 'KEY_K';
-		_key_def_list[76] = 'KEY_L';
-		_key_def_list[77] = 'KEY_M';
-		_key_def_list[78] = 'KEY_N';
-		_key_def_list[79] = 'KEY_O';
-		_key_def_list[80] = 'KEY_P';
-		_key_def_list[81] = 'KEY_Q';
-		_key_def_list[82] = 'KEY_R';
-		_key_def_list[83] = 'KEY_S';
-		_key_def_list[84] = 'KEY_T';
-		_key_def_list[85] = 'KEY_U';
-		_key_def_list[86] = 'KEY_V';
-		_key_def_list[87] = 'KEY_W';
-		_key_def_list[88] = 'KEY_X';
-		_key_def_list[89] = 'KEY_Y';
-		_key_def_list[90] = 'KEY_Z';
+		var _K_def_list = [];
+		_K_def_list[8] = 'K_BACKSPACE';
+		_K_def_list[9] = 'K_TAB';
+		_K_def_list[12] = 'K_CLEAR';
+		_K_def_list[13] = 'K_ENTER';
+		_K_def_list[16] = 'K_SHIFT';
+		_K_def_list[17] = 'K_CTRL';
+		_K_def_list[18] = 'K_ALT';
+		_K_def_list[19] = 'K_PAUSE';
+		//_K_def_list[20] = 'K_CAPS_LOCK';
+		_K_def_list[27] = 'K_ESC';
+		_K_def_list[32] = 'K_SPACE';
+		//_K_def_list[33] = 'K_PRIOR';
+		//_K_def_list[34] = 'K_NEXT';
+		_K_def_list[35] = 'K_END';
+		_K_def_list[36] = 'K_HOME';
+		_K_def_list[37] = 'K_LEFT';
+		_K_def_list[38] = 'K_UP';
+		_K_def_list[39] = 'K_RIGHT';
+		_K_def_list[40] = 'K_DOWN';
+		//_K_def_list[41] = 'K_Select';
+		//_K_def_list[42] = 'K_Print';
+		//_K_def_list[43] = 'K_Execute';
+		_K_def_list[45] = 'K_INSERT';
+		_K_def_list[46] = 'K_DELETE';
+		//_K_def_list[47] = 'K_Help';
+		_K_def_list[48] = 'K_0';
+		_K_def_list[49] = 'K_1';
+		_K_def_list[50] = 'K_2';
+		_K_def_list[51] = 'K_3';
+		_K_def_list[52] = 'K_4';
+		_K_def_list[53] = 'K_5';
+		_K_def_list[54] = 'K_6';
+		_K_def_list[55] = 'K_7';
+		_K_def_list[56] = 'K_8';
+		_K_def_list[57] = 'K_9';
+		_K_def_list[65] = 'K_A';
+		_K_def_list[66] = 'K_B';
+		_K_def_list[67] = 'K_C';
+		_K_def_list[68] = 'K_D';
+		_K_def_list[69] = 'K_E';
+		_K_def_list[70] = 'K_F';
+		_K_def_list[71] = 'K_G';
+		_K_def_list[72] = 'K_H';
+		_K_def_list[73] = 'K_I';
+		_K_def_list[74] = 'K_J';
+		_K_def_list[75] = 'K_K';
+		_K_def_list[76] = 'K_L';
+		_K_def_list[77] = 'K_M';
+		_K_def_list[78] = 'K_N';
+		_K_def_list[79] = 'K_O';
+		_K_def_list[80] = 'K_P';
+		_K_def_list[81] = 'K_Q';
+		_K_def_list[82] = 'K_R';
+		_K_def_list[83] = 'K_S';
+		_K_def_list[84] = 'K_T';
+		_K_def_list[85] = 'K_U';
+		_K_def_list[86] = 'K_V';
+		_K_def_list[87] = 'K_W';
+		_K_def_list[88] = 'K_X';
+		_K_def_list[89] = 'K_Y';
+		_K_def_list[90] = 'K_Z';
 		/*
-		_key_def_list[96] = 'KEY_KP_0 KP_0';
-		_key_def_list[97] = 'KEY_KP_1 KP_1';
-		_key_def_list[98] = 'KEY_KP_2 KP_2';
-		_key_def_list[99] = 'KEY_KP_3 KP_3';
-		_key_def_list[100] = 'KEY_KP_4 KP_4';
-		_key_def_list[101] = 'KEY_KP_5 KP_5';
-		_key_def_list[102] = 'KEY_KP_6 KP_6';
-		_key_def_list[103] = 'KEY_KP_7 KP_7';
-		_key_def_list[104] = 'KEY_KP_8 KP_8';
-		_key_def_list[105] = 'KEY_KP_9 KP_9';
-		_key_def_list[106] = 'KEY_KP_Multiply KP_Multiply';
-		_key_def_list[107] = 'KEY_KP_Add KP_Add';
-		_key_def_list[108] = 'KEY_KP_Separator KP_Separator';
-		_key_def_list[109] = 'KEY_KP_Subtract KP_Subtract';
-		_key_def_list[110] = 'KEY_KP_Decimal KP_Decimal';
-		_key_def_list[111] = 'KEY_KP_Divide KP_Divide';
+		_K_def_list[96] = 'K_KP_0 KP_0';
+		_K_def_list[97] = 'K_KP_1 KP_1';
+		_K_def_list[98] = 'K_KP_2 KP_2';
+		_K_def_list[99] = 'K_KP_3 KP_3';
+		_K_def_list[100] = 'K_KP_4 KP_4';
+		_K_def_list[101] = 'K_KP_5 KP_5';
+		_K_def_list[102] = 'K_KP_6 KP_6';
+		_K_def_list[103] = 'K_KP_7 KP_7';
+		_K_def_list[104] = 'K_KP_8 KP_8';
+		_K_def_list[105] = 'K_KP_9 KP_9';
+		_K_def_list[106] = 'K_KP_Multiply KP_Multiply';
+		_K_def_list[107] = 'K_KP_Add KP_Add';
+		_K_def_list[108] = 'K_KP_Separator KP_Separator';
+		_K_def_list[109] = 'K_KP_Subtract KP_Subtract';
+		_K_def_list[110] = 'K_KP_Decimal KP_Decimal';
+		_K_def_list[111] = 'K_KP_Divide KP_Divide';
 		*/
-		_key_def_list[112] = 'KEY_F1';
-		_key_def_list[113] = 'KEY_F2';
-		_key_def_list[114] = 'KEY_F3';
-		_key_def_list[115] = 'KEY_F4';
-		_key_def_list[116] = 'KEY_F5';
-		_key_def_list[117] = 'KEY_F6';
-		_key_def_list[118] = 'KEY_F7';
-		_key_def_list[119] = 'KEY_F8';
-		_key_def_list[120] = 'KEY_F9';
-		_key_def_list[121] = 'KEY_F10';
-		_key_def_list[122] = 'KEY_F11';
-		_key_def_list[123] = 'KEY_F12';
+		_K_def_list[112] = 'K_F1';
+		_K_def_list[113] = 'K_F2';
+		_K_def_list[114] = 'K_F3';
+		_K_def_list[115] = 'K_F4';
+		_K_def_list[116] = 'K_F5';
+		_K_def_list[117] = 'K_F6';
+		_K_def_list[118] = 'K_F7';
+		_K_def_list[119] = 'K_F8';
+		_K_def_list[120] = 'K_F9';
+		_K_def_list[121] = 'K_F10';
+		_K_def_list[122] = 'K_F11';
+		_K_def_list[123] = 'K_F12';
 		/*
-		_key_def_list[124] = 'KEY_F13';
-		_key_def_list[125] = 'KEY_F14';
-		_key_def_list[126] = 'KEY_F15';
-		_key_def_list[127] = 'KEY_F16';
-		_key_def_list[128] = 'KEY_F17';
-		_key_def_list[129] = 'KEY_F18';
-		_key_def_list[130] = 'KEY_F19';
-		_key_def_list[131] = 'KEY_F20';
-		_key_def_list[132] = 'KEY_F21';
-		_key_def_list[133] = 'KEY_F22';
-		_key_def_list[134] = 'KEY_F23';
-		_key_def_list[135] = 'KEY_F24';
+		_K_def_list[124] = 'K_F13';
+		_K_def_list[125] = 'K_F14';
+		_K_def_list[126] = 'K_F15';
+		_K_def_list[127] = 'K_F16';
+		_K_def_list[128] = 'K_F17';
+		_K_def_list[129] = 'K_F18';
+		_K_def_list[130] = 'K_F19';
+		_K_def_list[131] = 'K_F20';
+		_K_def_list[132] = 'K_F21';
+		_K_def_list[133] = 'K_F22';
+		_K_def_list[134] = 'K_F23';
+		_K_def_list[135] = 'K_F24';
 		*/
 		return {
 			//JavaScript only
@@ -275,8 +275,8 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 					window.clearInterval();
 				}
 			},
-			getKeyDefination: function (key_code) {
-				return _key_def_list[key_code] || 'KEY_UNDEFINED';
+			getKeyDefination: function (K_code) {
+				return _K_def_list[K_code] || 'K_UNDEFINED';
 			}
 		};
 	}
@@ -418,7 +418,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 	
 	Dr.Event = (function () {
 		var Event = function () {
-			this._key_callback_list = [];
+			this._K_callback_list = [];
 		}
 		
 		Event.prototype.subscribe = function (event_key, callback) {
@@ -428,13 +428,13 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			}
 			
 			if (event_key) {
-				this._key_callback_list[event_key] = this._key_callback_list[event_key] || [];
+				this._K_callback_list[event_key] = this._K_callback_list[event_key] || [];
 			}
 			else {
-				event_key = this._key_callback_list.push([]) - 1;	//get a vacant key
+				event_key = this._K_callback_list.push([]) - 1;	//get a vacant key
 			}
 			
-			var callback_list = this._key_callback_list[event_key];
+			var callback_list = this._K_callback_list[event_key];
 			for (var i in callback_list) {
 				if (callback_list[i] = callback) {
 					Dr.log('callback already exist');
@@ -448,8 +448,8 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 		}
 		
 		Event.prototype.unsubscribe = function (event_key, org_callback) {
-			this._key_callback_list[event_key] = this._key_callback_list[event_key] || [];
-			var callback_list = this._key_callback_list[event_key]
+			this._K_callback_list[event_key] = this._K_callback_list[event_key] || [];
+			var callback_list = this._K_callback_list[event_key]
 			for (var i in callback_list) {
 				if (callback_list[i] = org_callback) {
 					callback_list.splice(i, 1);
@@ -460,11 +460,11 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 		}
 		
 		Event.prototype.unsubscribeKey = function (event_key) {
-			this._key_callback_list[event_key] = null;
+			this._K_callback_list[event_key] = null;
 		}
 		
 		Event.prototype.unsubscribeAll = function () {
-			this._key_callback_list = [];
+			this._K_callback_list = [];
 		}
 		
 		Event.prototype.emit = function (event_key) {
@@ -473,8 +473,8 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			var args = Dr.getArgumentArray(arguments, 1);
 			args.unshift(event_key);
 			
-			this._key_callback_list[event_key] = this._key_callback_list[event_key] || [];
-			var callback_list = this._key_callback_list[event_key]
+			this._K_callback_list[event_key] = this._K_callback_list[event_key] || [];
+			var callback_list = this._K_callback_list[event_key]
 			for (var i in callback_list) {
 				callback_list[i].apply(null, args);
 			}

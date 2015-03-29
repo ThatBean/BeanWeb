@@ -484,25 +484,45 @@ function init() {
 	
 	animation.Frames.push(frame);
 	
-	var adjust_func = function (event_key, event, key_def) {
-		var meshes = model_data.meshes;
-		Dr.log('==================', key_def);
-		if (key_def == 'KEY_LEFT') {
+	var adjust_func = function (event_key, event, K_def) {
+		var target_model_data;
+		
+		if (Switch.Model) {
+			switch (Switch.Model_Type) {
+				case 3:
+					target_model_data = model_data3;
+					break;
+				case 2:
+					target_model_data = model_data2;
+					break;
+				default:
+					target_model_data = model_data;
+					break;
+			}
+		}
+		else {
+			return;
+		}
+		
+		var meshes = target_model_data.meshes;
+		
+		Dr.log('==================', K_def);
+		if (K_def == 'K_LEFT') {
 			for (var i = 0; i < meshes.length; i++) {
 				meshes[i].Position.x -= 1;
 			}
 		}
-		if (key_def == 'KEY_RIGHT') {
+		if (K_def == 'K_RIGHT') {
 			for (var i = 0; i < meshes.length; i++) {
 				meshes[i].Position.x += 1;
 			}
 		}
-		if (key_def == 'KEY_UP') {
+		if (K_def == 'K_UP') {
 			for (var i = 0; i < meshes.length; i++) {
 				meshes[i].Position.y += 1;
 			}
 		}
-		if (key_def == 'KEY_DOWN') {
+		if (K_def == 'K_DOWN') {
 			for (var i = 0; i < meshes.length; i++) {
 				meshes[i].Position.y -= 1;
 			}
