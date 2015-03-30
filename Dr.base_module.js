@@ -154,4 +154,144 @@ Dr.Implement('Toolbox', function (global, module_get) {
 	return Toolbox;
 });
 
+
+
+
+//resource_loader
+
+//var res = ""; for (var i = 0; i < 97; i++) { res += '[' + i * 6 + ', 0, 6, 13],\n'; }
+var image_data = {
+	src: 'Pic.png',
+	type: 'image',
+	callback: function (image_data) {},
+};
+
+var image_multi_data = {
+	image_src: 'Pic.png',
+	info_src: 'Pic.png',
+	type: 'image_multi',
+	callback: function (image_multi_data) {},
+};
+
+var font_data = {
+	image_src: 'Font.png',
+	info_src: 'Font.font',
+	type: 'font',
+	callback: function (font_data) {},
+};
+
+var script_data = {
+	src: 'dr.js',
+	type: 'script',
+	callback: function (script_data) {},
+};
+
+
+var text_data = {
+	src: 'dr.txt',
+	type: 'text',
+	callback: function (text_data) {},
+};
+
+
+
+
+//Dr.Get("ResourceLoader")._loader_list.text('math.js', function (a, b) {Dr.debug_a = a; Dr.log(a);})
+//Dr.Get("ResourceLoader")._loader_list.image_multi('BeanFont.png', 'math.js', function (a, b) {Dr.debug_a = a; Dr.debug_b = b; Dr.log(a, b);})
+
+Dr.Declare('ResourceLoader', 'single_instance');
+Dr.Implement('ResourceLoader', function (global, module_get) {
+	
+	var Module = function () {
+		this.loaded_resource_list = {};
+		
+	}
+	
+	var _loader_image = Dr.loadImage;
+	var _loader_script =Dr.loadScript;
+	var _loader_text = function (src, callback) {
+		Dr.createHttpRequest(src, null, function (xml_http, response_text) {
+			callback(response_text);
+		});
+	};
+	var _loader_image_text = function (image_src, text_src, callback) {
+		_loader_image(image_src, function (image_element) {
+			_loader_text(text_src, function (response_text) {
+				callback(image_element, response_text);
+			});
+		});
+	};
+	
+	Module._loader_list = {
+		text: _loader_text,
+		image: _loader_image,
+		image_multi: _loader_image_text,
+		script: _loader_script,
+		font_bitmap: _loader_image_text,
+	};
+	
+	
+	
+	Module.prototype._check_loaded = function (resource_data) {
+		switch (resource_data.type) {
+			case 'text':
+			case 'image':
+			case 'script':
+				if (
+					this.loaded_resource_list[resource_data.type] 
+					&& this.loaded_resource_list[resource_data.type][resource_data.src]
+				) {
+					resource_data.loaded = this.loaded_resource_list[resource_data.type][resource_data.src];
+					return true;
+				}
+				break;
+			case 'image_multi':
+			case 'font_bitmap':
+				if (
+					this.loaded_resource_list[resource_data.image] 
+					&& this.loaded_resource_list[resource_data.text] 
+					&& this.loaded_resource_list[resource_data.image][resource_data.image_src]
+					&& this.loaded_resource_list[resource_data.text][resource_data.image_src]
+				) {
+					resource_data.loaded_image = this.loaded_resource_list[resource_data.type][resource_data.image_src];
+					resource_data.loaded_info = this.loaded_resource_list[resource_data.type][resource_data.info_src];
+					return true;
+				}
+				break;
+			default:
+				Dr.log('[loadResource] Error type', resource_data.type);
+				break;
+		}
+	};
+	Module.prototype.loadResource = function (resource_data) {
+		if (this._check_loaded(resource_data)) {
+			resource_data.callback(resource_data);
+			return;
+		}
+		
+		
+		switch (resource_data.type) {
+			case 'text':
+			case 'image':
+			case 'script':
+				//if ()
+				break;
+			case 'image_multi':
+			case 'font_bitmap':
+				break;
+			default:
+				Dr.log('[loadResource] Error type', resource_data.type);
+				break;
+		}
+	}
+	
+	
+	Module.prototype.step = function () {
+	}
+	
+	return Module;
+});
+
+
+
 Dr.LoadAll();

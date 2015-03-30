@@ -505,30 +505,35 @@ function init() {
 		}
 		
 		var meshes = target_model_data.meshes;
+		var prevent_default = false;
 		
 		Dr.log('==================', K_def);
 		if (K_def == 'K_LEFT') {
 			for (var i = 0; i < meshes.length; i++) {
 				meshes[i].Position.x -= 1;
+				prevent_default = true;
 			}
 		}
 		if (K_def == 'K_RIGHT') {
 			for (var i = 0; i < meshes.length; i++) {
 				meshes[i].Position.x += 1;
+				prevent_default = true;
 			}
 		}
 		if (K_def == 'K_UP') {
 			for (var i = 0; i < meshes.length; i++) {
 				meshes[i].Position.y += 1;
+				prevent_default = true;
 			}
 		}
 		if (K_def == 'K_DOWN') {
 			for (var i = 0; i < meshes.length; i++) {
 				meshes[i].Position.y -= 1;
+				prevent_default = true;
 			}
 		}
 		
-		if (event) {
+		if (event && prevent_default) {
 			event.preventDefault();
 		}
 	};

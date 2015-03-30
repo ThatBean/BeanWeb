@@ -150,6 +150,8 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 		_K_def_list[134] = 'K_F23';
 		_K_def_list[135] = 'K_F24';
 		*/
+		
+		
 		return {
 			//JavaScript only
 			clock: Date.now,
@@ -204,12 +206,14 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			
 			//document related
 			loadScript: function (script_src, callback) {
-				console.log('Loading Script:', script_src);
+				Dr.log('Loading Script:', script_src);
 				var script_element = document.createElement('script');
 				script_element.type = 'text/javascript';
 				script_element.async = true;
 				script_element.src = script_src;
-				script_element.onload = callback;
+				script_element.onload = function () {
+					callback(script_element);
+				};
 				//script_element.onload = 'Dr.log("sdfsdfdsfdsfdsfdsf")';
 				//script_element.onload = function () {
 				//	Dr.log("sdfsdfdsfdsfdsfdsf")	
@@ -227,6 +231,26 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 					callback(image_element);
 				};
 				return image_element;
+			},
+			createHttpRequest: function (url, message, finish_callback, state_change_callback) {
+				//alert(url+"|"+message);
+				var xml_http = new XMLHttpRequest();
+				if (!xml_http) {
+					alert('Browser does not support HTTP Request');
+					return;
+				} 
+				xml_http.onreadystatechange= function () {
+					if (xml_http.readyState == 4 && xml_http.status==200) { 
+						finish_callback(xml_http, xml_http.responseText || xml_http.responseXML);
+					}
+					else { 
+						if (state_change_callback) state_change_callback(xml_http);
+					}
+				};
+				xml_http.open('POST', url, true);
+				xml_http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+				xml_http.send(message);
+				return xml_http;
 			},
 			createDownload: function (filename, file_src) {
 				var tag = document.createElement('a');
@@ -277,7 +301,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			},
 			getKeyDefination: function (K_code) {
 				return _K_def_list[K_code] || 'K_UNDEFINED';
-			}
+			},
 		};
 	}
 	
@@ -369,6 +393,8 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 		//start loop
 		loop_load_script();
 	};
+	Dr.loadImage = _required_native.loadImage;
+	Dr.createHttpRequest = _required_native.createHttpRequest;
 	Dr.getArgumentArray = _required_native.getArgumentArray;
 	Dr.getKeyDefination = _required_native.getKeyDefination;
 	
