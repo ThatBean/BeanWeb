@@ -263,8 +263,8 @@ Dr.Implement('ResourceLoader', function (global, module_get) {
 				break;
 		}
 	};
-	Module.prototype.loadResource = function (resource_data) {
-		if (this._check_loaded(resource_data)) {
+	Module.prototype.loadResource = function (resource_data, is_force_reload) {
+		if (!is_force_reload && this._check_loaded(resource_data)) {
 			resource_data.callback(resource_data);
 			return;
 		}
