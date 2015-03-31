@@ -89,7 +89,7 @@ function init() {
 	
 	
 	
-	canvas = document.getElementById("frontBuffer");
+	canvas = document.getElementById("Dr.Canvas");
 	device = new Pixel3D_Engine.Device(canvas, ratio);
 	
 	

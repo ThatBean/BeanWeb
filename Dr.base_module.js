@@ -321,131 +321,129 @@ Dr.Implement('ResourceLoader', function (global, module_get) {
 
 
 
-Dr.test_func = function () {
-	var log_action = function(event) {
-		event.preventDefault();
-		var action = Dr.getActionFromEvent(event);
-		var element = Dr.document.getElementById('frontBuffer');
-		
-		var position = Dr.getPositonInElementFromAction(action, element);
-		//Dr.log(action, element, position);
-		Dr.log(action.action_type, position);
-	}
-	
-	Dr.document.addEventListener('mousedown', log_action);
-	Dr.document.addEventListener('mousemove', log_action);
-	Dr.document.addEventListener('mouseup', log_action);
-	Dr.document.addEventListener('mouseout', log_action);
-	
+
+var sample_box_data = {
+	x: 0,
+	y: 0,
+	width: 0,
+	height: 0,
+	z: 0,
+	//callback: function (box_data) {};	//you can add
+	box_tag: 'tag',
 }
 
-/*
-Dr.Declare('InteractionCallback', 'class');
-Dr.Implement('InteractionCallback', function (global, module_get) {
+
+Dr.Declare('ActionBox', 'class');
+Dr.Implement('ActionBox', function (global, module_get) {
 	
 	var Module = function () {
-		this.loaded_cache = {};
+		this.box_list = [];
 	}
 	
-	Module.prototype.getLoaderList = function () {
-		return Module._loader_list;
+	Module.prototype.addBox = function (box_tag, box_data) {
+		var box_tag = box_tag || this.box_list.length;
+		this.box_list.box_tag = this.box_list.box_tag || box_tag;
+		this.box_list[box_tag] = box_data;
 	};
 	
-	Module.prototype._add_loaded_cache = function (type, src, loaded) {
-		this.loaded_cache[type] = this.loaded_cache[type] || {};
-		this.loaded_cache[type][src] = loaded;
+	Module.prototype.removeBox = function (box_tag) {
+		this.box_list[box_tag] = null;
 	};
 	
-	Module.prototype._check_loaded_cache = function (load_data) {
-		if (load_data.is_multi == false) {
+	Module.prototype.removeAllBox = function () {
+		this.box_list = [];
+	};
+	
+	Module.prototype.testPoint = function (position) {
+		var res_box_list;
+		var max_z = Number.NEGATIVE_INFINITY;
+		for (var box_tag in this.box_list) {
+			var box_data = this.box_list[box_tag];
 			if (
-				this.loaded_cache[load_data.type] 
-				&& this.loaded_cache[load_data.type][load_data.src]
+				position.x >= box_data.x
+				&& position.y >= box_data.y
+				&& position.x <= box_data.width
+				&& position.y <= box_data.height
 			) {
-				load_data.loaded = this.loaded_cache[load_data.type][load_data.src];
-				return true;
-			};
-		}	
-		else {
-			if (
-				this.loaded_cache[load_data.image] 
-				&& this.loaded_cache[load_data.text] 
-				&& this.loaded_cache[load_data.image][load_data.image_src]
-				&& this.loaded_cache[load_data.text][load_data.text_src]
-			) {
-				load_data.loaded_image = this.loaded_cache[load_data.type][load_data.image_src];
-				load_data.loaded_text = this.loaded_cache[load_data.type][load_data.text_src];
-				return true;
-			};
-		};
-	};
-	
-	Module.prototype._check_data = function (load_data) {
-		switch (load_data.type) {
-			case 'text':
-			case 'image':
-			case 'script':
-				load_data.is_multi = false;
-				break;
-			case 'image_multi':
-			case 'font_bitmap':
-				load_data.is_multi = true;
-				break;
-			default:
-				Dr.log('[loadResource] Error type', load_data.type);
-				return;
-				break;
-		};
-		return load_data;
-	};
-	
-	Module.prototype._load_resource = function (load_data) {
-		if (load_data.is_multi == false) {
-			Module._loader_list[load_data.type](load_data.src, function (loaded) {
-				this._add_loaded_cache(load_data.type, load_data.src, loaded);
-				load_data.loaded = loaded;
-				load_data.callback(load_data);
-			});
+				if (max_z < box_data.z) {
+					res_box_list = [];	//clear previous
+					max_z = box_data.z; 
+				}
+				res_box_list.push(box_data);
+			}
 		}
-		else {
-			Module._loader_list['multi'](load_data.src, function (loaded_image, loaded_text) {
-				this._add_loaded_cache('image', load_data.image_src, loaded_image);
-				this._add_loaded_cache('text', load_data.text_src, loaded_text);
-				load_data.loaded_image = loaded_image;
-				load_data.loaded_text = loaded_text;
-				load_data.callback(load_data);
-			});
-		};
-	};
-	
-	Module.prototype.load = function (load_data, is_force_reload) {
-		var load_data = this._check_data(load_data);
-		
-		if (!load_data) {
-			return;
-		};
-		
-		//check cache if not force reload
-		if (!is_force_reload && this._check_loaded_cache(load_data)) {
-			load_data.callback(load_data);
-			return load_data;
-		};
-		
-		this._load_resource(load_data);
-		return load_data;
+		return res_box_list;
 	};
 	
 	return Module;
 });
-*/
 
 
 
-
-
-
-
-
+Dr.test_func_list = {
+	ActionElement: function () {
+		var log_action = function(event) {
+			event.preventDefault();
+			var action = Dr.getActionFromEvent(event);
+			var element = Dr.document.getElementById('Dr.Canvas');
+			
+			var position = Dr.getPositonInElementFromAction(action, element);
+			//Dr.log(action, element, position);
+			Dr.log(action.action_type, position);
+		}
+		
+		Dr.document.addEventListener('mousedown', log_action);
+		Dr.document.addEventListener('mousemove', log_action);
+		Dr.document.addEventListener('mouseup', log_action);
+		Dr.document.addEventListener('mouseout', log_action);
+	},
+	
+	ActionBox: function () {
+		var box_data_a= {
+			x: 0,
+			y: 0,
+			width: 10,
+			height: 10,
+			z: 0,
+			//callback: function (box_data) {};	//you can add
+			box_tag: 'tag_a',
+		}
+		var box_data_b = {
+			x: 10,
+			y: 10,
+			width: 10,
+			height: 10,
+			z: 0,
+			//callback: function (box_data) {};	//you can add
+			box_tag: 'tag_b',
+		}
+		var box_data_c = {
+			x: 10,
+			y: 10,
+			width: 10,
+			height: 10,
+			z: 10,
+			//callback: function (box_data) {};	//you can add
+			box_tag: 'tag_c',
+		}
+		
+		var ActionBox = Dr.Get('ActionBox');
+		var action_box = new ActionBox;
+		
+		action_box.addBox('tag_a', box_data_a);
+		Dr.log('nothing at (-1, 5)', action_box.testPoint({x: -1, y: 5}));
+		Dr.log('tag_a at (5, 5)', action_box.testPoint({x: 5, y: 5}));
+		Dr.log('tag_a at (10, 10)', action_box.testPoint({x: 10, y: 10}));
+		action_box.addBox('tag_b', box_data_b);
+		Dr.log('nothing at (-1, 5)', action_box.testPoint({x: -1, y: 5}));
+		Dr.log('tag_a at (5, 5)', action_box.testPoint({x: 5, y: 5}));
+		Dr.log('tag_a, tag_b at (10, 10)', action_box.testPoint({x: 10, y: 10}));
+		action_box.addBox('tag_c', box_data_c);
+		Dr.log('nothing at (-1, 5)', action_box.testPoint({x: -1, y: 5}));
+		Dr.log('tag_a at (5, 5)', action_box.testPoint({x: 5, y: 5}));
+		Dr.log('tag_a, tag_b, tag_c at (10, 10), but tag_c has max z', action_box.testPoint({x: 10, y: 10}));
+	},
+}
 
 
 

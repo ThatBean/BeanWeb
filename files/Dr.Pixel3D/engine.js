@@ -84,7 +84,7 @@ Dr.Implement('Pixel3D_Engine', function (global, module_get) {
 			//clear the back buffer and the Z index
 			this.backbufferdata = this.backBuffer.data;
 			for (var i = 0; i < this.depthBuffer.length; i++) {
-				this.depthBuffer[i] = 10000000;
+				this.depthBuffer[i] = Number.POSITIVE_INFINITY;
 				this.backbufferdata[3 + (i << 2)] = 0;
 			}
 		};
