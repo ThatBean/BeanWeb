@@ -28,7 +28,7 @@ var animation;	//the animation object
 ///set these value
 var screenPixelWidth = 400;		//the width of on-screen canvas
 var blockScale = 8;	//(how many pixel for one block in working pixel)
-var workingPixelScale = 4;	//(how many pixel on screen for one pixel in working pixel)
+var workingPixelScale = 2;	//(how many pixel on screen for one pixel in working pixel)
 
 
 //auto calculated and used
@@ -129,7 +129,7 @@ function init() {
 			new Pixel3D_Math.Color4.Random(1)
 		)
 	}
-	mesh.removeInvisible();	//mark invisible faces
+	//mesh.removeInvisible();	//mark invisible faces
 	meshes.push(mesh);
 	
 	
@@ -206,15 +206,24 @@ function init() {
 	var lightsGlobal = model_data4.lightsGlobal;
 	var lightsDot = model_data4.lightsDot;
 	
-	mesh= new Pixel3D_Data.BlockMesh("Cube", 2); 
-	mesh.Blocks[0] = new Pixel3D_Data.Block(
-		new Pixel3D_Math.Vector3(5, 0, 0),
-		new Pixel3D_Math.Color4(1, 0, 1, 1)
-	);
-	mesh.Blocks[1] = new Pixel3D_Data.Block(
-		new Pixel3D_Math.Vector3(5, 5, 0),
-		new Pixel3D_Math.Color4(1, 0, 0, 1)
-	);
+	mesh= new Pixel3D_Data.BlockMesh("Cube", 27); 
+	for (var i = 0; i < 27; i++) {
+		var dist = 1;
+		var x = (i % 3 - 1) * dist;
+		var y = ((i / 3 >> 0) % 3 - 1) * dist;
+		var z = ((i / 9 >> 0) % 3 - 1) * dist;
+		
+		var r = 0.5 + i / 27 * 0.5;
+		var g = 1 - i / 27 * 0.5;
+		var b = i / 27 * 1;
+		
+		Dr.log("add", x,y,z);
+		
+		mesh.Blocks[i] = new Pixel3D_Data.Block(
+			new Pixel3D_Math.Vector3(x, y, z),
+			new Pixel3D_Math.Color4(r, g, b, 1)
+		);
+	};
 	meshes.push(mesh);
 	
 	
@@ -315,7 +324,7 @@ function init() {
 			/**/
 		}
 	}
-	mesh.removeInvisible();	//mark invisible faces
+	//mesh.removeInvisible();	//mark invisible faces
 	meshes.push(mesh);
 	
 	/**/
@@ -682,7 +691,12 @@ function drawingLoop(delta_time) {
 		if (Switch.PixelRotation) {
 			var Pixel3D_Math = Dr.Get("Pixel3D_Math");
 			var center_vec = new Pixel3D_Math.Vector3(0, 0, 0);
-			var rotate_vec = new Pixel3D_Math.Vector3(0.5, 0, 0);
+			//var rotate_vec = new Pixel3D_Math.Vector3(0.5 * delta_time, 0.5 * delta_time, 0);
+			var rotate_vec = new Pixel3D_Math.Vector3(
+				Switch.PixelRotationX ? 0.5 * delta_time : 0,
+				Switch.PixelRotationY ? 0.5 * delta_time : 0,
+				Switch.PixelRotationZ ? 0.5 * delta_time : 0
+			);
 			
 			for (var i = 0; i < meshes.length; i++) {
 				var block_list = meshes[i].Blocks;

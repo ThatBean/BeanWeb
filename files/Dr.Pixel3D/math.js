@@ -233,37 +233,32 @@ Dr.Implement('Pixel3D_Math', function (global, module_get) {
 		
 		
 		Vector3.prototype.pixelize = function () {
-			this.x = this.x >> 0;
-			this.y = this.y >> 0;
-			this.z = this.z >> 0;
+			return new Vector3(Math.round(this.x), Math.round(this.y), Math.round(this.z));
 		};
 		
 		/*
 			ccw_0, ccw_1 -- the centered coordinate(pick two from x, y, z), in order of right hand rotate
 		*/
 		
-		var _pixel_rotate_by_axis = function (rotate_ratio, dist, ccw_0, ccw_1) {
+		var _pixel_rotate_by_axis = function (rotate_ratio, ccw_0, ccw_1) {
+			var dist = Math.max(Math.abs(ccw_0), Math.abs(ccw_1));
+			
 			if (rotate_ratio == 0 || dist == 0) {
 				return [ccw_0, ccw_1];
 			}
 			
 			var current_total_pixel;
-			var rotate_direction;
 			if (ccw_0 == dist) {
 				current_total_pixel = (0 + 1) * dist + ccw_1;
-				rotate_direction = 1;
 			}
 			else if (ccw_1 == dist) {
 				current_total_pixel = (2 + 1) * dist - ccw_0;
-				rotate_direction = -1;
 			}
 			else if (ccw_0 == -dist) {
 				current_total_pixel = (4 + 1) * dist - ccw_1;
-				rotate_direction = -1;
 			}
 			else if (ccw_1 == -dist) {
 				current_total_pixel = (6 + 1) * dist + ccw_0;
-				rotate_direction = 1;
 			}
 			else {
 				//debugger;
@@ -275,7 +270,7 @@ Dr.Implement('Pixel3D_Math', function (global, module_get) {
 			var rotate_pixel = rotate_ratio * 2 * dist;
 			//Dr.log('rotate_pixel', rotate_pixel);
 			
-			var result_total_pixel = (current_total_pixel + rotate_pixel * rotate_direction) % (8 * dist);
+			var result_total_pixel = (current_total_pixel + rotate_pixel) % (8 * dist);
 			
 			var result_edge = (result_total_pixel / (2 * dist)) >> 0;
 			var result_pixel = result_total_pixel - result_edge * 2 * dist - dist;
@@ -319,22 +314,21 @@ Dr.Implement('Pixel3D_Math', function (global, module_get) {
 			
 			//should be zxy
 			
-			/*
 			//z axis
-			var res = _pixel_rotate_by_axis(rotate_vec.z, dist, dy, dx);
+			var res = _pixel_rotate_by_axis(rotate_vec.z, dy, dx);
 			dy = res[0];
 			dx = res[1];
-			*/
+			
 			//x axis
-			var res = _pixel_rotate_by_axis(rotate_vec.x, dist, dz, dy);
+			var res = _pixel_rotate_by_axis(rotate_vec.x, dz, dy);
 			dz = res[0];
 			dy = res[1];
-			/*
+			
 			//y axis
-			var res = _pixel_rotate_by_axis(rotate_vec.y, dist, dx, dz);
+			var res = _pixel_rotate_by_axis(rotate_vec.y, dx, dz);
 			dx = res[0];
 			dz = res[1];
-			*/
+			
 			this.x = (center_vec.x + dx);
 			this.y = (center_vec.y + dy);
 			this.z = (center_vec.z + dz);
