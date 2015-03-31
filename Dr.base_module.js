@@ -160,51 +160,50 @@ Dr.Implement('Toolbox', function (global, module_get) {
 //resource_loader
 
 //var res = ""; for (var i = 0; i < 97; i++) { res += '[' + i * 6 + ', 0, 6, 13],\n'; }
-var image_data = {
+var image_load_data = {
 	src: 'Pic.png',
 	type: 'image',
-	callback: function (image_data) {},
+	callback: function (image_load_data) {},
 };
 
-var image_multi_data = {
+var image_multi_load_data = {
 	image_src: 'Pic.png',
-	info_src: 'Pic.png',
-	type: 'image_multi',
-	callback: function (image_multi_data) {},
+	text_src: 'Pic.png',
+	type: 'multi',
+	callback: function (image_multi_load_data) {},
 };
 
-var font_data = {
+var font_load_data = {
 	image_src: 'Font.png',
-	info_src: 'Font.font',
-	type: 'font',
-	callback: function (font_data) {},
+	text_src: 'Font.font',
+	type: 'multi',
+	callback: function (font_load_data) {},
 };
 
-var script_data = {
+var script_load_data = {
 	src: 'dr.js',
 	type: 'script',
-	callback: function (script_data) {},
+	callback: function (script_load_data) {},
 };
 
 
-var text_data = {
+var text_load_data = {
 	src: 'dr.txt',
 	type: 'text',
-	callback: function (text_data) {},
+	callback: function (text_load_data) {},
 };
 
 
 
 
-//Dr.Get("ResourceLoader")._loader_list.text('math.js', function (a, b) {Dr.debug_a = a; Dr.log(a);})
-//Dr.Get("ResourceLoader")._loader_list.image_multi('BeanFont.png', 'math.js', function (a, b) {Dr.debug_a = a; Dr.debug_b = b; Dr.log(a, b);})
+//Dr.Get("ResourceLoader").getLoaderList().text('math.js', function (a) {Dr.debug_a = a; Dr.log(a);})
+//Dr.Get("ResourceLoader").getLoaderList().multi('BeanFont.png', 'math.js', function (a, b) {Dr.debug_a = a; Dr.debug_b = b; Dr.log(a, b);})
 
 Dr.Declare('ResourceLoader', 'single_instance');
 Dr.Implement('ResourceLoader', function (global, module_get) {
 	
 	var Module = function () {
-		this.loaded_resource_list = {};
-		
+		this.loaded_cache = {};
 	}
 	
 	var _loader_image = Dr.loadImage;
@@ -225,72 +224,241 @@ Dr.Implement('ResourceLoader', function (global, module_get) {
 	Module._loader_list = {
 		text: _loader_text,
 		image: _loader_image,
-		image_multi: _loader_image_text,
 		script: _loader_script,
-		font_bitmap: _loader_image_text,
+		multi: _loader_image_text,
 	};
 	
+	Module.prototype.getLoaderList = function () {
+		return Module._loader_list;
+	};
 	
+	Module.prototype._add_loaded_cache = function (type, src, loaded) {
+		this.loaded_cache[type] = this.loaded_cache[type] || {};
+		this.loaded_cache[type][src] = loaded;
+	};
 	
-	Module.prototype._check_loaded = function (resource_data) {
-		switch (resource_data.type) {
+	Module.prototype._check_loaded_cache = function (load_data) {
+		if (load_data.is_multi == false) {
+			if (
+				this.loaded_cache[load_data.type] 
+				&& this.loaded_cache[load_data.type][load_data.src]
+			) {
+				load_data.loaded = this.loaded_cache[load_data.type][load_data.src];
+				return true;
+			};
+		}	
+		else {
+			if (
+				this.loaded_cache[load_data.image] 
+				&& this.loaded_cache[load_data.text] 
+				&& this.loaded_cache[load_data.image][load_data.image_src]
+				&& this.loaded_cache[load_data.text][load_data.text_src]
+			) {
+				load_data.loaded_image = this.loaded_cache[load_data.type][load_data.image_src];
+				load_data.loaded_text = this.loaded_cache[load_data.type][load_data.text_src];
+				return true;
+			};
+		};
+	};
+	
+	Module.prototype._check_data = function (load_data) {
+		switch (load_data.type) {
 			case 'text':
 			case 'image':
 			case 'script':
-				if (
-					this.loaded_resource_list[resource_data.type] 
-					&& this.loaded_resource_list[resource_data.type][resource_data.src]
-				) {
-					resource_data.loaded = this.loaded_resource_list[resource_data.type][resource_data.src];
-					return true;
-				}
+				load_data.is_multi = false;
 				break;
 			case 'image_multi':
 			case 'font_bitmap':
-				if (
-					this.loaded_resource_list[resource_data.image] 
-					&& this.loaded_resource_list[resource_data.text] 
-					&& this.loaded_resource_list[resource_data.image][resource_data.image_src]
-					&& this.loaded_resource_list[resource_data.text][resource_data.image_src]
-				) {
-					resource_data.loaded_image = this.loaded_resource_list[resource_data.type][resource_data.image_src];
-					resource_data.loaded_info = this.loaded_resource_list[resource_data.type][resource_data.info_src];
-					return true;
-				}
+				load_data.is_multi = true;
 				break;
 			default:
-				Dr.log('[loadResource] Error type', resource_data.type);
+				Dr.log('[loadResource] Error type', load_data.type);
+				return;
 				break;
-		}
+		};
+		return load_data;
 	};
-	Module.prototype.loadResource = function (resource_data, is_force_reload) {
-		if (!is_force_reload && this._check_loaded(resource_data)) {
-			resource_data.callback(resource_data);
+	
+	Module.prototype._load_resource = function (load_data) {
+		if (load_data.is_multi == false) {
+			Module._loader_list[load_data.type](load_data.src, function (loaded) {
+				this._add_loaded_cache(load_data.type, load_data.src, loaded);
+				load_data.loaded = loaded;
+				load_data.callback(load_data);
+			});
+		}
+		else {
+			Module._loader_list['multi'](load_data.src, function (loaded_image, loaded_text) {
+				this._add_loaded_cache('image', load_data.image_src, loaded_image);
+				this._add_loaded_cache('text', load_data.text_src, loaded_text);
+				load_data.loaded_image = loaded_image;
+				load_data.loaded_text = loaded_text;
+				load_data.callback(load_data);
+			});
+		};
+	};
+	
+	Module.prototype.load = function (load_data, is_force_reload) {
+		var load_data = this._check_data(load_data);
+		
+		if (!load_data) {
 			return;
-		}
+		};
 		
+		//check cache if not force reload
+		if (!is_force_reload && this._check_loaded_cache(load_data)) {
+			load_data.callback(load_data);
+			return load_data;
+		};
 		
-		switch (resource_data.type) {
+		this._load_resource(load_data);
+		return load_data;
+	};
+	
+	return new Module;
+});
+
+
+
+Dr.test_func = function () {
+	var log_action = function(event) {
+		event.preventDefault();
+		var action = Dr.getActionFromEvent(event);
+		var element = Dr.document.getElementById('frontBuffer');
+		
+		var position = Dr.getPositonInElementFromAction(action, element);
+		//Dr.log(action, element, position);
+		Dr.log(action.action_type, position);
+	}
+	
+	Dr.document.addEventListener('mousedown', log_action);
+	Dr.document.addEventListener('mousemove', log_action);
+	Dr.document.addEventListener('mouseup', log_action);
+	Dr.document.addEventListener('mouseout', log_action);
+	
+}
+
+/*
+Dr.Declare('InteractionCallback', 'class');
+Dr.Implement('InteractionCallback', function (global, module_get) {
+	
+	var Module = function () {
+		this.loaded_cache = {};
+	}
+	
+	Module.prototype.getLoaderList = function () {
+		return Module._loader_list;
+	};
+	
+	Module.prototype._add_loaded_cache = function (type, src, loaded) {
+		this.loaded_cache[type] = this.loaded_cache[type] || {};
+		this.loaded_cache[type][src] = loaded;
+	};
+	
+	Module.prototype._check_loaded_cache = function (load_data) {
+		if (load_data.is_multi == false) {
+			if (
+				this.loaded_cache[load_data.type] 
+				&& this.loaded_cache[load_data.type][load_data.src]
+			) {
+				load_data.loaded = this.loaded_cache[load_data.type][load_data.src];
+				return true;
+			};
+		}	
+		else {
+			if (
+				this.loaded_cache[load_data.image] 
+				&& this.loaded_cache[load_data.text] 
+				&& this.loaded_cache[load_data.image][load_data.image_src]
+				&& this.loaded_cache[load_data.text][load_data.text_src]
+			) {
+				load_data.loaded_image = this.loaded_cache[load_data.type][load_data.image_src];
+				load_data.loaded_text = this.loaded_cache[load_data.type][load_data.text_src];
+				return true;
+			};
+		};
+	};
+	
+	Module.prototype._check_data = function (load_data) {
+		switch (load_data.type) {
 			case 'text':
 			case 'image':
 			case 'script':
-				//if ()
+				load_data.is_multi = false;
 				break;
 			case 'image_multi':
 			case 'font_bitmap':
+				load_data.is_multi = true;
 				break;
 			default:
-				Dr.log('[loadResource] Error type', resource_data.type);
+				Dr.log('[loadResource] Error type', load_data.type);
+				return;
 				break;
+		};
+		return load_data;
+	};
+	
+	Module.prototype._load_resource = function (load_data) {
+		if (load_data.is_multi == false) {
+			Module._loader_list[load_data.type](load_data.src, function (loaded) {
+				this._add_loaded_cache(load_data.type, load_data.src, loaded);
+				load_data.loaded = loaded;
+				load_data.callback(load_data);
+			});
 		}
-	}
+		else {
+			Module._loader_list['multi'](load_data.src, function (loaded_image, loaded_text) {
+				this._add_loaded_cache('image', load_data.image_src, loaded_image);
+				this._add_loaded_cache('text', load_data.text_src, loaded_text);
+				load_data.loaded_image = loaded_image;
+				load_data.loaded_text = loaded_text;
+				load_data.callback(load_data);
+			});
+		};
+	};
 	
-	
-	Module.prototype.step = function () {
-	}
+	Module.prototype.load = function (load_data, is_force_reload) {
+		var load_data = this._check_data(load_data);
+		
+		if (!load_data) {
+			return;
+		};
+		
+		//check cache if not force reload
+		if (!is_force_reload && this._check_loaded_cache(load_data)) {
+			load_data.callback(load_data);
+			return load_data;
+		};
+		
+		this._load_resource(load_data);
+		return load_data;
+	};
 	
 	return Module;
 });
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

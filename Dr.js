@@ -44,113 +44,104 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 	
 	// Pack required
 	var _collect_required = function () {
-		var _K_def_list = [];
-		_K_def_list[8] = 'K_BACKSPACE';
-		_K_def_list[9] = 'K_TAB';
-		_K_def_list[12] = 'K_CLEAR';
-		_K_def_list[13] = 'K_ENTER';
-		_K_def_list[16] = 'K_SHIFT';
-		_K_def_list[17] = 'K_CTRL';
-		_K_def_list[18] = 'K_ALT';
-		_K_def_list[19] = 'K_PAUSE';
-		//_K_def_list[20] = 'K_CAPS_LOCK';
-		_K_def_list[27] = 'K_ESC';
-		_K_def_list[32] = 'K_SPACE';
-		//_K_def_list[33] = 'K_PRIOR';
-		//_K_def_list[34] = 'K_NEXT';
-		_K_def_list[35] = 'K_END';
-		_K_def_list[36] = 'K_HOME';
-		_K_def_list[37] = 'K_LEFT';
-		_K_def_list[38] = 'K_UP';
-		_K_def_list[39] = 'K_RIGHT';
-		_K_def_list[40] = 'K_DOWN';
-		//_K_def_list[41] = 'K_Select';
-		//_K_def_list[42] = 'K_Print';
-		//_K_def_list[43] = 'K_Execute';
-		_K_def_list[45] = 'K_INSERT';
-		_K_def_list[46] = 'K_DELETE';
-		//_K_def_list[47] = 'K_Help';
-		_K_def_list[48] = 'K_0';
-		_K_def_list[49] = 'K_1';
-		_K_def_list[50] = 'K_2';
-		_K_def_list[51] = 'K_3';
-		_K_def_list[52] = 'K_4';
-		_K_def_list[53] = 'K_5';
-		_K_def_list[54] = 'K_6';
-		_K_def_list[55] = 'K_7';
-		_K_def_list[56] = 'K_8';
-		_K_def_list[57] = 'K_9';
-		_K_def_list[65] = 'K_A';
-		_K_def_list[66] = 'K_B';
-		_K_def_list[67] = 'K_C';
-		_K_def_list[68] = 'K_D';
-		_K_def_list[69] = 'K_E';
-		_K_def_list[70] = 'K_F';
-		_K_def_list[71] = 'K_G';
-		_K_def_list[72] = 'K_H';
-		_K_def_list[73] = 'K_I';
-		_K_def_list[74] = 'K_J';
-		_K_def_list[75] = 'K_K';
-		_K_def_list[76] = 'K_L';
-		_K_def_list[77] = 'K_M';
-		_K_def_list[78] = 'K_N';
-		_K_def_list[79] = 'K_O';
-		_K_def_list[80] = 'K_P';
-		_K_def_list[81] = 'K_Q';
-		_K_def_list[82] = 'K_R';
-		_K_def_list[83] = 'K_S';
-		_K_def_list[84] = 'K_T';
-		_K_def_list[85] = 'K_U';
-		_K_def_list[86] = 'K_V';
-		_K_def_list[87] = 'K_W';
-		_K_def_list[88] = 'K_X';
-		_K_def_list[89] = 'K_Y';
-		_K_def_list[90] = 'K_Z';
-		/*
-		_K_def_list[96] = 'K_KP_0 KP_0';
-		_K_def_list[97] = 'K_KP_1 KP_1';
-		_K_def_list[98] = 'K_KP_2 KP_2';
-		_K_def_list[99] = 'K_KP_3 KP_3';
-		_K_def_list[100] = 'K_KP_4 KP_4';
-		_K_def_list[101] = 'K_KP_5 KP_5';
-		_K_def_list[102] = 'K_KP_6 KP_6';
-		_K_def_list[103] = 'K_KP_7 KP_7';
-		_K_def_list[104] = 'K_KP_8 KP_8';
-		_K_def_list[105] = 'K_KP_9 KP_9';
-		_K_def_list[106] = 'K_KP_Multiply KP_Multiply';
-		_K_def_list[107] = 'K_KP_Add KP_Add';
-		_K_def_list[108] = 'K_KP_Separator KP_Separator';
-		_K_def_list[109] = 'K_KP_Subtract KP_Subtract';
-		_K_def_list[110] = 'K_KP_Decimal KP_Decimal';
-		_K_def_list[111] = 'K_KP_Divide KP_Divide';
-		*/
-		_K_def_list[112] = 'K_F1';
-		_K_def_list[113] = 'K_F2';
-		_K_def_list[114] = 'K_F3';
-		_K_def_list[115] = 'K_F4';
-		_K_def_list[116] = 'K_F5';
-		_K_def_list[117] = 'K_F6';
-		_K_def_list[118] = 'K_F7';
-		_K_def_list[119] = 'K_F8';
-		_K_def_list[120] = 'K_F9';
-		_K_def_list[121] = 'K_F10';
-		_K_def_list[122] = 'K_F11';
-		_K_def_list[123] = 'K_F12';
-		/*
-		_K_def_list[124] = 'K_F13';
-		_K_def_list[125] = 'K_F14';
-		_K_def_list[126] = 'K_F15';
-		_K_def_list[127] = 'K_F16';
-		_K_def_list[128] = 'K_F17';
-		_K_def_list[129] = 'K_F18';
-		_K_def_list[130] = 'K_F19';
-		_K_def_list[131] = 'K_F20';
-		_K_def_list[132] = 'K_F21';
-		_K_def_list[133] = 'K_F22';
-		_K_def_list[134] = 'K_F23';
-		_K_def_list[135] = 'K_F24';
-		*/
-		
+		var _key_code_to_def = {
+			'8': 'K_BACKSPACE',
+			'9': 'K_TAB',
+			'12': 'K_CLEAR',
+			'13': 'K_ENTER',
+			'16': 'K_SHIFT',
+			'17': 'K_CTRL',
+			'18': 'K_ALT',
+			'19': 'K_PAUSE',
+			'20': 'K_CAPS_LOCK',
+			'27': 'K_ESC',
+			'32': 'K_SPACE',
+			'33': 'K_PRIOR',
+			'34': 'K_NEXT',
+			'35': 'K_END',
+			'36': 'K_HOME',
+			'37': 'K_LEFT',
+			'38': 'K_UP',
+			'39': 'K_RIGHT',
+			'40': 'K_DOWN',
+			'41': 'K_SELECT',
+			'42': 'K_PRINT',
+			'43': 'K_EXECUTE',
+			'45': 'K_INSERT',
+			'46': 'K_DELETE',
+			'47': 'K_HELP',
+			'48': 'K_0',
+			'49': 'K_1',
+			'50': 'K_2',
+			'51': 'K_3',
+			'52': 'K_4',
+			'53': 'K_5',
+			'54': 'K_6',
+			'55': 'K_7',
+			'56': 'K_8',
+			'57': 'K_9',
+			'65': 'K_A',
+			'66': 'K_B',
+			'67': 'K_C',
+			'68': 'K_D',
+			'69': 'K_E',
+			'70': 'K_F',
+			'71': 'K_G',
+			'72': 'K_H',
+			'73': 'K_I',
+			'74': 'K_J',
+			'75': 'K_K',
+			'76': 'K_L',
+			'77': 'K_M',
+			'78': 'K_N',
+			'79': 'K_O',
+			'80': 'K_P',
+			'81': 'K_Q',
+			'82': 'K_R',
+			'83': 'K_S',
+			'84': 'K_T',
+			'85': 'K_U',
+			'86': 'K_V',
+			'87': 'K_W',
+			'88': 'K_X',
+			'89': 'K_Y',
+			'90': 'K_Z',
+			
+			'96': 'K_KP_0',
+			'97': 'K_KP_1',
+			'98': 'K_KP_2',
+			'99': 'K_KP_3',
+			'100': 'K_KP_4',
+			'101': 'K_KP_5',
+			'102': 'K_KP_6',
+			'103': 'K_KP_7',
+			'104': 'K_KP_8',
+			'105': 'K_KP_9',
+			
+			'112': 'K_F1',
+			'113': 'K_F2',
+			'114': 'K_F3',
+			'115': 'K_F4',
+			'116': 'K_F5',
+			'117': 'K_F6',
+			'118': 'K_F7',
+			'119': 'K_F8',
+			'120': 'K_F9',
+			'121': 'K_F10',
+			'122': 'K_F11',
+			'123': 'K_F12',
+		};
+		var _event_to_action_type = {
+			touchstart: 'action_start',
+			touchmove: 'action_move',
+			touchend: 'action_end',
+			touchcancel: 'action_cancel',
+			
+			mousedown: 'action_start',
+			mousemove: 'action_move',
+			mouseup: 'action_end',
+			mouseout: 'action_cancel',
+		};
 		
 		return {
 			//JavaScript only
@@ -159,27 +150,12 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			getUTCTimeStamp: function () {
 				return Math.floor(Date.now() / 1000);
 			},
-			getArgumentArray: function (src_args, omit_arg) {
-				return Array.prototype.slice.call(src_args, omit_arg || 0);
-			},
-			logList: (function () {
-				if (console.log.apply) {
-					return function (arg_list) {
-						console.log.apply(console, arg_list);
-					}
-				}
-				else {
-					return function (arg_list) {
-						console.log(arg_list);
-					}
-				}
-			})(),
-			get_random_int: function (range_01, range_02) {
+			getRandomInt: function (range_01, range_02) {
 				var from = Math.min(range_01, range_02);
 				var to = Math.max(range_01, range_02);
 				return _get_random_int(from, to);
 			},
-			get_random_int_multi: function (range_01, range_02, count) {
+			getRandomIntMulti: function (range_01, range_02, count) {
 				var from = Math.min(range_01, range_02);
 				var to = Math.max(range_01, range_02);
 				var count = Math.min(count, (to - from));
@@ -198,10 +174,21 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 				}
 				return res;
 			},
-
-			
-			
-			
+			getArgumentArray: function (src_args, omit_arg) {
+				return Array.prototype.slice.call(src_args, omit_arg || 0);
+			},
+			logList: (function () {
+				if (console.log.apply) {
+					return function (arg_list) {
+						console.log.apply(console, arg_list);
+					}
+				}
+				else {
+					return function (arg_list) {
+						console.log(arg_list);
+					}
+				}
+			})(),
 			
 			
 			//document related
@@ -299,8 +286,54 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 					window.clearInterval();
 				}
 			},
-			getKeyDefination: function (K_code) {
-				return _K_def_list[K_code] || 'K_UNDEFINED';
+			
+			//event related
+			getKeyDefination: function (key_code) {
+				return _key_code_to_def[key_code] || 'K_UNDEFINED';
+			},
+			getActionFromEvent: function (event) {
+				var action_type = _event_to_action_type[event.type];
+				
+				var position_visible;
+				if (event.targetTouches) {
+					position_visible = {
+						x: event.targetTouches[0].clientX,
+						y: event.targetTouches[0].clientY,
+					}
+				}
+				else {
+					position_visible = {
+						x: event.clientX,
+						y: event.clientY,
+					}
+				}
+				
+				var position_document;
+				if (event.pageX || event.pageY) {
+					position_document = {
+						x: event.pageX,
+						y: event.pageY,
+					};
+				}
+				else {
+					position_document = {
+						x: position_visible.x + Dr.document.body.scrollLeft + Dr.document.documentElement.scrollLeft,
+						y: position_visible.y + Dr.document.body.scrollTop + Dr.document.documentElement.scrollTop,
+					};
+				}
+				
+				return {
+					event: event,
+					action_type: action_type,
+					position_visible: position_visible,	//position relative to visible (inner window or device screen)
+					position_document: position_document, //position relative to document
+				}
+			},
+			getPositonInElementFromAction: function (action, element) {
+				return {
+					x: action.position_document.x - element.offsetLeft,
+					y: action.position_document.y - element.offsetTop,
+				};
 			},
 		};
 	}
@@ -317,6 +350,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 	// Dr Initialize
 	console.log('[Dr] Initializing...');
 	
+	
 	var Dr = function () {
 		Dr.log('[Dr] A Frame by ' + Dr.author);
 		Dr.log('[Dr] Version ' + Dr.verion);
@@ -328,6 +362,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 	Dr.global = window;	//normally window
 	Dr.window = window;	//normally window, always in fact
 	Dr.document = document;	//normally document, always in fact
+	Dr.devicePixelRatio = window.devicePixelRatio || 1;
 	
 	
 	Dr.document.onkeydown = function (event) {
@@ -342,7 +377,6 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 		Dr.log("[document.onkeyup]", event.keyCode, event.which, Dr.getKeyDefination(event.keyCode || event.which));
 		Dr.Event.emit("KEY_UP", event, Dr.getKeyDefination(event.keyCode || event.which));
 	};
-	
 	Dr.document.onpaste = function (event) {
 		//get content
 		var content;
@@ -366,19 +400,27 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			document.getElementById('B_DataA').value = "[Data from ClipBoard] \n" + theClipBoardData.slice(0, 200) + "\n" + appendInfo;
 		};
 	};
+	
 	Dr.window.addEventListener(("onorientationchange" in window ? "orientationchange" : "resize"), function (event) {
 		Dr.Event.emit("WINDOW_RESIZE", event);
 	});
 	
+	//time related
 	Dr.now = _required_native.clock;
 	Dr.getUTCTimeStamp = _required_native.getUTCTimeStamp;
 	Dr.startClock = Dr.now();
 	Dr.startTimestamp = Dr.getUTCTimeStamp();
 	Dr.clock = function () { return (Dr.now() - Dr.startClock); };
 	Dr.clock_per_sec = _required_native.clock_per_sec;
-	Dr.get_random_int = _required_native.get_random_int;
-	Dr.get_random_int_multi = _required_native.get_random_int_multi;
-	Dr.onNextScreenUpdate = _required_native.onNextScreenUpdate;
+	
+	//math related
+	Dr.getRandomInt = _required_native.getRandomInt;
+	Dr.getRandomIntMulti = _required_native.getRandomIntMulti;
+	
+	//function argument to array
+	Dr.getArgumentArray = _required_native.getArgumentArray;
+	
+	//document related
 	Dr.loadScript = _required_native.loadScript;
 	Dr.loadScriptByList = function (script_src_list, callback) {
 		var loop_load_script = function () {
@@ -392,36 +434,42 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 		loop_load_script();
 	};
 	Dr.loadImage = _required_native.loadImage;
+	Dr.createHttpRequest = _required_native.createHttpRequest;
 	Dr.createDownload = _required_native.createDownload;
 	Dr.createTextDownload = _required_native.createTextDownload;
-	Dr.createHttpRequest = _required_native.createHttpRequest;
 	Dr.createOffscreenCanvas = _required_native.createOffscreenCanvas;
-	Dr.getArgumentArray = _required_native.getArgumentArray;
-	Dr.getKeyDefination = _required_native.getKeyDefination;
 	
+	//window related
+	Dr.onNextScreenUpdate = _required_native.onNextScreenUpdate;
+	
+	//event related
+	Dr.getKeyDefination = _required_native.getKeyDefination;
+	Dr.getActionFromEvent = _required_native.getActionFromEvent;
+	Dr.getPositonInElementFromAction = _required_native.getPositonInElementFromAction;
+	
+	//extend
+	console.log('[Dr] add extend function...');
 	
 	Dr.logList = _required_native.logList;
 	Dr.Log = (function () {
 		var Log = function () {
 			this._log_history = [];
 		}
-		
 		Log.prototype.log = function () {
 			var arg_list = Dr.getArgumentArray(arguments);
 			arg_list.unshift('[' + ((Dr.now() - Dr.startClock) / Dr.clock_per_sec) + 'sec]');
 			this._log_history.push(arg_list);
 			Dr.logList(arg_list);
 		}
-		
 		Log.prototype.get_history = function () {
 			return this._log_history;
 		}
-		
 		return new Log;
 	})()
 	Dr.log = function () {
 		Dr.Log.log.apply(Dr.Log, Dr.getArgumentArray(arguments));
 	}
+	
 	
 	Dr.inspect = function (target) {
 		Dr.log('[Inspect]', target);
@@ -443,25 +491,26 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 		}
 	};
 	
+	
 	Dr.Event = (function () {
-		var Event = function () {
-			this._K_callback_list = [];
+		var Module = function () {
+			this._event_data = [];
 		}
 		
-		Event.prototype.subscribe = function (event_key, callback) {
+		Module.prototype._get_callback_list = function (event_key) {
+			if (!this._event_data[event_key]) this._event_data[event_key] = [];
+			return this._event_data[event_key];
+		}
+		
+		Module.prototype.subscribe = function (event_key, callback) {
 			if (!callback && typeof(callback) != 'function') {
 				Dr.log('callback error', callback);
 				return;
 			}
 			
-			if (event_key) {
-				this._K_callback_list[event_key] = this._K_callback_list[event_key] || [];
-			}
-			else {
-				event_key = this._K_callback_list.push([]) - 1;	//get a vacant key
-			}
+			var event_key = event_key || this._event_data.length;
+			var callback_list = this._get_callback_list(event_key);
 			
-			var callback_list = this._K_callback_list[event_key];
 			for (var i in callback_list) {
 				if (callback_list[i] = callback) {
 					Dr.log('callback already exist');
@@ -474,9 +523,8 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			return event_key;
 		}
 		
-		Event.prototype.unsubscribe = function (event_key, org_callback) {
-			this._K_callback_list[event_key] = this._K_callback_list[event_key] || [];
-			var callback_list = this._K_callback_list[event_key]
+		Module.prototype.unsubscribe = function (event_key, org_callback) {
+			var callback_list = this._get_callback_list(event_key);
 			for (var i in callback_list) {
 				if (callback_list[i] = org_callback) {
 					callback_list.splice(i, 1);
@@ -486,41 +534,36 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			return null;
 		}
 		
-		Event.prototype.unsubscribeKey = function (event_key) {
-			this._K_callback_list[event_key] = null;
+		Module.prototype.unsubscribeKey = function (event_key) {
+			this._event_data[event_key] = null;
 		}
 		
-		Event.prototype.unsubscribeAll = function () {
-			this._K_callback_list = [];
+		Module.prototype.unsubscribeAll = function () {
+			this._event_data = [];
 		}
 		
-		Event.prototype.emit = function (event_key) {
+		Module.prototype.emit = function (event_key) {
 			Dr.log("[Event.prototype.emit] Get", event_key)
 			
 			var args = Dr.getArgumentArray(arguments, 1);
 			args.unshift(event_key);
 			
-			this._K_callback_list[event_key] = this._K_callback_list[event_key] || [];
-			var callback_list = this._K_callback_list[event_key]
+			var callback_list = this._get_callback_list(event_key);
 			for (var i in callback_list) {
 				callback_list[i].apply(null, args);
 			}
 		}
 		
-		return new Event;
+		return new Module;
 	})()
 	
 	
 	Dr.ModuleManager = (function () {
-		/*
-			Dr Module can be a function or an object
-			module_type can be: function, object, ...
-		*/
-		var ModuleManager = function () {
+		var Module = function () {
 			this._module_data_pool = {};
 		}
 		
-		ModuleManager.prototype._module_init = function (module_name, module_type) { 
+		Module.prototype._module_init = function (module_name, module_type) { 
 			this._module_data_pool[module_name] = {
 				status: {
 					declare: false,
@@ -534,7 +577,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 				name: module_name,
 			};
 		};
-		ModuleManager.prototype._module_get = function (module_name) { 
+		Module.prototype._module_get = function (module_name) { 
 			//Dr.log('_module_get', module_name, this._module_data_pool);
 			if (module_name 
 				&& this._module_data_pool[module_name] 
@@ -543,7 +586,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			else
 				return null;
 		};
-		ModuleManager.prototype._module_set = function (module_name, module) {
+		Module.prototype._module_set = function (module_name, module) {
 			if (!this._module_data_pool[module_name]) {
 				alert('[ModuleManager.prototype._module_set] module not declared', module_name, module);
 				debugger;
@@ -553,7 +596,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			this._module_data_pool[module_name].status.load = true;
 		};
 		
-		ModuleManager.prototype.declare =  function (module_name, module_type) {
+		Module.prototype.declare =  function (module_name, module_type) {
 			if (!module_name) {
 				alert('error declare nameless module');
 				return;
@@ -570,7 +613,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			this._module_init(module_name, module_type);
 			this._module_data_pool[module_name].status.declare = true;
 		};
-		ModuleManager.prototype.implement =  function (module_name, module_implement_func) {
+		Module.prototype.implement =  function (module_name, module_implement_func) {
 			if (!this._module_data_pool[module_name] 
 				|| !this._module_data_pool[module_name].status.declare) {
 				alert('[ModuleManager.prototype.implement] module not declared', module_name, module_implement_func);
@@ -582,7 +625,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			this._module_data_pool[module_name].implement_func = module_implement_func;
 			this._module_data_pool[module_name].status.implement = true;
 		};
-		ModuleManager.prototype.require =  function (module_name, required_module_name) {
+		Module.prototype.require =  function (module_name, required_module_name) {
 			if (!this._module_data_pool[module_name] 
 				|| !this._module_data_pool[module_name].status.declare) {
 				alert('[ModuleManager.prototype.require] module not declared', module_name, required_module_name);
@@ -593,7 +636,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			
 			this._module_data_pool[module_name].require.push(required_module_name);
 		};
-		ModuleManager.prototype.load =  function (module_name) {
+		Module.prototype.load =  function (module_name) {
 			if (!this._module_data_pool[module_name] 
 				|| !this._module_data_pool[module_name].status.declare) {
 				alert('[ModuleManager.prototype.load] module not declared', module_name);
@@ -636,7 +679,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			else
 				return;
 		};
-		ModuleManager.prototype.loadAll = function () {
+		Module.prototype.loadAll = function () {
 			var left_to_load = -1;
 			var last_left_to_load = 0;
 			
@@ -665,11 +708,11 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			
 		};
 		
-		ModuleManager.prototype.get = function (module_name) {
+		Module.prototype.get = function (module_name) {
 			return this._module_get(module_name);
 		};
 		
-		return new ModuleManager;
+		return new Module;
 	})()
 	
 	Dr.Declare = function (module_name, module_type) { Dr.ModuleManager.declare(module_name, module_type); }
@@ -678,8 +721,9 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 	Dr.LoadAll = function () { Dr.ModuleManager.loadAll(); }
 	Dr.Get = function (module_name) { return Dr.ModuleManager.get(module_name); }
 	
+	
 	Dr.UpdateLoop = (function () {
-		var UpdateLoop = function () {
+		var Module = function () {
 			this._update_list = [];	//non-constant, will be refreshed on every update
 			this._last_update_clock = Dr.clock();
 			this._is_active = false;
@@ -691,7 +735,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			}
 		}
 		
-		UpdateLoop.prototype.update = function () {
+		Module.prototype.update = function () {
 			var current_update_clock = Dr.clock()
 			var delta_sec = (current_update_clock - this._last_update_clock) / Dr.clock_per_sec;
 			this._last_update_clock = current_update_clock
@@ -707,36 +751,39 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			this._update_list = next_update_list;
 			//Dr.log('Dr.Update', delta_sec);
 			
-			if (this._is_active)
+			if (this._is_active) {
 				Dr.onNextScreenUpdate(this._update_func);
-			else
+			}
+			else {
 				Dr.log('[UpdateLoop] Stopped');
+			}
 		}
 		
 		
-		UpdateLoop.prototype.start = function () {
-			if (this._is_active)
+		Module.prototype.start = function () {
+			if (this._is_active) {
 				return;
-			
+			}
 			this._is_active = true;
 			this._update_func();
 		}
 		
-		UpdateLoop.prototype.stop = function () {
+		Module.prototype.stop = function () {
 			this._is_active = false;
 		}
 		
-		UpdateLoop.prototype.clear = function () {
+		Module.prototype.clear = function () {
 			this._update_list = [];
 		}
 		
-		UpdateLoop.prototype.add = function (update_func) {
+		Module.prototype.add = function (update_func) {
 			this._update_list.push(update_func);
 		}
 		
-		return new UpdateLoop;
+		return new Module;
 	})()
 	
+	console.log('[Dr] Finished Initialize.');
 	
 	return Dr;
 })(window);
