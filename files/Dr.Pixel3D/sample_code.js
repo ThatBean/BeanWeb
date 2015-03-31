@@ -39,7 +39,7 @@ var zoom = blockScale * workingPixelScale / screenPixelWidth;
 //		when zoom == 0.005, the projected size is 200 x 200
 
 var _zoom_modifier = 1.0;
-var _zoom_modify_speed = 0.5;
+var _zoom_modify_speed = -0.5;
 
 
 
@@ -208,7 +208,7 @@ function init() {
 	
 	mesh= new Pixel3D_Data.BlockMesh("Cube", 27); 
 	for (var i = 0; i < 27; i++) {
-		var dist = 1;
+		var dist = 3;
 		var x = (i % 3 - 1) * dist;
 		var y = ((i / 3 >> 0) % 3 - 1) * dist;
 		var z = ((i / 9 >> 0) % 3 - 1) * dist;

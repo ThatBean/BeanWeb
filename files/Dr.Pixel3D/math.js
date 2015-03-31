@@ -236,7 +236,18 @@ Dr.Implement('Pixel3D_Math', function (global, module_get) {
 			return new Vector3(Math.round(this.x), Math.round(this.y), Math.round(this.z));
 		};
 		
+		
 		/*
+			the pixel rotate coordinate system
+			
+			y (yaw)
+			^
+			|   z (roll)
+			|  /
+			| /
+			|/
+			/-----------> x (pitch)
+			
 			ccw_0, ccw_1 -- the centered coordinate(pick two from x, y, z), in order of right hand rotate
 		*/
 		
@@ -305,6 +316,7 @@ Dr.Implement('Pixel3D_Math', function (global, module_get) {
 			return [ccw_0, ccw_1];
 		};
 		
+		
 		Vector3.prototype.pixelRotate = function (center_vec, rotate_vec) {
 			var dx = this.x - center_vec.x;
 			var dy = this.y - center_vec.y;
@@ -312,19 +324,19 @@ Dr.Implement('Pixel3D_Math', function (global, module_get) {
 			
 			var dist = Math.max(Math.abs(dx), Math.abs(dy), Math.abs(dz));
 			
-			//should be zxy
+			//should be z-x-y (performs the roll first, then the pitch, and finally the yaw)
 			
-			//z axis
+			//z axis (roll)
 			var res = _pixel_rotate_by_axis(rotate_vec.z, dy, dx);
 			dy = res[0];
 			dx = res[1];
 			
-			//x axis
+			//x axis (pitch)
 			var res = _pixel_rotate_by_axis(rotate_vec.x, dz, dy);
 			dz = res[0];
 			dy = res[1];
 			
-			//y axis
+			//y axis (yaw)
 			var res = _pixel_rotate_by_axis(rotate_vec.y, dx, dz);
 			dx = res[0];
 			dz = res[1];
