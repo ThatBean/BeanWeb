@@ -14,11 +14,11 @@ Dr.Implement('Pixel3D_Math', function (global, module_get) {
 	var Module = Module || {};
 	
 	var Color4 = (function () {
-		function Color4(initialR, initialG, initialB, initialA) {
-			this.r = initialR;
-			this.g = initialG;
-			this.b = initialB;
-			this.a = initialA;
+		function Color4(r, g, b, a) {
+			this.r = r;
+			this.g = g;
+			this.b = b;
+			this.a = a;
 		}
 		Color4.prototype.toString = function () {
 			return "{R: " + this.r + " G:" + this.g + " B:" + this.b + " A:" + this.a + "}";
@@ -40,54 +40,54 @@ Dr.Implement('Pixel3D_Math', function (global, module_get) {
 			var a = (alpha ? alpha : Math.random());
 			return new Color4(Math.random(), Math.random(), Math.random(), a);
 		};
-		Color4.Blend = function Blend (baseColor, applyColor) {
+		Color4.Blend = function Blend (base_color, apply_color) {
 			var r, g, b, a;
-			var aa = applyColor.a;
+			var aa = apply_color.a;
 			//normal blend
-			r = baseColor.r * (1 - aa) + applyColor.r * aa;
-			g = baseColor.g * (1 - aa) + applyColor.g * aa;
-			b = baseColor.b * (1 - aa) + applyColor.b * aa;
-			a = 1 - (1 - baseColor.a) * (1 - aa);
+			r = base_color.r * (1 - aa) + apply_color.r * aa;
+			g = base_color.g * (1 - aa) + apply_color.g * aa;
+			b = base_color.b * (1 - aa) + apply_color.b * aa;
+			a = 1 - (1 - base_color.a) * (1 - aa);
 			return new Color4(r, g, b, a);
 		};
-		Color4.MethodBlend = function MethodBlend (baseColor, applyColor, method, intensity) {
+		Color4.MethodBlend = function MethodBlend (base_color, apply_color, method, intensity) {
 			var r, g, b, a;
-			var ba = baseColor.a;
-			var aa = applyColor.a;
+			var ba = base_color.a;
+			var aa = apply_color.a;
 			//blend
 			if (method == "L") {	//lighting
 				if (intensity <= 0) {	//no need to blend
-					return new Color4(baseColor.r, baseColor.g, baseColor.b, baseColor.a);
+					return new Color4(base_color.r, base_color.g, base_color.b, base_color.a);
 				}
 				if (intensity > 1) {
 					Dr.log("[MethodBlend|warning] intensity > 1 | intensity = "+intensity);
 					intensity = 1;
-				}//aa = (applyColor.r + applyColor.g + applyColor.b) / 255 / 3 * aa * intensity;
+				}//aa = (apply_color.r + apply_color.g + apply_color.b) / 255 / 3 * aa * intensity;
 				aa *= intensity;
-				r = Math.max(baseColor.r * ba, applyColor.r * aa);
-				g = Math.max(baseColor.g * ba, applyColor.g * aa);
-				b = Math.max(baseColor.b * ba, applyColor.b * aa);
+				r = Math.max(base_color.r * ba, apply_color.r * aa);
+				g = Math.max(base_color.g * ba, apply_color.g * aa);
+				b = Math.max(base_color.b * ba, apply_color.b * aa);
 				a = 1 - (1 - ba) * (1 - aa);
 			}
 			
 			if (method == "F") {	//face + lighting
 				/*
-				r = baseColor.r * (1 - applyColor.r) * aa;
-				g = baseColor.g * (1 - applyColor.g) * aa;
-				b = baseColor.b * (1 - applyColor.b) * aa;
+				r = base_color.r * (1 - apply_color.r) * aa;
+				g = base_color.g * (1 - apply_color.g) * aa;
+				b = base_color.b * (1 - apply_color.b) * aa;
 				*/
 				aa = aa / (aa + ba);
-				r = baseColor.r * (1 - aa) + (applyColor.r * aa);
-				g = baseColor.g * (1 - aa) + (applyColor.g * aa);
-				b = baseColor.b * (1 - aa) + (applyColor.b * aa);
+				r = base_color.r * (1 - aa) + (apply_color.r * aa);
+				g = base_color.g * (1 - aa) + (apply_color.g * aa);
+				b = base_color.b * (1 - aa) + (apply_color.b * aa);
 				a = ba;
 			}
 			
 			/*
 			Dr.log("Method:"+method+"<br />"
 			+"intensity:"+intensity+"<br />"
-			+"Base:"+baseColor+"<br />"
-			+"Apply:"+applyColor+"<br />"
+			+"Base:"+base_color+"<br />"
+			+"Apply:"+apply_color+"<br />"
 			+"Get:"+new Color4(r, g, b, a)+"<br />");
 			*/
 			
@@ -98,18 +98,18 @@ Dr.Implement('Pixel3D_Math', function (global, module_get) {
 	Module.Color4 = Color4;
 /*Not used
 	var Vector2 = (function () {
-		function Vector2(initialX, initialY) {
-			this.x = initialX;
-			this.y = initialY;
+		function Vector2(x, y) {
+			this.x = x;
+			this.y = y;
 		}
 		Vector2.prototype.toString = function () {
 			return "{X: " + this.x + " Y:" + this.y + "}";
 		};
-		Vector2.prototype.add = function (otherVector) {
-			return new Vector2(this.x + otherVector.x, this.y + otherVector.y);
+		Vector2.prototype.add = function (vector) {
+			return new Vector2(this.x + vector.x, this.y + vector.y);
 		};
-		Vector2.prototype.subtract = function (otherVector) {
-			return new Vector2(this.x - otherVector.x, this.y - otherVector.y);
+		Vector2.prototype.subtract = function (vector) {
+			return new Vector2(this.x - vector.x, this.y - vector.y);
 		};
 		Vector2.prototype.negate = function () {
 			return new Vector2(-this.x, -this.y);
@@ -117,8 +117,8 @@ Dr.Implement('Pixel3D_Math', function (global, module_get) {
 		Vector2.prototype.scale = function (scale) {
 			return new Vector2(this.x * scale, this.y * scale);
 		};
-		Vector2.prototype.equals = function (otherVector) {
-			return this.x === otherVector.x && this.y === otherVector.y;
+		Vector2.prototype.equals = function (vector) {
+			return this.x === vector.x && this.y === vector.y;
 		};
 		Vector2.prototype.length = function () {
 			return Math.sqrt(this.x * this.x + this.y * this.y);
@@ -185,11 +185,11 @@ Dr.Implement('Pixel3D_Math', function (global, module_get) {
 		Vector3.prototype.toArray = function () {
 			return [this.x, this.y, this.z];
 		};
-		Vector3.prototype.add = function (otherVector) {
-			return new Vector3(this.x + otherVector.x, this.y + otherVector.y, this.z + otherVector.z);
+		Vector3.prototype.add = function (vector) {
+			return new Vector3(this.x + vector.x, this.y + vector.y, this.z + vector.z);
 		};
-		Vector3.prototype.subtract = function (otherVector) {
-			return new Vector3(this.x - otherVector.x, this.y - otherVector.y, this.z - otherVector.z);
+		Vector3.prototype.subtract = function (vector) {
+			return new Vector3(this.x - vector.x, this.y - vector.y, this.z - vector.z);
 		};
 		Vector3.prototype.negate = function () {
 			return new Vector3(-this.x, -this.y, -this.z);
@@ -197,14 +197,14 @@ Dr.Implement('Pixel3D_Math', function (global, module_get) {
 		Vector3.prototype.scale = function (scale) {
 			return new Vector3(this.x * scale, this.y * scale, this.z * scale);
 		};
-		Vector3.prototype.equals = function (otherVector) {
-			return this.x === otherVector.x && this.y === otherVector.y && this.z === otherVector.z;
+		Vector3.prototype.equals = function (vector) {
+			return this.x === vector.x && this.y === vector.y && this.z === vector.z;
 		};
-		Vector3.prototype.multiply = function (otherVector) {
-			return new Vector3(this.x * otherVector.x, this.y * otherVector.y, this.z * otherVector.z);
+		Vector3.prototype.multiply = function (vector) {
+			return new Vector3(this.x * vector.x, this.y * vector.y, this.z * vector.z);
 		};
-		Vector3.prototype.divide = function (otherVector) {
-			return new Vector3(this.x / otherVector.x, this.y / otherVector.y, this.z / otherVector.z);
+		Vector3.prototype.divide = function (vector) {
+			return new Vector3(this.x / vector.x, this.y / vector.y, this.z / vector.z);
 		};
 		Vector3.prototype.length = function () {
 			return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
@@ -230,7 +230,122 @@ Dr.Implement('Pixel3D_Math', function (global, module_get) {
 		Vector3.prototype.copy = function () {
 			return new Vector3(this.x, this.y, this.z);
 		};
-
+		
+		
+		Vector3.prototype.pixelize = function () {
+			this.x = this.x >> 0;
+			this.y = this.y >> 0;
+			this.z = this.z >> 0;
+		};
+		
+		/*
+			ccw_0, ccw_1 -- the centered coordinate(pick two from x, y, z), in order of right hand rotate
+		*/
+		
+		var _pixel_rotate_by_axis = function (rotate_ratio, dist, ccw_0, ccw_1) {
+			if (rotate_ratio == 0 || dist == 0) {
+				return [ccw_0, ccw_1];
+			}
+			
+			var current_total_pixel;
+			var rotate_direction;
+			if (ccw_0 == dist) {
+				current_total_pixel = (0 + 1) * dist + ccw_1;
+				rotate_direction = 1;
+			}
+			else if (ccw_1 == dist) {
+				current_total_pixel = (2 + 1) * dist - ccw_0;
+				rotate_direction = -1;
+			}
+			else if (ccw_0 == -dist) {
+				current_total_pixel = (4 + 1) * dist - ccw_1;
+				rotate_direction = -1;
+			}
+			else if (ccw_1 == -dist) {
+				current_total_pixel = (6 + 1) * dist + ccw_0;
+				rotate_direction = 1;
+			}
+			else {
+				//debugger;
+				return [ccw_0, ccw_1];
+			}
+			//Dr.log('current_total_pixel', current_total_pixel);
+			
+			//rotate_ratio range is [0, 4)
+			var rotate_pixel = rotate_ratio * 2 * dist;
+			//Dr.log('rotate_pixel', rotate_pixel);
+			
+			var result_total_pixel = (current_total_pixel + rotate_pixel * rotate_direction) % (8 * dist);
+			
+			var result_edge = (result_total_pixel / (2 * dist)) >> 0;
+			var result_pixel = result_total_pixel - result_edge * 2 * dist - dist;
+			
+			//Dr.log('result_total_pixel', result_total_pixel);
+			//Dr.log('result_edge', result_edge);
+			//Dr.log('result_pixel', result_pixel);
+			
+			switch (result_edge) {
+				case 0:
+					ccw_0 = dist;
+					ccw_1 = result_pixel;
+					break;
+				case 1:
+					ccw_0 = -result_pixel;
+					ccw_1 = dist;
+					break;
+				case 2:
+					ccw_0 = -dist;
+					ccw_1 = -result_pixel;
+					break;
+				case 3:
+					ccw_0 = result_pixel;
+					ccw_1 = -dist;
+					break;
+			}
+			
+			if (isNaN(ccw_0) || isNaN(ccw_1)) {
+				debugger;
+			}
+			
+			return [ccw_0, ccw_1];
+		};
+		
+		Vector3.prototype.pixelRotate = function (center_vec, rotate_vec) {
+			var dx = this.x - center_vec.x;
+			var dy = this.y - center_vec.y;
+			var dz = this.z - center_vec.z;
+			
+			var dist = Math.max(Math.abs(dx), Math.abs(dy), Math.abs(dz));
+			
+			//should be zxy
+			
+			/*
+			//z axis
+			var res = _pixel_rotate_by_axis(rotate_vec.z, dist, dy, dx);
+			dy = res[0];
+			dx = res[1];
+			*/
+			//x axis
+			var res = _pixel_rotate_by_axis(rotate_vec.x, dist, dz, dy);
+			dz = res[0];
+			dy = res[1];
+			/*
+			//y axis
+			var res = _pixel_rotate_by_axis(rotate_vec.y, dist, dx, dz);
+			dx = res[0];
+			dz = res[1];
+			*/
+			this.x = (center_vec.x + dx);
+			this.y = (center_vec.y + dy);
+			this.z = (center_vec.z + dz);
+		};
+		
+		/*
+		Dr.log('should get [5, 5]', _pixel_rotate_by_axis(0.5, 5, 5, 0));
+		Dr.log('should get [5, -5]', _pixel_rotate_by_axis(-0.5, 5, 5, 0));
+		Dr.log('should get [5, 0]', _pixel_rotate_by_axis(4, 5, 5, 0));
+		Dr.log('should get [-1, 5]', _pixel_rotate_by_axis(1.1, 5, 5, 0));
+		*/
 		Vector3.FromArray = function (array, offset) {
 			if (!offset) {
 				offset = 0;
@@ -395,29 +510,29 @@ Dr.Implement('Pixel3D_Math', function (global, module_get) {
 		Matrix.prototype.copy = function () {
 			return Matrix.FromArray(this.m);
 		};
-		Matrix.FromValues = function (initialM11, initialM12, initialM13, initialM14, initialM21, initialM22, initialM23, initialM24, initialM31, initialM32, initialM33, initialM34, initialM41, initialM42, initialM43, initialM44) {
+		Matrix.FromValues = function (m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44) {
 			var result = new Matrix();
-			result.m[0] = initialM11;
-			result.m[1] = initialM12;
-			result.m[2] = initialM13;
-			result.m[3] = initialM14;
-			result.m[4] = initialM21;
-			result.m[5] = initialM22;
-			result.m[6] = initialM23;
-			result.m[7] = initialM24;
-			result.m[8] = initialM31;
-			result.m[9] = initialM32;
-			result.m[10] = initialM33;
-			result.m[11] = initialM34;
-			result.m[12] = initialM41;
-			result.m[13] = initialM42;
-			result.m[14] = initialM43;
-			result.m[15] = initialM44;
+			result.m[0] = m11;
+			result.m[1] = m12;
+			result.m[2] = m13;
+			result.m[3] = m14;
+			result.m[4] = m21;
+			result.m[5] = m22;
+			result.m[6] = m23;
+			result.m[7] = m24;
+			result.m[8] = m31;
+			result.m[9] = m32;
+			result.m[10] = m33;
+			result.m[11] = m34;
+			result.m[12] = m41;
+			result.m[13] = m42;
+			result.m[14] = m43;
+			result.m[15] = m44;
 			return result;
 		};
-		Matrix.FromArray = function (matrixArray) {
+		Matrix.FromArray = function (matrix_array) {
 			var result = new Matrix();
-			result.m = matrixArray.slice(0);
+			result.m = matrix_array.slice(0);
 			return result;
 		};
 		Matrix.Identity = function () {
@@ -505,19 +620,19 @@ Dr.Implement('Pixel3D_Math', function (global, module_get) {
 			return result;
 		};
 		Matrix.LookAtLH = function (eye, target, up) {
-			var zAxis = target.subtract(eye);
-			zAxis.normalize();
-			var xAxis = Vector3.Cross(up, zAxis);
-			xAxis.normalize();
-			if (xAxis.x ==0 && xAxis.y ==0 && xAxis.z ==0) {
-				xAxis = new Vector3(1, 0, 0);
+			var z_axis = target.subtract(eye);
+			z_axis.normalize();
+			var x_axis = Vector3.Cross(up, z_axis);
+			x_axis.normalize();
+			if (x_axis.x ==0 && x_axis.y ==0 && x_axis.z ==0) {
+				x_axis = new Vector3(1, 0, 0);
 			}
-			var yAxis = Vector3.Cross(zAxis, xAxis);
+			var yAxis = Vector3.Cross(z_axis, x_axis);
 			yAxis.normalize();
-			var ex = -Vector3.Dot(xAxis, eye);
+			var ex = -Vector3.Dot(x_axis, eye);
 			var ey = -Vector3.Dot(yAxis, eye);
-			var ez = -Vector3.Dot(zAxis, eye);
-			return Matrix.FromValues(xAxis.x, yAxis.x, zAxis.x, 0, xAxis.y, yAxis.y, zAxis.y, 0, xAxis.z, yAxis.z, zAxis.z, 0, ex, ey, ez, 1);
+			var ez = -Vector3.Dot(z_axis, eye);
+			return Matrix.FromValues(x_axis.x, yAxis.x, z_axis.x, 0, x_axis.y, yAxis.y, z_axis.y, 0, x_axis.z, yAxis.z, z_axis.z, 0, ex, ey, ez, 1);
 		};
 		/*
 		Matrix.PerspectiveLH = function (width, height, znear, zfar) {

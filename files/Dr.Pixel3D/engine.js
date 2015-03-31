@@ -9,14 +9,6 @@
  * 
  * 
  * 
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- * 
  **/
 
 Dr.Declare('Pixel3D_Engine', 'class');

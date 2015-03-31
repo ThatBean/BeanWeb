@@ -7,12 +7,12 @@ Dr.Implement('Switch', function (global, module_get) {
 	}
 	
 	Switch.prototype.Switch = function (key, value) {
-		Dr.log('[Switch]', key, value);
-		
 		if (value == undefined)
 			this[key] = !this[key];
 		else
 			this[key] = value;
+		
+		Dr.log('[Switch]', key, value, this[key]);
 	}
 	return Switch;
 });

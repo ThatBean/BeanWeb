@@ -7,6 +7,7 @@ var camera;		//the camera-view point-eye
 var model_data;	//the model
 var model_data2;	//the model 2
 var model_data3;	//the model 3
+var model_data4;	//the model 4
 var animation;	//the animation object
 
 ///The concept of size and ratio in this engine
@@ -26,7 +27,7 @@ var animation;	//the animation object
 //should always keep a 4 based size
 ///set these value
 var screenPixelWidth = 400;		//the width of on-screen canvas
-var blockScale = 10;	//(how many pixel for one block in working pixel)
+var blockScale = 8;	//(how many pixel for one block in working pixel)
 var workingPixelScale = 4;	//(how many pixel on screen for one pixel in working pixel)
 
 
@@ -171,6 +172,49 @@ function init() {
 			if (j!=3) mesh.Blocks[i*4+j-1].Color = new Pixel3D_Math.Color4(1, 1, 1, 1);
 		}
 	}
+	meshes.push(mesh);
+	
+	
+	lightsGlobal.push(new Pixel3D_Data.Light(
+		new Pixel3D_Math.Vector3(1, 0, 0),
+		new Pixel3D_Math.Color4(0, 0, 1, 1),
+		"Blue"
+	));
+	lightsGlobal.push(new Pixel3D_Data.Light(
+		new Pixel3D_Math.Vector3(-1, 0, 0),
+		new Pixel3D_Math.Color4(1, 0, 0, 1),
+		"Red"
+	));
+	lightsGlobal.push(new Pixel3D_Data.Light(
+		new Pixel3D_Math.Vector3(0, -1, 0),
+		new Pixel3D_Math.Color4(0, 1, 0, 1),
+		"Green"
+	));
+	
+	
+	lightsDot.push(new Pixel3D_Data.Light(
+		new Pixel3D_Math.Vector3(0, 0, 0),
+		new Pixel3D_Math.Color4(1, 0, 1, 1),
+		"RedD"
+	));
+	/**/
+	
+	/**/
+	/**/
+	model_data4 = new Pixel3D_Data.Data();
+	var meshes = model_data4.meshes;
+	var lightsGlobal = model_data4.lightsGlobal;
+	var lightsDot = model_data4.lightsDot;
+	
+	mesh= new Pixel3D_Data.BlockMesh("Cube", 2); 
+	mesh.Blocks[0] = new Pixel3D_Data.Block(
+		new Pixel3D_Math.Vector3(5, 0, 0),
+		new Pixel3D_Math.Color4(1, 0, 1, 1)
+	);
+	mesh.Blocks[1] = new Pixel3D_Data.Block(
+		new Pixel3D_Math.Vector3(5, 5, 0),
+		new Pixel3D_Math.Color4(1, 0, 0, 1)
+	);
 	meshes.push(mesh);
 	
 	
@@ -489,6 +533,9 @@ function init() {
 		
 		if (Switch.Model) {
 			switch (Switch.Model_Type) {
+				case 4:
+					target_model_data = model_data4;
+					break;
 				case 3:
 					target_model_data = model_data3;
 					break;
@@ -578,6 +625,9 @@ function drawingLoop(delta_time) {
 		
 		if (Switch.Model) {
 			switch (Switch.Model_Type) {
+				case 4:
+					target_model_data = model_data4;
+					break;
 				case 3:
 					target_model_data = model_data3;
 					break;
@@ -629,16 +679,18 @@ function drawingLoop(delta_time) {
 			}
 		}
 		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+		if (Switch.PixelRotation) {
+			var Pixel3D_Math = Dr.Get("Pixel3D_Math");
+			var center_vec = new Pixel3D_Math.Vector3(0, 0, 0);
+			var rotate_vec = new Pixel3D_Math.Vector3(0.5, 0, 0);
+			
+			for (var i = 0; i < meshes.length; i++) {
+				var block_list = meshes[i].Blocks;
+				for (var j = 0; j < block_list.length; j++) {
+					block_list[j].Coord.pixelRotate(center_vec, rotate_vec);
+				}
+			}
+		}
 		
 		device.render(
 			target_zoom * _zoom_modifier, 
