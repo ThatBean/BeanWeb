@@ -132,7 +132,7 @@ function init() {
 			new Pixel3D_Math.Color4.Random(1)
 		)
 	}
-	//mesh.removeInvisible();	//mark invisible faces
+	mesh.removeInvisible();	//mark invisible faces
 	meshes.push(mesh);
 	
 	
@@ -327,7 +327,7 @@ function init() {
 			/**/
 		}
 	}
-	//mesh.removeInvisible();	//mark invisible faces
+	mesh.removeInvisible();	//mark invisible faces
 	meshes.push(mesh);
 	
 	/**/

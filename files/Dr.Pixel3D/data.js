@@ -252,6 +252,7 @@ Dr.Implement('Pixel3D_Data', function (global, module_get) {
 		];
 		
 		BlockMesh.prototype.removeInvisible = function () {
+			/*
 			for (var i = 0; i < this.Blocks.length; i++) {
 				//clear All value first
 				this.Blocks[i].Invisible.length = 0;
@@ -263,6 +264,7 @@ Dr.Implement('Pixel3D_Data', function (global, module_get) {
 					this.checkNeighbourBlock(i, j);
 				}
 			}
+			*/
 		}
 		BlockMesh.prototype.checkNeighbourBlock = function (value1, value2) {
 			var b1 = this.Blocks[value1];
