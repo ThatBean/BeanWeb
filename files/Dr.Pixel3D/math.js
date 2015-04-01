@@ -341,9 +341,11 @@ Dr.Implement('Pixel3D_Math', function (global, module_get) {
 			dx = res[0];
 			dz = res[1];
 			
-			this.x = (center_vec.x + dx);
-			this.y = (center_vec.y + dy);
-			this.z = (center_vec.z + dz);
+			var x = (center_vec.x + dx);
+			var y = (center_vec.y + dy);
+			var z = (center_vec.z + dz);
+			
+			return new Vector3(Math.round(x), Math.round(y), Math.round(z));
 		};
 		
 		/*

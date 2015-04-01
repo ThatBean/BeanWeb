@@ -372,7 +372,11 @@ Dr.Implement('Pixel3D_Engine', function (global, module_get) {
 				for (var indexBlocks = 0; indexBlocks < currentMesh.Blocks.length; indexBlocks++) {
 					var currentBlock = currentMesh.Blocks[indexBlocks];
 					//transform Center Coord and get the 3D shift vector
-					var CenterVertex=this.project(currentBlock.Coord.pixelize(), transformMatrix);
+					
+					//var block_coord = currentBlock.Coord;
+					var block_coord = currentBlock.Coord.pixelRotate(Dr._center_vec, Dr._rotate_vec);
+					
+					var CenterVertex=this.project(block_coord, transformMatrix);
 					var vecShift=CenterVertex.Coord.subtract(currentMesh.ModelBlock.TransCenterVertex.Coord);
 					
 					//give all info to drawProjectedBlock

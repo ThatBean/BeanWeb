@@ -87,6 +87,9 @@ function init() {
 	
 	
 	
+	Dr._rotate_ratio = 0;
+	Dr._center_vec = new Pixel3D_Math.Vector3(0, 0, 0);
+	Dr._rotate_vec = new Pixel3D_Math.Vector3(0, 0, 0);
 	
 	
 	
@@ -690,20 +693,30 @@ function drawingLoop(delta_time) {
 		
 		if (Switch.PixelRotation) {
 			var Pixel3D_Math = Dr.Get("Pixel3D_Math");
-			var center_vec = new Pixel3D_Math.Vector3(0, 0, 0);
+			var center_vec = new Pixel3D_Math.Vector3(10, 0, 0);
 			//var rotate_vec = new Pixel3D_Math.Vector3(0.5 * delta_time, 0.5 * delta_time, 0);
-			var rotate_vec = new Pixel3D_Math.Vector3(
+			/*var rotate_vec = new Pixel3D_Math.Vector3(
 				Switch.PixelRotationX ? 0.5 * delta_time : 0,
 				Switch.PixelRotationY ? 0.5 * delta_time : 0,
 				Switch.PixelRotationZ ? 0.5 * delta_time : 0
+			);*/
+			
+			Dr._rotate_ratio = (Dr._rotate_ratio + 0.5 * delta_time) % 4;
+			Dr._center_vec = new Pixel3D_Math.Vector3(0, 0, 0);
+			Dr._rotate_vec = new Pixel3D_Math.Vector3(
+				Switch.PixelRotationX ? Dr._rotate_ratio : 0,
+				Switch.PixelRotationY ? Dr._rotate_ratio : 0,
+				Switch.PixelRotationZ ? Dr._rotate_ratio : 0
 			);
 			
+			/*
 			for (var i = 0; i < meshes.length; i++) {
 				var block_list = meshes[i].Blocks;
 				for (var j = 0; j < block_list.length; j++) {
 					block_list[j].Coord.pixelRotate(center_vec, rotate_vec);
 				}
 			}
+			*/
 		}
 		
 		device.render(
