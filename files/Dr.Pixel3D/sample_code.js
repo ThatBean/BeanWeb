@@ -216,23 +216,38 @@ function init() {
 	var dist = 4 * 2 + 1;
 	var dist_offset = dist * 0.5 >> 0;
 	var block_total = dist * dist * dist;
-	
-	mesh= new Pixel3D_Data.BlockMesh("Cube", block_total); 
+	var draw_total = block_total - (dist - 1) * (dist - 1) * (dist - 1);
+	var already_draw = 0;
+	mesh= new Pixel3D_Data.BlockMesh("Cube", draw_total); 
 	for (var i = 0; i < block_total; i++) {
 		var x = (i % dist - dist_offset) * gap;
 		var y = ((i / dist >> 0) % dist - dist_offset) * gap;
 		var z = ((i / dist / dist >> 0) % dist - dist_offset) * gap;
 		
+		if (
+			Math.abs(x) != (dist_offset * gap)
+			&& Math.abs(y) != (dist_offset * gap)
+			&& Math.abs(z) != (dist_offset * gap)
+		){
+			continue;
+		}
+		
+		var r = (x / dist + 1) * 0.5;
+		var g = (y / dist + 1) * 0.5;
+		var b = (z / dist + 1) * 0.5;
+		/*
 		var r = 0.2 + i / block_total * 0.8;
 		var g = 1 - i / block_total * 0.8;
 		var b = i / block_total * 1;
+		*/
+		Dr.log("add", x, y, z, r, g, b);
 		
-		Dr.log("add", x,y,z);
-		
-		mesh.Blocks[i] = new Pixel3D_Data.Block(
+		mesh.Blocks[already_draw] = new Pixel3D_Data.Block(
 			new Pixel3D_Math.Vector3(x, y, z),
 			new Pixel3D_Math.Color4(r, g, b, 1)
 		);
+		
+		already_draw++;
 	};
 	meshes.push(mesh);
 	
@@ -240,17 +255,17 @@ function init() {
 	/** /
 	lightsGlobal.push(new Pixel3D_Data.Light(
 		new Pixel3D_Math.Vector3(1, 0, 0),
-		new Pixel3D_Math.Color4(0, 0, 1, 1),
+		new Pixel3D_Math.Color4(0.5, 0.5, 1, 1),
 		"Blue"
 	));
 	lightsGlobal.push(new Pixel3D_Data.Light(
 		new Pixel3D_Math.Vector3(-1, 0, 0),
-		new Pixel3D_Math.Color4(1, 0, 0, 1),
+		new Pixel3D_Math.Color4(1, 0.5, 0.5, 1),
 		"Red"
 	));
 	lightsGlobal.push(new Pixel3D_Data.Light(
 		new Pixel3D_Math.Vector3(0, -1, 0),
-		new Pixel3D_Math.Color4(0, 1, 0, 1),
+		new Pixel3D_Math.Color4(0.5, 1, 0.5, 1),
 		"Green"
 	));
 	
