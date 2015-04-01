@@ -701,7 +701,7 @@ function drawingLoop(delta_time) {
 				Switch.PixelRotationZ ? 0.5 * delta_time : 0
 			);*/
 			
-			Dr._rotate_ratio = (Dr._rotate_ratio + 0.5 * delta_time) % 4;
+			Dr._rotate_ratio = (Dr._rotate_ratio + 0.1 * delta_time) % 4;
 			Dr._center_vec = new Pixel3D_Math.Vector3(0, 0, 0);
 			Dr._rotate_vec = new Pixel3D_Math.Vector3(
 				Switch.PixelRotationX ? Dr._rotate_ratio : 0,
