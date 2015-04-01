@@ -90,7 +90,7 @@ function init() {
 	Dr._rotate_ratio = 0;
 	Dr._center_vec = new Pixel3D_Math.Vector3(0, 0, 0);
 	Dr._rotate_vec = new Pixel3D_Math.Vector3(0, 0, 0);
-	
+	Switch.PixelRotationSpeed = 0.1;
 	
 	
 	canvas = document.getElementById("Dr.Canvas");
@@ -166,13 +166,15 @@ function init() {
 	var lightsDot = model_data3.lightsDot;
 	
 	mesh= new Pixel3D_Data.BlockMesh("Cube", 12); 
+	
+	var dist = 10;
 	for (var i = 0; i < 3; i++) {
-		for (var j = 1; j <= 4; j++) {
-			mesh.Blocks[i*4+j-1] = new Pixel3D_Data.Block(
+		for (var j = 1; j <= dist; j++) {
+			mesh.Blocks[i*dist+j-1] = new Pixel3D_Data.Block(
 				new Pixel3D_Math.Vector3(j*(i==0?1:0), j*(i==1?1:0), j*(i==2?1:0)),
-				new Pixel3D_Math.Color4(1*(i==0?1:0), 1*(i==1?1:0), 1*(i==2?1:0), 1)
+				j % 2 == 1 ? new Pixel3D_Math.Color4(1*(i==0?1:0), 1*(i==1?1:0), 1*(i==2?1:0), 1)
+				: new Pixel3D_Math.Color4(1, 1, 1, 1)
 			);
-			if (j!=3) mesh.Blocks[i*4+j-1].Color = new Pixel3D_Math.Color4(1, 1, 1, 1);
 		}
 	}
 	meshes.push(mesh);
@@ -209,16 +211,21 @@ function init() {
 	var lightsGlobal = model_data4.lightsGlobal;
 	var lightsDot = model_data4.lightsDot;
 	
-	mesh= new Pixel3D_Data.BlockMesh("Cube", 27); 
-	for (var i = 0; i < 27; i++) {
-		var dist = 3;
-		var x = (i % 3 - 1) * dist;
-		var y = ((i / 3 >> 0) % 3 - 1) * dist;
-		var z = ((i / 9 >> 0) % 3 - 1) * dist;
+	
+	var gap = 1;
+	var dist = 4 * 2 + 1;
+	var dist_offset = dist * 0.5 >> 0;
+	var block_total = dist * dist * dist;
+	
+	mesh= new Pixel3D_Data.BlockMesh("Cube", block_total); 
+	for (var i = 0; i < block_total; i++) {
+		var x = (i % dist - dist_offset) * gap;
+		var y = ((i / dist >> 0) % dist - dist_offset) * gap;
+		var z = ((i / dist / dist >> 0) % dist - dist_offset) * gap;
 		
-		var r = 0.5 + i / 27 * 0.5;
-		var g = 1 - i / 27 * 0.5;
-		var b = i / 27 * 1;
+		var r = 0.2 + i / block_total * 0.8;
+		var g = 1 - i / block_total * 0.8;
+		var b = i / block_total * 1;
 		
 		Dr.log("add", x,y,z);
 		
@@ -230,6 +237,7 @@ function init() {
 	meshes.push(mesh);
 	
 	
+	/** /
 	lightsGlobal.push(new Pixel3D_Data.Light(
 		new Pixel3D_Math.Vector3(1, 0, 0),
 		new Pixel3D_Math.Color4(0, 0, 1, 1),
@@ -252,7 +260,6 @@ function init() {
 		new Pixel3D_Math.Color4(1, 0, 1, 1),
 		"RedD"
 	));
-	/**/
 	
 	/**/
 	
@@ -701,7 +708,7 @@ function drawingLoop(delta_time) {
 				Switch.PixelRotationZ ? 0.5 * delta_time : 0
 			);*/
 			
-			Dr._rotate_ratio = (Dr._rotate_ratio + 0.1 * delta_time) % 4;
+			Dr._rotate_ratio = (Dr._rotate_ratio + Switch.PixelRotationSpeed * delta_time) % 4;
 			Dr._center_vec = new Pixel3D_Math.Vector3(0, 0, 0);
 			Dr._rotate_vec = new Pixel3D_Math.Vector3(
 				Switch.PixelRotationX ? Dr._rotate_ratio : 0,

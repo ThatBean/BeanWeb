@@ -252,33 +252,35 @@ Dr.Implement('Pixel3D_Math', function (global, module_get) {
 		*/
 		
 		var _pixel_rotate_by_axis = function (rotate_ratio, ccw_0, ccw_1) {
-			var dist = Math.max(Math.abs(ccw_0), Math.abs(ccw_1));
+			//var dist = Math.max(Math.abs(Math.round(ccw_0)), Math.abs(Math.round(ccw_1)));
+			var edge_dist = Math.max(Math.abs(ccw_0), Math.abs(ccw_1));
+			var dist = Math.round(edge_dist);
 			
 			if (rotate_ratio === 0 || dist === 0) {
 				return [ccw_0, ccw_1];
 			}
 			
 			var current_total_pixel;
-			if (ccw_0 === dist) {
+			if (ccw_0 === edge_dist) {
 				current_total_pixel = (0 + 1) * dist + ccw_1;
 			}
-			else if (ccw_1 === dist) {
+			else if (ccw_1 === edge_dist) {
 				current_total_pixel = (2 + 1) * dist - ccw_0;
 			}
-			else if (ccw_0 === -dist) {
+			else if (ccw_0 === -edge_dist) {
 				current_total_pixel = (4 + 1) * dist - ccw_1;
 			}
-			else if (ccw_1 === -dist) {
+			else if (ccw_1 === -edge_dist) {
 				current_total_pixel = (6 + 1) * dist + ccw_0;
 			}
 			else {
-				//debugger;
+				debugger;
 				return [ccw_0, ccw_1];
 			}
 			//Dr.log('current_total_pixel', current_total_pixel);
 			
 			//rotate_ratio range is [0, 4)
-			var rotate_pixel = rotate_ratio * 2 * dist;
+			var rotate_pixel = Math.round(rotate_ratio * 2 * dist);
 			//Dr.log('rotate_pixel', rotate_pixel);
 			
 			var result_total_pixel = (current_total_pixel + rotate_pixel) % (8 * dist);
@@ -316,34 +318,43 @@ Dr.Implement('Pixel3D_Math', function (global, module_get) {
 			return [ccw_0, ccw_1];
 		};
 		
-		
 		Vector3.prototype.pixelRotate = function (center_vec, rotate_vec) {
 			var dx = this.x - center_vec.x;
 			var dy = this.y - center_vec.y;
 			var dz = this.z - center_vec.z;
 			
-			var dist = Math.max(Math.abs(dx), Math.abs(dy), Math.abs(dz));
+			//var dist = Math.max(Math.abs(dx), Math.abs(dy), Math.abs(dz));
 			
 			//should be z-x-y (performs the roll first, then the pitch, and finally the yaw)
+			
+			//Dr.log('start', dx, dy, dz, 'next', rotate_vec.z, dy, dx);
 			
 			//z axis (roll)
 			var res = _pixel_rotate_by_axis(rotate_vec.z, dy, dx);
 			dy = res[0];
 			dx = res[1];
 			
+			//Dr.log('step', dx, dy, dz, 'next', rotate_vec.x, dz, dy);
+			
 			//x axis (pitch)
 			var res = _pixel_rotate_by_axis(rotate_vec.x, dz, dy);
 			dz = res[0];
 			dy = res[1];
+			
+			//Dr.log('step', dx, dy, dz, 'next', rotate_vec.y, dx, dz);
 			
 			//y axis (yaw)
 			var res = _pixel_rotate_by_axis(rotate_vec.y, dx, dz);
 			dx = res[0];
 			dz = res[1];
 			
+			//Dr.log('step', dx, dy, dz);
+			
 			var x = (center_vec.x + dx);
 			var y = (center_vec.y + dy);
 			var z = (center_vec.z + dz);
+			
+			//Dr.log('get', x, y, z);
 			
 			return new Vector3(Math.round(x), Math.round(y), Math.round(z));
 		};
@@ -353,6 +364,16 @@ Dr.Implement('Pixel3D_Math', function (global, module_get) {
 		Dr.log('should get [5, -5]', _pixel_rotate_by_axis(-0.5, 5, 5, 0));
 		Dr.log('should get [5, 0]', _pixel_rotate_by_axis(4, 5, 5, 0));
 		Dr.log('should get [-1, 5]', _pixel_rotate_by_axis(1.1, 5, 5, 0));
+		
+		var Pixel3D_Math = Dr.Get("Pixel3D_Math");
+		var Vector3 = Pixel3D_Math.Vector3;
+		var test_1 = new Vector3(2, -1, -4);
+		var test_2 = new Vector3(2, 0, -4);
+		var center_vec = new Vector3(0, 0, 0);
+		var rotate_vec = new Vector3(0, 2.455199999999994, 2.455199999999994);
+		Dr.log('test_1', test_1.pixelRotate(center_vec, rotate_vec));
+		Dr.log('test_2', test_2.pixelRotate(center_vec, rotate_vec));
+		
 		*/
 		Vector3.FromArray = function (array, offset) {
 			if (!offset) {

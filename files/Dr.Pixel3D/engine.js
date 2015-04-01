@@ -218,8 +218,8 @@ Dr.Implement('Pixel3D_Engine', function (global, module_get) {
 
 			///var sx = this.interpolate(pa.x, pb.x, gradient1) - 0.90000 / 2 >> 0;	/// TODO: gap problem?
 			///var ex = this.interpolate(pc.x, pd.x, gradient2) + 0.90000 / 2 >> 0;	/// TODO: gap problem?
-			var sx = this.interpolate(pa.x, pb.x, gradient1) + 0.49999 >> 0;	/// TODO: gap problem?
-			var ex = this.interpolate(pc.x, pd.x, gradient2) + 0.49999 >> 0;	/// TODO: gap problem?
+			var sx = Math.round(this.interpolate(pa.x, pb.x, gradient1));// + 0.49999 >> 0;	/// TODO: gap problem?
+			var ex = Math.round(this.interpolate(pc.x, pd.x, gradient2));// + 0.49999 >> 0;	/// TODO: gap problem?
 
 			var z1 = this.interpolate(pa.z, pb.z, gradient1);
 			var z2 = this.interpolate(pc.z, pd.z, gradient2);
@@ -311,7 +311,7 @@ Dr.Implement('Pixel3D_Engine', function (global, module_get) {
 					
 					//draw scan line
 					//Dr.log("start Y:"+startY+" end Y:"+endY);
-					for (var currentY = startY >> 0; currentY < endY >> 0; currentY++) {
+					for (var currentY = Math.round(startY); currentY < Math.round(endY); currentY++) {
 						//finalColor = new Color4(1, 1, 1, 1);
 						this.processScanLine(currentY, p0, p1, p2, p3, finalColor);
 						
@@ -368,6 +368,7 @@ Dr.Implement('Pixel3D_Engine', function (global, module_get) {
 					optionExtra
 				);
 				
+				//Dr.block_debug = {};
 				
 				for (var indexBlocks = 0; indexBlocks < currentMesh.Blocks.length; indexBlocks++) {
 					var currentBlock = currentMesh.Blocks[indexBlocks];
@@ -375,6 +376,13 @@ Dr.Implement('Pixel3D_Engine', function (global, module_get) {
 					
 					//var block_coord = currentBlock.Coord;
 					var block_coord = currentBlock.Coord.pixelRotate(Dr._center_vec, Dr._rotate_vec);
+					
+					//var debug_tag = block_coord.x + ',' + block_coord.y + ',' + block_coord.z;
+					//if (Dr.block_debug[debug_tag]) {
+					//	debugger;
+					//}
+					//Dr.block_debug[debug_tag] = indexBlocks;
+					
 					
 					var CenterVertex=this.project(block_coord, transformMatrix);
 					var vecShift=CenterVertex.Coord.subtract(currentMesh.ModelBlock.TransCenterVertex.Coord);

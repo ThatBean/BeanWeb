@@ -552,7 +552,7 @@ Dr.Implement('Pixel3D_Data', function (global, module_get) {
 					//part 2
 					packedScanLine.push({
 						p: [ p[3], p[2], p[0], p[1] ],
-						startY: p[3].y - 0.90000 / 2,
+						startY: p[3].y,// - 0.90000 / 2,
 						endY: p[1].y
 					});
 					firstEndY = p[3].y;
@@ -584,7 +584,7 @@ Dr.Implement('Pixel3D_Data', function (global, module_get) {
 					packedScanLine.push({
 						p: [ p[3], p[2], p[1], p[2] ],
 						startY: lastStartY,
-						endY: p[2].y + 0.90000 / 2
+						endY: p[2].y,// + 0.90000 / 2
 					});
 				}
 				//add to Packs Array
