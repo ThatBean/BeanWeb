@@ -254,21 +254,21 @@ Dr.Implement('Pixel3D_Math', function (global, module_get) {
 		var _pixel_rotate_by_axis = function (rotate_ratio, ccw_0, ccw_1) {
 			var dist = Math.max(Math.abs(ccw_0), Math.abs(ccw_1));
 			
-			if (rotate_ratio == 0 || dist == 0) {
+			if (rotate_ratio === 0 || dist === 0) {
 				return [ccw_0, ccw_1];
 			}
 			
 			var current_total_pixel;
-			if (ccw_0 == dist) {
+			if (ccw_0 === dist) {
 				current_total_pixel = (0 + 1) * dist + ccw_1;
 			}
-			else if (ccw_1 == dist) {
+			else if (ccw_1 === dist) {
 				current_total_pixel = (2 + 1) * dist - ccw_0;
 			}
-			else if (ccw_0 == -dist) {
+			else if (ccw_0 === -dist) {
 				current_total_pixel = (4 + 1) * dist - ccw_1;
 			}
-			else if (ccw_1 == -dist) {
+			else if (ccw_1 === -dist) {
 				current_total_pixel = (6 + 1) * dist + ccw_0;
 			}
 			else {
@@ -283,7 +283,7 @@ Dr.Implement('Pixel3D_Math', function (global, module_get) {
 			
 			var result_total_pixel = (current_total_pixel + rotate_pixel) % (8 * dist);
 			
-			var result_edge = (result_total_pixel / (2 * dist)) >> 0;
+			var result_edge = Math.floor(result_total_pixel / (2 * dist));
 			var result_pixel = result_total_pixel - result_edge * 2 * dist - dist;
 			
 			//Dr.log('result_total_pixel', result_total_pixel);
@@ -308,11 +308,11 @@ Dr.Implement('Pixel3D_Math', function (global, module_get) {
 					ccw_1 = -dist;
 					break;
 			}
-			
+			/*
 			if (isNaN(ccw_0) || isNaN(ccw_1)) {
 				debugger;
 			}
-			
+			*/
 			return [ccw_0, ccw_1];
 		};
 		
