@@ -28,7 +28,7 @@
 		Dr.loadScriptByList([
 			'../../Dr.base_module.js',
 			'actor.js',
-			'sample_code.js'
+			'actor_sample_code.js'
 		], function () {
 			Dr.log("All script loaded");
 		})
@@ -85,11 +85,6 @@
 			<button onclick="Dr.Switch.Switch('Skeleton')">Switch Skeleton</button>
 			<br />
 			<br />
-			<button onclick="Dr.Switch.Switch('Model')">Switch Model</button>
-			<button onclick="Dr.Switch.Switch('Zoom')">Switch Zoom</button>
-			<button onclick="Dr.Switch.Switch('Rotate')">Switch Rotate</button>
-			<br />
-			<br />
 			<button onclick="Dr.Event.emit('KEY_UP', null, 'K_LEFT')">[Left]</button>
 			<button onclick="Dr.Event.emit('KEY_UP', null, 'K_RIGHT')">[Right]</button>
 			<button onclick="Dr.Event.emit('KEY_UP', null, 'K_UP')">[ Up ]</button>
@@ -100,18 +95,6 @@
 			<button onclick="Dr.Switch.Switch('Model_Type', 2)">Model 2</button>
 			<button onclick="Dr.Switch.Switch('Model_Type', 3)">Model 3</button>
 			<button onclick="Dr.Switch.Switch('Model_Type', 4)">Model 4</button>
-			<br />
-			<br />
-			<button onclick="Dr.Switch.Switch('PixelRotation')">PixelRotation</button>
-			<button onclick="Dr.Switch.Switch('PixelRotationX')">PixelRotationX</button>
-			<button onclick="Dr.Switch.Switch('PixelRotationY')">PixelRotationY</button>
-			<button onclick="Dr.Switch.Switch('PixelRotationZ')">PixelRotationZ</button>
-			<br />
-			<br />
-			<button onclick="Dr.Switch.Switch('PixelRotationSpeed', 0.05)">PixelRotationSpeed1</button>
-			<button onclick="Dr.Switch.Switch('PixelRotationSpeed', 0.1)">PixelRotationSpeed2</button>
-			<button onclick="Dr.Switch.Switch('PixelRotationSpeed', 0.5)">PixelRotationSpeed3</button>
-			<button onclick="Dr.Switch.Switch('PixelRotationSpeed', 1)">PixelRotationSpeed4</button>
 		</div>
 		
 		<br />
