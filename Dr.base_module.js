@@ -19,6 +19,7 @@ Dr.Implement('Switch', function (global, module_get) {
 
 
 
+
 //Log utility
 //Maintain a log of recent 'listMax' number
 //the log is updated to 'logTag'
@@ -461,3 +462,7 @@ Dr.test_func_list = {
 
 
 Dr.LoadAll();
+
+var Switch = Dr.Get("Switch");
+Dr.Switch = new Switch;
+//Dr.Switch.Switch("Test");

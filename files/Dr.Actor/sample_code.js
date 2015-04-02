@@ -1,12 +1,4 @@
-var canvas;
 
-var Switch = new (Dr.Get("Switch"));
-Dr.log(Switch);
-Switch.Switch("Test");
-
-
-
-//document.addEventListener("DOMContentLoaded", init, false);
 
 function init() {
 	Dr.LoadAll();
@@ -27,7 +19,7 @@ function init() {
 		document.getElementById("Log").innerHTML = log_text;
 	})
 	Dr.UpdateLoop.add(function (delta_time) { 
-		if (!Switch.Log) {
+		if (!Dr.Switch.Log) {
 			tag_log.Log("update log " + Dr.now()); 
 		}
 		return true;
@@ -46,8 +38,8 @@ function init() {
 	var adjust_func = function (event_key, event, K_def) {
 		var target_model_data;
 		
-		if (Switch.Model) {
-			switch (Switch.Model_Type) {
+		if (Dr.Switch.Model) {
+			switch (Dr.Switch.Model_Type) {
 				case 4:
 					target_model_data = model_data4;
 					break;
@@ -110,7 +102,7 @@ function drawingLoop(delta_time) {
 	//Dr.log("drawingLoop", delta_time);
 	
 	
-	if (!Switch.Render) {
+	if (!Dr.Switch.Render) {
 		
 	}
 	
