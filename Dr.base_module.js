@@ -2,11 +2,11 @@
 //A switch that save and flip the value
 Dr.Declare('Switch', 'class');
 Dr.Implement('Switch', function (global, module_get) {
-	var Switch = function () {
+	var Module = function () {
 		Dr.log('[Switch] init');
 	}
 	
-	Switch.prototype.Switch = function (key, value) {
+	Module.prototype.Switch = function (key, value) {
 		if (value == undefined)
 			this[key] = !this[key];
 		else
@@ -14,7 +14,7 @@ Dr.Implement('Switch', function (global, module_get) {
 		
 		Dr.log('[Switch]', key, value, this[key]);
 	}
-	return Switch;
+	return Module;
 });
 
 
@@ -25,7 +25,7 @@ Dr.Implement('Switch', function (global, module_get) {
 //the log is updated to 'logTag'
 Dr.Declare('TagLog', 'class');
 Dr.Implement('TagLog', function (global, module_get) {
-	var TagLog = function(output_func) {
+	var Module = function(output_func) {
 		//record putput func, so you don't need to set it next time
 		if (output_func) this.output_func = output_func;
 		
@@ -35,10 +35,10 @@ Dr.Implement('TagLog', function (global, module_get) {
 		this.logSeperator = '<br />';	//usually '<br />' or '\n'
 	}
 	
-	TagLog.prototype.Log = function (newLog, logTagId) {
+	Module.prototype.Log = function (newLog, logTagId) {
 		//generate this log
 		var now = Dr.now();
-		this.List.unshift('[+' + (now - this.lastTime) / 1000 + 'sec]' + newLog);	//add to head of the array
+		this.List.unshift('[+' + (now - this.lastTime).toFixed(4) + 'sec]' + newLog);	//add to head of the array
 		this.lastTime = now;
 		//remove excessive log
 		if (this.List.length > this.listMax) this.List.length = this.listMax;
@@ -50,7 +50,7 @@ Dr.Implement('TagLog', function (global, module_get) {
 			this.output_func(log_text);
 		}
 	}
-	return TagLog;
+	return Module;
 });
 
 
@@ -59,7 +59,7 @@ Dr.Implement('TagLog', function (global, module_get) {
 //display the FPS or step to record
 Dr.Declare('FPS', 'class');
 Dr.Implement('FPS', function (global, module_get) {
-	var FPS = function (output_func) {
+	var Module = function (output_func) {
 		//record putput func, so you don't need to set it next time
 		if (output_func) this.output_func = output_func;
 		//output_func(averageFPS, currentFPS)
@@ -67,7 +67,7 @@ Dr.Implement('FPS', function (global, module_get) {
 		this.List = [];
 		this.listMax = 20;			//max history to maintain
 	}
-	FPS.prototype.FPS = function (output_func) {
+	Module.prototype.FPS = function (output_func) {
 		var step = this.step();
 		//record tag, so you don't need to set it next time
 		if (output_func) this.output_func = output_func;
@@ -79,26 +79,26 @@ Dr.Implement('FPS', function (global, module_get) {
 		if (this.output_func) this.output_func(averageFPS, this.List[0]);
 		return step;
 	}
-	FPS.prototype.step = function () {
+	Module.prototype.step = function () {
 		//get step
 		var now = Dr.now();
 		var step = (now - this.lastTime);
 		this.lastTime = now;
 		//get stepFPS
-		var stepFPS = 1000 / step;
+		var stepFPS = 1 / step;
 		//save to list
 		this.List.unshift(stepFPS);
 		if (this.List.length > this.listMax) this.List.length = this.listMax;
 		return step;
 	}
-	return FPS;
+	return Module;
 });
 
 
-Dr.Declare('Toolbox', 'function pack');
+Dr.Declare('Toolbox', 'function_pack');
 Dr.Implement('Toolbox', function (global, module_get) {
-	var Toolbox = {}
-	Toolbox.getPageSize = function () {
+	var Module = {}
+	Module.getPageSize = function () {
 		var xScroll,yScroll;
 		if (Dr.window.innerHeight && Dr.window.scrollMaxY) {
 			xScroll = Dr.document.body.scrollWidth;
@@ -126,7 +126,7 @@ Dr.Implement('Toolbox', function (global, module_get) {
 		pageWidth = ( (xScroll < windowWidth) ? windowWidth : xScroll );
 		return {'pageX':pageWidth,'pageY':pageHeight,'winX':windowWidth,'winY':windowHeight};
 	}
-	Toolbox.setSize = function(element, width, height) {
+	Module.setSize = function(element, width, height) {
 		if (!element) {
 			alert('[Toolbox.setSize] get null, ' + element);
 			return;
@@ -141,18 +141,18 @@ Dr.Implement('Toolbox', function (global, module_get) {
 		element.style.minHeight = height + 'px';
 		element.style.maxHeight = height + 'px';
 	}
-	Toolbox.resizeEventListener = function(func) {
+	Module.resizeEventListener = function(func) {
 		var evt = 'onorientationchange' in Dr.window ? 'orientationchange' : 'resize';
 		Dr.window.addEventListener(evt, func);
 	}
-	Toolbox.createElement = function (element_data) {
+	Module.createElement = function (element_data) {
 		var new_element= Dr.document.createElement(element_data.type);
 		if (element_data.parent) element_data.parent.appendChild(new_element);
 		if (element_data.id) new_element.id = element_data.id;
 		if (element_data.name) new_element.name = element_data.name;
 		return new_element;
 	}
-	return Toolbox;
+	return Module;
 });
 
 

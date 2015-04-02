@@ -406,12 +406,14 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 	});
 	
 	//time related
-	Dr.now = _required_native.clock;
+	Dr.startTimestamp = _required_native.getUTCTimeStamp();
 	Dr.getUTCTimeStamp = _required_native.getUTCTimeStamp;
-	Dr.startClock = Dr.now();
-	Dr.startTimestamp = Dr.getUTCTimeStamp();
-	Dr.clock = function () { return (Dr.now() - Dr.startClock); };
+	Dr.startClock = _required_native.clock();
+	Dr.clock = function () { return (_required_native.clock() - Dr.startClock); };
 	Dr.clock_per_sec = _required_native.clock_per_sec;
+	Dr.now = function () {
+		return (_required_native.clock() - Dr.startClock) / _required_native.clock_per_sec;	//return running time in seconds
+	};
 	
 	//math related
 	Dr.getRandomInt = _required_native.getRandomInt;
@@ -457,7 +459,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 		}
 		Log.prototype.log = function () {
 			var arg_list = Dr.getArgumentArray(arguments);
-			arg_list.unshift('[' + ((Dr.now() - Dr.startClock) / Dr.clock_per_sec) + 'sec]');
+			arg_list.unshift('[' + Dr.now().toFixed(4) + 'sec]');
 			this._log_history.push(arg_list);
 			Dr.logList(arg_list);
 		}
