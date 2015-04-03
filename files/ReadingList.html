@@ -1,0 +1,138 @@
+<pre>
+<code>
+<h1>Reading List</h1>
+<script>
+	var reading_list = [
+		["<b>Title</b>", "<b>Link</b>", "<b>Time Added</b>"],
+		["article | development comments about Spore", "http://chrishecker.com/My_liner_notes_for_spore", "2015/4/3"],
+		["article | behaviour trees in JavaScript", "http://machinejs.maryrosecook.com/", "2015/4/3"],
+		["article | JavaScript for Artificial Intelligence", "http://mind.sourceforge.net/js.html", "2015/4/3"],
+		
+		["Game | The Render Engine by B. Fattori | has behaviour tree", "http://pistolslut.com/", "2015/4/3"],
+		["Game | Looks fun", "http://www.spyparty.com/", "2015/4/3"],
+		
+		["End", "End", "End"],
+	];
+	var result_line = '<table>';
+	for (var i in reading_list) {
+		var title = reading_list[i][0];
+		var link = reading_list[i][1];
+		var time = reading_list[i][2];
+		var line = '<tr><td>' + title + '</td><td><a href="' + link + '">' + link + '</a></td><td>' + time + '</td></tr>';
+		
+		result_line += line;
+	}
+	result_line += '</table>';
+	document.write(result_line);
+</script>
+</code>
+</pre>
+
+<hr />
+
+<pre>
+<code>
+<h1>Some Notes</h1>
+About AI
+	Popular Methods:
+		Neural network	--	feedback is pre-defined(mostly)
+		Behaviour tree	--	maximum potential limited
+		
+	Focus Aspect:
+		Input:
+			Processing
+			Classify
+		
+		
+		
+	Preferred AI Model for a Game:
+		will be run every frame:
+			no non-stoppable looping
+			breakable, re-enter-able
+		like function:
+			data in, data out
+		change-able at run-time
+		can be stored by save files
+		per actor in game
+		can be changed by:
+			copying other AI
+			try and error
+			additional scripting
+		
+		the data a game can offer:(from simple to complex)
+			storage for initial data
+			storage for run-time data
+			storage for accumulating data
+			list of actions available
+			data of "self"
+			data of environment
+			data of feedback/result(before commit action or after)
+			notification/event of perceived actions
+			data/function of how favorable of a status data or a status change
+			
+			
+		
+	The ADVICE Model:
+		AI keeps a List/Trees of Advices
+		an Advice is consists of:
+			Aspect:	(aspect of this advice, loose restraint, where player may tweak a lot)
+				combat
+				daily
+				long-term
+				...
+				
+			Condition:	(some thing need checked before use)
+				Time
+				Location
+				Resource
+				Target
+				...
+				
+			Slot: (keywords, for some advice will occupy some slot and prevent same typed advice)
+				Mission
+				Move
+				Attack
+				...
+				
+			Action:	(the result action to take, will also be checked)
+				Use
+				Move
+				...
+				
+			Source:	(the source of this advice, the source has a credit(objective) value, a favor(subjective) value)
+				system (predefined)
+				ally (predefined, per AI)
+				enemy (predefined, per AI)
+				self
+				AI001
+				AI002
+				...
+				
+			Credit: (objective, how this advice is considered by other AI)
+			Favor: (subjective, how this advice is considered by this AI)
+				
+		On each update, some Advice about something will be Read, some will fail on Condition check, Action check, or even Source-favorable check
+		
+		AI keeps a List of Sources, not only for a quick back link from Advice, but also can be use as a contact book, and the "Recognition" logic
+			List:
+				Source:
+					Credit:	(objective, how overall advice is considered by other AI)
+					Favor:	(subjective, how overall advice is considered by this AI)
+		
+		AI itself, as a source of advice will have some data related:
+			Credit:	(objective, how overall advice is considered by other AI)
+			Favor:	(subjective, how overall advice is considered by this AI, it can be a low value, indicating this AI is lack of confidence)
+			
+		The Credit/Favor value is used to create a Emotion-like decision process, for decision consideration:
+			Credit: True - Fake
+			Favor: Like - Hate
+			??Confidence: Strong - Weak (decide the attack/flee action)
+			
+		AI keeps a List of Interact-able Object(Other AI or just environment), not only for a quick back link from Advice, but also can be use as a contact book, and the "Recognition" logic
+			List:
+				Source:
+					Credit:	(objective, how overall advice is considered by other AI)
+					Favor:	(subjective, how overall advice is considered by this AI)
+		
+</code>
+</pre>
