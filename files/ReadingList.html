@@ -88,7 +88,7 @@ About AI
 				Target
 				...
 				
-			Slot: (keywords, for some advice will occupy some slot and prevent same typed advice)
+			Slot: (keywords, for some advice will occupy some slot and prevent same type advice)
 				Mission
 				Move
 				Attack
@@ -108,31 +108,35 @@ About AI
 				AI002
 				...
 				
-			Credit: (objective, how this advice is considered by other AI)
-			Favor: (subjective, how this advice is considered by this AI)
+			Opinion:
+				Credit: (objective, how this advice is considered by other AI)
+				Favor: (subjective, how this advice is considered by this AI)
 				
 		On each update, some Advice about something will be Read, some will fail on Condition check, Action check, or even Source-favorable check
 		
 		AI keeps a List of Sources, not only for a quick back link from Advice, but also can be use as a contact book, and the "Recognition" logic
 			List:
 				Source:
-					Credit:	(objective, how overall advice is considered by other AI)
-					Favor:	(subjective, how overall advice is considered by this AI)
+					Opinion:
+						Credit:	(objective, how advice from this source is considered by other AI)
+						Favor:	(subjective, how advice from this source is considered by this AI)
 		
 		AI itself, as a source of advice will have some data related:
-			Credit:	(objective, how overall advice is considered by other AI)
-			Favor:	(subjective, how overall advice is considered by this AI, it can be a low value, indicating this AI is lack of confidence)
+			Opinion:
+				Credit:	(objective, how advice from this source is considered by other AI)
+				Favor:	(subjective, how advice from this source is considered by this AI, it can be a low value, indicating this AI is lack of confidence and make wrong decisions)
 			
-		The Credit/Favor value is used to create a Emotion-like decision process, for decision consideration:
+		The Opinion value is used to create a Emotion-like decision process, for decision consideration:
 			Credit: True - Fake
-			Favor: Like - Hate
-			??Confidence: Strong - Weak (decide the attack/flee action)
+			Favor: True - Fake
+			??Confidence: Strong - Weak (decide the attack/flee action) -- denied, the attack/flee action is an action, not opinion
 			
 		AI keeps a List of Interact-able Object(Other AI or just environment), not only for a quick back link from Advice, but also can be use as a contact book, and the "Recognition" logic
 			List:
 				Source:
-					Credit:	(objective, how overall advice is considered by other AI)
-					Favor:	(subjective, how overall advice is considered by this AI)
+					Opinion:
+						Credit:	(objective, how overall advice is considered by other AI)
+						Favor:	(subjective, how overall advice is considered by this AI)
 		
 </code>
 </pre>
