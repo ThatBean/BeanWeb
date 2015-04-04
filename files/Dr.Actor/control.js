@@ -12,7 +12,9 @@
 
 Dr.Declare('ActorControl', 'class');
 Dr.Implement('ActorControl', function (global, module_get) {
-	var Module = {};
+	var Module = function () {
+		//
+	}
 	
 	Module.prototype.init = function (actor) {
 		this._actor = actor;

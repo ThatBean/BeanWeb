@@ -47,14 +47,18 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 		var _key_code_to_def = {
 			'8': 'K_BACKSPACE',
 			'9': 'K_TAB',
+			
 			'12': 'K_CLEAR',
 			'13': 'K_ENTER',
+			
 			'16': 'K_SHIFT',
 			'17': 'K_CTRL',
 			'18': 'K_ALT',
 			'19': 'K_PAUSE',
 			'20': 'K_CAPS_LOCK',
+			
 			'27': 'K_ESC',
+			
 			'32': 'K_SPACE',
 			'33': 'K_PRIOR',
 			'34': 'K_NEXT',
@@ -131,16 +135,17 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			'122': 'K_F11',
 			'123': 'K_F12',
 		};
+		
 		var _event_to_action_type = {
-			touchstart: 'action_start',
-			touchmove: 'action_move',
-			touchend: 'action_end',
-			touchcancel: 'action_cancel',
+			'touchstart': 'action_start',
+			'touchmove': 'action_move',
+			'touchend': 'action_end',
+			'touchcancel': 'action_cancel',
 			
-			mousedown: 'action_start',
-			mousemove: 'action_move',
-			mouseup: 'action_end',
-			mouseout: 'action_cancel',
+			'mousedown': 'action_start',
+			'mousemove': 'action_move',
+			'mouseup': 'action_end',
+			'mouseout': 'action_cancel',
 		};
 		
 		return {
@@ -189,7 +194,22 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 					}
 				}
 			})(),
-			
+			assertList: (function () {
+				if (console.assert.apply) {
+					return function (arg_list) {
+						console.assert.apply(console, arg_list);
+					}
+				}
+				else {
+					return function (arg_list) {
+						var arg_list = arg_list || [];
+						if (!arg_list[0]) {
+							arg_list[0] = 'Assertion failed';
+							throw new Error(arg_list);
+						}
+					}
+				}
+			})(),
 			
 			//document related
 			loadScript: function (script_src, callback) {
@@ -463,7 +483,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			this._log_history.push(arg_list);
 			Dr.logList(arg_list);
 		}
-		Log.prototype.get_history = function () {
+		Log.prototype.getHistory = function () {
 			return this._log_history;
 		}
 		return new Log;
@@ -472,6 +492,11 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 		Dr.Log.log.apply(Dr.Log, Dr.getArgumentArray(arguments));
 	}
 	
+	Dr.assertList = _required_native.assertList;
+	Dr.assert = function () {
+		var arg_list = Dr.getArgumentArray(arguments);
+		Dr.assertList(arg_list);
+	}
 	
 	Dr.inspect = function (target) {
 		Dr.log('[Inspect]', target);

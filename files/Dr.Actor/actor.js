@@ -27,7 +27,9 @@ Dr.Implement('Actor', function (global, module_get) {
 	var ActorLogicPool = module_get("ActorLogicPool");
 	var ActorActionPool = module_get("ActorActionPool");
 	
-	var Module = {};
+	var Module = function () {
+		//
+	}
 	
 	Module.prototype.init = function () {
 		this._id = null;	//used mostly with stage
@@ -84,7 +86,9 @@ Dr.Implement('Actor', function (global, module_get) {
 
 Dr.Declare('ActorData', 'class');
 Dr.Implement('ActorData', function (global, module_get) {
-	var Module = {};
+	var Module = function () {
+		//
+	}
 	
 	Module.prototype.init = function (actor) {
 		this._actor = actor;

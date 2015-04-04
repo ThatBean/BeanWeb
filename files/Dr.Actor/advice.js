@@ -31,45 +31,51 @@
  
 Dr.Declare('Advice_Opinion', 'class');
 Dr.Implement('Advice_Opinion', function (global, module_get) {
-	var Module = {};
+	var Module = function () {
+		//
+	}
 	
-	Module.type = {
-		PENDING: 'PENDING',
-		ENTER: 'ENTER',
-		ACTIVE: 'ACTIVE',
-		EXIT: 'EXIT',
-	};
-	
-	Module.prototype.init = function (credit, favor) {
-		this.credit = credit || 0;
-		this.favor = favor || 0;
-	};
-	
-	//for a typed result
-	Module.prototype.consider = function (opinion) {
-		this.credit = 0;
-		this.favor = 0;
+	Module.prototype.init = function (credit_total, favor_total, credit_count, favor_count) {
+		this._credit_total = credit_total || 0.5;
+		this._credit_count = credit_count || 1;
+		this._favor_total = favor_total || 0.5;
+		this._favor_count = favor_count || 1;
 		
-		opinion.credit;
-		opinion.favor;
-		
+		this._origin = null;
 	};
+	
+	Module.prototype.setOrigin = function (origin) { this._origin = origin; };
+	Module.prototype.getOrigin = function () { return this._origin; };
+	Module.prototype.getCredit = function () { return this._credit_total / this._credit_count; };
+	Module.prototype.getFavor = function () { return this._favor_total / this._favor_count; };
+	Module.prototype.addCredit = function (value) { this._credit_total += value; this._credit_count++; };
+	Module.prototype.addFavor = function (value) { this._favor_total += value; this._favor_count++; };
 	
 	//for a bool result
 	Module.prototype.decide = function (opinion) {
-		this.credit = 0;
-		this.favor = 0;
+		//this.getCredit();	//other's opinion about you will not related to your consider
+		///TODO: think a better way
+		return (opinion.getCredit() + opinion.getFavor() * this.getFavor()) >= 0.5;
 	};
 	
 	//for take in feedback of a decision
-	Module.prototype.change = function (opinion, result) {
-		this.credit = 0;
-		this.favor = 0;
+	Module.prototype.change = function (opinion, value) {
+		opinion.getOrigin().addCredit(value);
+		opinion.addCredit(value);
+			
+		opinion.addFavor(value);
+		this.addFavor(value);
 	};
 	
-	Module.create = function (credit, favor) {
+	Module.prototype.copy = function () {
+		var copy_instance = Module.create(this._credit_total, this._favor_total, this._credit_count, this._favor_count);
+		copy_instance.setOrigin(this.origin);
+		return copy_instance;
+	};
+	
+	Module.create = function (credit_total, favor_total, credit_count, favor_count) {
 		var instance = new Module;
-		instance.init(credit, favor);
+		instance.init(credit_total, favor_total, credit_count, favor_count);
 		return instance;
 	};
 	
@@ -79,7 +85,9 @@ Dr.Implement('Advice_Opinion', function (global, module_get) {
 Dr.Declare('Advice_Advice', 'class');
 Dr.Require('Advice_Advice', 'Advice_Opinion');
 Dr.Implement('Advice_Advice', function (global, module_get) {
-	var Module = {};
+	var Module = function () {
+		//
+	}
 	
 	Module.status = {
 		PENDING: 'PENDING',
@@ -106,7 +114,9 @@ Dr.Implement('Advice_Advice', function (global, module_get) {
 Dr.Declare('Advice_AdviceBag', 'class');
 Dr.Require('Advice_AdviceBag', 'Advice_Advice');
 Dr.Implement('Advice_AdviceBag', function (global, module_get) {
-	var Module = {};
+	var Module = function () {
+		//
+	}
 	
 	Module.status = {
 		PENDING: 'PENDING',
@@ -137,7 +147,10 @@ Dr.Implement('ActorStatePool', function (global, module_get) {
 	
 	var ActorState = module_get("ActorState");
 	
-	var Module = {};
+	var Module = function () {
+		//
+	}
+	
 	Module.status = ActorState.status;
 	
 	Module.prototype.init = function (actor) {
