@@ -26,9 +26,9 @@ var animation;	//the animation object
 //Important:
 //should always keep a 4 based size
 ///set these value
-var screenPixelWidth = 400;		//the width of on-screen canvas
+var screenPixelWidth = 100;		//the width of on-screen canvas
 var blockScale = 8;	//(how many pixel for one block in working pixel)
-var workingPixelScale = 2;	//(how many pixel on screen for one pixel in working pixel)
+var workingPixelScale = 1;	//(how many pixel on screen for one pixel in working pixel)
 
 
 //auto calculated and used
