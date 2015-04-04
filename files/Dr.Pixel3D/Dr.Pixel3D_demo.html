@@ -52,8 +52,15 @@
 			document.body.onresize = set_body_padding;
 		}
 		
+		function scale_canvas() {
+			var canvas = document.getElementById('Dr.Canvas');
+			canvas.style.width = Dr.devicePixelRatio * (parseInt(canvas.style.width)) + 'px';
+			canvas.style.height = Dr.devicePixelRatio * (parseInt(canvas.style.height)) + 'px';
+		}
+		
 		window.onload = function () {
 			set_body_padding();
+			scale_canvas();
 		}
 	</script>
 </head>

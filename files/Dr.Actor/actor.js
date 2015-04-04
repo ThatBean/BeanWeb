@@ -16,10 +16,10 @@
  **/
 
 Dr.Declare('Actor', 'class');
-Dr.Require('Actor', 'ActorData');
-Dr.Require('Actor', 'ActorControl');
-Dr.Require('Actor', 'ActorLogicPool');
-Dr.Require('Actor', 'ActorActionPool');
+//Dr.Require('Actor', 'ActorData');
+//Dr.Require('Actor', 'ActorControl');
+//Dr.Require('Actor', 'ActorLogicPool');
+//Dr.Require('Actor', 'ActorActionPool');
 Dr.Implement('Actor', function (global, module_get) {
 	
 	var ActorData = module_get("ActorData");

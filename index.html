@@ -13,17 +13,18 @@
 	<link href="bean_common.css" rel="stylesheet" type="text/css">
 	
 	<script type="text/javascript">
-		var site_url = "jp.thatbean.com";
+		var site_url = "thatbean.com";
 		
 		if(top != window){
 			top.location.href = site_url;
 		}
+		
 		window["PATHS_PASSPORT"] = site_url;
 	</script>
 	
 	<script type="text/javascript"> 
 		function switch_to_url (target_url) {
-			window.location.href=target_url;
+			window.location.href = target_url;
 		}
 		
 		function set_body_padding () {
@@ -34,11 +35,15 @@
 			
 			document.body.style.paddingTop = padding_header;
 			document.body.style.paddingBottom = padding_footer;
-			
 			console.log("set_body_padding", padding_header, padding_footer);
-			
 			//add watch
 			document.body.onresize = set_body_padding;
+		}
+		
+		function scale_canvas() {
+			var canvas = document.getElementById('Dr.Canvas');
+			canvas.style.width = Dr.devicePixelRatio * (parseInt(canvas.style.width)) + 'px';
+			canvas.style.height = Dr.devicePixelRatio * (parseInt(canvas.style.height)) + 'px';
 		}
 		
 		function set_canvas_script() {
@@ -57,10 +62,31 @@
 				ctx.fillStyle = "#" + (99 - i * 9).toString() + (99 - i * 9).toString() + (99 - i * 9).toString();
 				ctx.fillText("Hello Canvas World!", 0, 480 - 48 * i);
 			}
+			
+			var FPS = Dr.Get("FPS")
+			var fps = new FPS(function (averageFPS, currentFPS) {
+				document.getElementById("FPS").innerHTML = "AvgFPS:" + averageFPS.toFixed(2) + ", CurFPS:" + currentFPS.toFixed(2);
+			})
+			Dr.UpdateLoop.add(function (delta_time) { 
+				fps.FPS(); 
+				return true;
+			})
+			
+			var TagLog = Dr.Get("TagLog")
+			var tag_log = new TagLog(function (log_text) {
+				document.getElementById("Log").innerHTML = log_text;
+			})
+			Dr.UpdateLoop.add(function (delta_time) { 
+				tag_log.Log("update log " + Dr.now()); 
+				return true;
+			})
+			
+			Dr.UpdateLoop.start();
 		}
 		
 		window.onload = function () {
 			set_body_padding();
+			scale_canvas();
 			set_canvas_script();
 		}
 	</script>
@@ -102,6 +128,9 @@
 				<td>
 					<button onclick="switch_to_url('files/Dr.Pixel3D/Dr.Pixel3D_demo.html')"><b>Dr.Pixel3D.js</b></button>
 				</td>
+				<td>
+					<button onclick="switch_to_url('files/Dr.Actor/Dr.Actor_demo.html')"><b>Dr.Actor.js</b></button>
+				</td>
 			</tr>
 			<tr>
 				<td>
@@ -115,6 +144,9 @@
 				</td>
 				<td>
 					<b class="font-small"> - test for Dr.js + Dr.Pixel3D</b>
+				</td>
+				<td>
+					<b class="font-small"> - test for Dr.js + Dr.Actor</b>
 				</td>
 			</tr>
 		</table>

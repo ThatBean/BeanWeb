@@ -23,17 +23,18 @@
 	</script>
 	<!-- -->
 	<script type="text/javascript">
-		var site_url = "jp.thatbean.com";
+		var site_url = "thatbean.com";
 		
 		if(top != window){
 			top.location.href = site_url;
 		}
+		
 		window["PATHS_PASSPORT"] = site_url;
 	</script>
 	
 	<script type="text/javascript"> 
 		function switch_to_url (target_url) {
-			window.location.href=target_url;
+			window.location.href = target_url;
 		}
 		
 		function set_body_padding () {
@@ -47,6 +48,12 @@
 			console.log("set_body_padding", padding_header, padding_footer);
 			//add watch
 			document.body.onresize = set_body_padding;
+		}
+		
+		function scale_canvas() {
+			var canvas = document.getElementById('Dr.Canvas');
+			canvas.style.width = Dr.devicePixelRatio * (parseInt(canvas.style.width)) + 'px';
+			canvas.style.height = Dr.devicePixelRatio * (parseInt(canvas.style.height)) + 'px';
 		}
 		
 		function set_canvas_script() {
@@ -65,8 +72,6 @@
 				ctx.fillStyle = "#" + (99 - i * 9).toString() + (99 - i * 9).toString() + (99 - i * 9).toString();
 				ctx.fillText("Hello Canvas World!", 0, 480 - 48 * i);
 			}
-			
-			
 			
 			var FPS = Dr.Get("FPS")
 			var fps = new FPS(function (averageFPS, currentFPS) {
@@ -91,6 +96,7 @@
 		
 		window.onload = function () {
 			set_body_padding();
+			scale_canvas();
 			set_canvas_script();
 		}
 	</script>
