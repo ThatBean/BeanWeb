@@ -7,7 +7,7 @@
 		["article | development comments about Spore", "http://chrishecker.com/My_liner_notes_for_spore", "2015/4/3"],
 		["article | behaviour trees in JavaScript", "http://machinejs.maryrosecook.com/", "2015/4/3"],
 		["article | fake | JavaScript for Artificial Intelligence", "http://mind.sourceforge.net/js.html", "2015/4/3"],
-		["article | funny faq about the fake AI above", "www.nothingisreal.com/mentifex_faq.html", "2015/4/3"],
+		["article | funny faq about the fake AI above", "http://www.nothingisreal.com/mentifex_faq.html", "2015/4/3"],
 		
 		["Game | Render Engine | has behaviour tree", "http://pistolslut.com/", "2015/4/3"],
 		["Game | looks fun", "http://www.spyparty.com/", "2015/4/3"],
@@ -139,5 +139,14 @@ About AI
 						Credit:	(objective, how overall advice is considered by other AI)
 						Favor:	(subjective, how overall advice is considered by this AI)
 		
+		The opinion feedback process:
+			Pick Advice:
+				check Advice source
+				check Advice source opinion
+				check Advice opinion
+				PASS = Advice opinion PASS or Advice source opinion PASS
+			Action Feedback:
+				Credit feedback: all Advice source opinion, Advice opinion
+				Favor feedback: Advice opinion, AI self opinion
 </code>
 </pre>

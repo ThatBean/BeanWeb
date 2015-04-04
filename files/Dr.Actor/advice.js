@@ -55,19 +55,22 @@ Dr.Implement('Advice_Opinion', function (global, module_get) {
 	Module.prototype.getFavor = function () { return this._favor_total / this._favor_count; };
 	Module.prototype.addFavor = function (value) { this._favor_total += value; this._favor_count++; };
 	
-	//for a bool result
+	//for a bool result, 'this' should be the actor's self evaluation, 'opinion' is the advice to be check with
 	Module.prototype.decide = function (opinion) {
 		//this.getCredit();	//other's opinion about you will not related to your consider
-		///TODO: think a better way, add roll dice
-		return (opinion.getCredit() + opinion.getFavor() * this.getFavor()) >= 0.5;
+		///TODO: think a better way, add roll dice and more ??
+		return (opinion.getCredit() + opinion.getFavor() * this.getFavor()) * 100 >= Dr.rollDice();
 	};
 	
 	//for take in feedback of a decision
-	Module.prototype.change = function (opinion, value) {
-		opinion.getOrigin().addCredit(value);
-		opinion.addCredit(value);
-		opinion.addFavor(value);
-		this.addFavor(value);
+	Module.prototype.feedback = function (value, is_change_credit, is_change_favor) {
+		if (is_change_credit) {
+			this.getOrigin().addCredit(value);
+			this.addCredit(value);
+		}
+		if (is_change_favor) {
+			this.addFavor(value);
+		}
 	};
 	
 	Module.prototype.copy = function () {
@@ -86,7 +89,7 @@ Dr.Implement('Advice_Opinion', function (global, module_get) {
 });
 
 Dr.Declare('Advice_Advice', 'class');
-Dr.Require('Advice_Advice', 'Advice_Opinion');
+//Dr.Require('Advice_Advice', 'Advice_Opinion');
 Dr.Implement('Advice_Advice', function (global, module_get) {
 	var Module = function () {
 		//
@@ -99,10 +102,15 @@ Dr.Implement('Advice_Advice', function (global, module_get) {
 		EXIT: 'EXIT',
 	};
 	
-	Module.prototype.init = function (tag, actor) {
+	Module.prototype.init = function (tag, source, opinion) {
 		this._tag = tag;
-		this._actor = actor;
-		this._status = Module.status.PENDING;
+		
+		this._aspect = [];
+		this._condition = [];
+		this._slot = [];
+		this._action = [];
+		this._source = source;	//list: name
+		this._opinion = opinion;
 	};
 	
 	Module.create = function (tag) {
@@ -131,109 +139,12 @@ Dr.Implement('Advice_AdviceBag', function (global, module_get) {
 	Module.prototype.init = function (tag, owner) {
 		this._advice_bag = {};
 		this._owner = owner;
-		this._status = Module.status.PENDING;
+		this._source = {};	//map: name - opinion
 	};
 	
 	Module.create = function (tag) {
 		var instance = new Module;
 		instance.init(tag);
-		return instance;
-	};
-	
-	return Module;
-});
-
-
-Dr.Declare('ActorStatePool', 'class');
-Dr.Require('ActorStatePool', '"ActorState"');
-Dr.Implement('ActorStatePool', function (global, module_get) {
-	
-	var ActorState = module_get("ActorState");
-	
-	var Module = function () {
-		//
-	}
-	
-	Module.status = ActorState.status;
-	
-	Module.prototype.init = function (actor) {
-		this._actor = actor;
-		
-		this.resetStatePool();
-	};
-	
-	Module.prototype.update = function (delta_time) {
-		var result_action_priority_list = [];
-		
-		//loop for control
-		for (var state in this._active_state_list) {
-			//update
-			var action_priority_list = state.update(actor, delta_time);
-			result_action_priority_list.concat(action_priority_list);
-		};
-		
-		var result_action_priority_list = this.decideAction(result_action_priority_list);
-		this.commitAction(result_action_priority_list);
-	};
-	
-	Module.prototype.resetStatePool = function () {
-		this._valid_state_list = {}; 
-		this._active_state_list = {};
-		this._marked = {}; 
-	};
-	Module.prototype.removeState = function (tag) { this._control_data[tag] = null; };
-	Module.prototype.getState = function (tag) { return tag ? this._control_data[tag] : this._control_data; };
-	Module.prototype.addState = function (tag, data) {
-		if (!data || !data.update_func) {
-			Dr.log('[addState] error! invalid data', data);
-			return;
-		};
-		
-		//add item
-		data.actor = this._actor;
-		data.tag = tag;
-		data.status = Module.status.PENDING;
-		
-		this._control_data[tag].data = data; 
-	};
-	Module.prototype.applyState = function (state_priority_list) {
-		
-		
-	};
-	
-	Module.prototype.decideAction = function (action_priority_list) {
-		var max_priority = -1;
-		var result_action_priority_list;
-		
-		for (var i in action_priority_list) {
-			var state = action_priority_list[i][0];
-			var priority = action_priority_list[i][1];
-			
-			if (priority >= max_priority) {
-				if (priority > max_priority) {
-					result_action_priority_list = [];
-					max_priority = priority;
-				}
-				result_action_priority_list.push([state, priority]);
-			};
-		};
-		
-		return result_action_priority_list;
-	};
-	
-	Module.prototype.commitAction = function (action_priority_list) {
-		if (!action_priority_list || action_priority_list.length === 0) {
-			return;
-		};
-		
-		Dr.log('[commitAction]', action_priority_list);
-		
-		this._actor.getActionPool().applyAction(action_priority_list);
-	};
-	
-	Module.create = function (actor) {
-		var instance = new Module;
-		instance.init(actor);
 		return instance;
 	};
 	
