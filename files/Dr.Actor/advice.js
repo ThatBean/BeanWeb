@@ -18,14 +18,14 @@
 	
 	AdvicePool - single in game will hold all advice, needed?
 	
-	AdviceBag - every Actor in game will hold one of these
+	AdviceBag - every Actor(owner) in game will hold one of these
 		pick - pick a advice of some aspect, for how many times
 			
 			
 		update - update picked advice
 			
 		
-		 - update picked advice
+		collect - put back picked advice
 */
 
  
@@ -38,23 +38,27 @@ Dr.Implement('Advice_Opinion', function (global, module_get) {
 	Module.prototype.init = function (credit_total, favor_total, credit_count, favor_count) {
 		this._credit_total = credit_total || 0.5;
 		this._credit_count = credit_count || 1;
+		
 		this._favor_total = favor_total || 0.5;
 		this._favor_count = favor_count || 1;
 		
-		this._origin = null;
+		this._origin = this;
 	};
 	
+	Module.prototype.isOrigin = function () { return (this._origin === this); };
 	Module.prototype.setOrigin = function (origin) { this._origin = origin; };
 	Module.prototype.getOrigin = function () { return this._origin; };
+	
 	Module.prototype.getCredit = function () { return this._credit_total / this._credit_count; };
-	Module.prototype.getFavor = function () { return this._favor_total / this._favor_count; };
 	Module.prototype.addCredit = function (value) { this._credit_total += value; this._credit_count++; };
+	
+	Module.prototype.getFavor = function () { return this._favor_total / this._favor_count; };
 	Module.prototype.addFavor = function (value) { this._favor_total += value; this._favor_count++; };
 	
 	//for a bool result
 	Module.prototype.decide = function (opinion) {
 		//this.getCredit();	//other's opinion about you will not related to your consider
-		///TODO: think a better way
+		///TODO: think a better way, add roll dice
 		return (opinion.getCredit() + opinion.getFavor() * this.getFavor()) >= 0.5;
 	};
 	
@@ -62,14 +66,13 @@ Dr.Implement('Advice_Opinion', function (global, module_get) {
 	Module.prototype.change = function (opinion, value) {
 		opinion.getOrigin().addCredit(value);
 		opinion.addCredit(value);
-			
 		opinion.addFavor(value);
 		this.addFavor(value);
 	};
 	
 	Module.prototype.copy = function () {
 		var copy_instance = Module.create(this._credit_total, this._favor_total, this._credit_count, this._favor_count);
-		copy_instance.setOrigin(this.origin);
+		copy_instance.setOrigin(this._origin);
 		return copy_instance;
 	};
 	
@@ -125,9 +128,9 @@ Dr.Implement('Advice_AdviceBag', function (global, module_get) {
 		EXIT: 'EXIT',
 	};
 	
-	Module.prototype.init = function (tag, actor) {
-		this._tag = tag;
-		this._actor = actor;
+	Module.prototype.init = function (tag, owner) {
+		this._advice_bag = {};
+		this._owner = owner;
 		this._status = Module.status.PENDING;
 	};
 	

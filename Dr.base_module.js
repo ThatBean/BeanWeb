@@ -444,6 +444,30 @@ Dr.test_func_list = {
 		Dr.log('tag_a at (5, 5)', action_box.testPoint({x: 5, y: 5}));
 		Dr.log('tag_a, tag_b, tag_c at (10, 10), but tag_c has max z', action_box.testPoint({x: 10, y: 10}));
 	},
+	
+	loopRollDice: function () {
+		var res = [];
+		var loop_time = 1000000;
+		
+		Dr.log('[loopRollDice]', 'loop_time', loop_time);
+		
+		Dr.loop(loop_time, function() {
+			var index = Dr.rollDice();
+			res[index] = (res[index] || 0) + 1;
+		});
+		
+		Dr.log('[loopRollDice]', 'res', res);
+		
+		var min = [-1, loop_time];
+		var max = [-1, 0];
+		
+		for (var index in res) {
+			var count = res[index];
+			if (count < min[1]) min = [index, count, count / loop_time];
+			if (count > max[1]) max = [index, count, count / loop_time];
+		}
+		Dr.log('[loopRollDice]', 'min', min, 'max', max);
+		},
 }
 
 

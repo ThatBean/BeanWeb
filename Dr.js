@@ -438,6 +438,9 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 	//math related
 	Dr.getRandomInt = _required_native.getRandomInt;
 	Dr.getRandomIntMulti = _required_native.getRandomIntMulti;
+	Dr.rollDice = function () {
+		return Dr.getRandomInt(1, 100);
+	};
 	
 	//function argument to array
 	Dr.getArgumentArray = _required_native.getArgumentArray;
@@ -471,6 +474,14 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 	
 	//extend
 	console.log('[Dr] add extend function...');
+	
+	Dr.loop = function (loop_time, loop_func) {
+		var looped_time = 0;
+		while (loop_time > looped_time) {
+			loop_func(looped_time);
+			looped_time++;
+		};
+	};
 	
 	Dr.logList = _required_native.logList;
 	Dr.Log = (function () {
