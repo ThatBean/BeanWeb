@@ -49,8 +49,8 @@
 		
 		function scale_canvas() {
 			var canvas = document.getElementById('Dr.Canvas');
-			canvas.style.width = Dr.devicePixelRatio * 4 * (parseInt(canvas.style.width)) + 'px';
-			canvas.style.height = Dr.devicePixelRatio * 4 * (parseInt(canvas.style.height)) + 'px';
+			canvas.style.width = Math.min(800, Dr.devicePixelRatio * 4 * (parseInt(canvas.style.width))) + 'px';
+			canvas.style.height = Math.min(800, Dr.devicePixelRatio * 4 * (parseInt(canvas.style.height))) + 'px';
 		}
 		
 		window.onload = function () {
