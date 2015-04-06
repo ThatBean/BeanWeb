@@ -406,19 +406,8 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 		else if (window.clipboardData) {
 			content = window.clipboardData.getData('Text');
 		}
-		
 		//pass on
 		Dr.Event.emit("PASTE", event, content);
-		
-		var sample_process_func = function (event_key, event, content) {
-			//cut the text content off the event chain
-			event.preventDefault();
-			theClipBoardData = content;
-			alert("get Pasted ClipBoard Data!");
-			var appendInfo = "[All Data is here]";
-			if (theClipBoardData.length > 200) {appendInfo = "[Displayed only part of data for speed]"}
-			document.getElementById('B_DataA').value = "[Data from ClipBoard] \n" + theClipBoardData.slice(0, 200) + "\n" + appendInfo;
-		};
 	};
 	
 	Dr.window.addEventListener(("onorientationchange" in window ? "orientationchange" : "resize"), function (event) {

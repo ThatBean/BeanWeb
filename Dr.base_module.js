@@ -98,33 +98,47 @@ Dr.Implement('FPS', function (global, module_get) {
 Dr.Declare('Toolbox', 'function_pack');
 Dr.Implement('Toolbox', function (global, module_get) {
 	var Module = {}
-	Module.getPageSize = function () {
-		var xScroll,yScroll;
-		if (Dr.window.innerHeight && Dr.window.scrollMaxY) {
-			xScroll = Dr.document.body.scrollWidth;
-			yScroll = Dr.window.innerHeight + Dr.window.scrollMaxY;
-		} else if (Dr.document.body.scrollHeight > Dr.document.body.offsetHeight) {
-			xScroll = Dr.document.body.scrollWidth;
-			yScroll = Dr.document.body.scrollHeight;
-		} else {
-			xScroll = Dr.document.body.offsetWidth;
-			yScroll = Dr.document.body.offsetHeight;
-		}
-		var windowWidth,windowHeight;
+	Module.getViewportSize = function () {
+		var client_width, client_height;
 		if (Dr.window.innerHeight) {
-			windowWidth = Dr.window.innerWidth;
-			windowHeight = Dr.window.innerHeight;
+			client_width = Dr.window.innerWidth;
+			client_height = Dr.window.innerHeight;
 		} else if (Dr.document.documentElement && Dr.document.documentElement.clientHeight) {
-			windowWidth = Dr.document.documentElement.clientWidth;
-			windowHeight = Dr.document.documentElement.clientHeight;
+			client_width = Dr.document.documentElement.clientWidth;
+			client_height = Dr.document.documentElement.clientHeight;
 		} else if (Dr.document.body) {
-			windowWidth = Dr.document.body.clientWidth;
-			windowHeight = Dr.document.body.clientHeight;
+			client_width = Dr.document.body.clientWidth;
+			client_height = Dr.document.body.clientHeight;
 		}
-		var pageWidth,pageHeight
-		pageHeight = ( (yScroll < windowHeight) ? windowHeight : yScroll );
-		pageWidth = ( (xScroll < windowWidth) ? windowWidth : xScroll );
-		return {'pageX':pageWidth,'pageY':pageHeight,'winX':windowWidth,'winY':windowHeight};
+		
+		return {
+			width: client_width,
+			height: client_height,
+		};
+	}
+	Module.getPageSize = function () {
+		var scroll_x, scroll_y;
+		if (Dr.window.innerHeight && Dr.window.scrollMaxY) {
+			scroll_x = Dr.document.body.scrollWidth;
+			scroll_y = Dr.window.innerHeight + Dr.window.scrollMaxY;
+		} else if (Dr.document.body.scrollHeight > Dr.document.body.offsetHeight) {
+			scroll_x = Dr.document.body.scrollWidth;
+			scroll_y = Dr.document.body.scrollHeight;
+		} else {
+			scroll_x = Dr.document.body.offsetWidth;
+			scroll_y = Dr.document.body.offsetHeight;
+		}
+		
+		viewport_size = Module.getViewportSize();
+		
+		var page_width, page_height;
+		page_height = ( (scroll_y < viewport_size.height) ? viewport_size.height : scroll_y );
+		page_width = ( (scroll_x < viewport_size.width) ? viewport_size.width : scroll_x );
+		
+		return {
+			width: page_width,
+			height: page_height,
+		};
 	}
 	Module.setSize = function(element, width, height) {
 		if (!element) {
@@ -140,10 +154,6 @@ Dr.Implement('Toolbox', function (global, module_get) {
 		element.style.height = height + 'px';
 		element.style.minHeight = height + 'px';
 		element.style.maxHeight = height + 'px';
-	}
-	Module.resizeEventListener = function(func) {
-		var evt = 'onorientationchange' in Dr.window ? 'orientationchange' : 'resize';
-		Dr.window.addEventListener(evt, func);
 	}
 	Module.createElement = function (element_data) {
 		var new_element= Dr.document.createElement(element_data.type);

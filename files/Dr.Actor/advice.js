@@ -88,6 +88,8 @@ Dr.Implement('Advice_Opinion', function (global, module_get) {
 	return Module;
 });
 
+
+
 Dr.Declare('Advice_Advice', 'class');
 //Dr.Require('Advice_Advice', 'Advice_Opinion');
 Dr.Implement('Advice_Advice', function (global, module_get) {
@@ -95,22 +97,15 @@ Dr.Implement('Advice_Advice', function (global, module_get) {
 		//
 	}
 	
-	Module.status = {
-		PENDING: 'PENDING',
-		ENTER: 'ENTER',
-		ACTIVE: 'ACTIVE',
-		EXIT: 'EXIT',
-	};
-	
 	Module.prototype.init = function (tag, source, opinion) {
 		this._tag = tag;
 		
-		this._aspect = [];
-		this._condition = [];
-		this._slot = [];
-		this._action = [];
-		this._source = source;	//list: name
-		this._opinion = opinion;
+		this._aspect = aspect || [];	//aspect key list
+		this._condition = condition || [];	//check function list
+		this._slot = slot || [];	//occupy slot to prevent advice conflict
+		this._action = action || function (owner, advice);	//function to run
+		this._source = source;	//list: name only
+		this._opinion = opinion;	//advice holder's opinion to this advice
 	};
 	
 	Module.create = function (tag) {
