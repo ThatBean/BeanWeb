@@ -53,14 +53,15 @@ Dr.Implement('ActorExcludeArray', function (global, module_get) {
 		this._slot_status = {};
 		this._priority = 0;
 	};
-	Module.prototype.include = function (data) {
+	
+	Module.prototype.add = function (data) {
 		var tag = data.tag;
 		var slot = data.slot;
 		var priority = data.priority;
 		
 		//duplication
 		if (this._data_list[tag]) return;
-		if (this.check_exclude(slot, priority)) return {tag: data};
+		if (this.check_exclude(slot, priority)) return;
 		
 		var res_data_list;
 		if (priority < this._priority) {
@@ -91,9 +92,9 @@ Dr.Implement('ActorExcludeArray', function (global, module_get) {
 		this._priority = 0;
 	};
 	
-	Module.create = function (tag) {
+	Module.create = function () {
 		var instance = new Module;
-		instance.init(tag);
+		instance.init();
 		return instance;
 	};
 	
@@ -118,18 +119,20 @@ Dr.Implement('ActorState', function (global, module_get) {
 		this._status = Module.status.PENDING;
 	};
 	
+	Module.prototype.getTag = function () { return this._tag; };
+	
 	Module.prototype.enter = function (delta_time) {
-		Dr.log('[enter]');
+		Dr.log('[enter]', this._tag);
 		this._status = Module.status.ENTER;
 	};
 	
 	Module.prototype.exit = function (delta_time) {
-		Dr.log('[exit]');
+		Dr.log('[exit]', this._tag);
 		this._status = Module.status.EXIT;
 	};
 	
 	Module.prototype.update = function (delta_time) {
-		Dr.log('[update]');
+		Dr.log('[update]', this._tag);
 		this._status = Module.status.ACTIVE;
 	};
 	
@@ -163,16 +166,18 @@ Dr.Implement('ActorStatePool', function (global, module_get) {
 	
 	Module.prototype.init = function (owner) {
 		this._owner = owner;
+		this._state_data = {};	//map: tag - state, all available state
 		
 		this.resetStatePool();
 	};
 	
 	Module.prototype.resetStatePool = function () {
-		//for state holding & update(pending -> enter -> active -> exit -> pending)
+		//for state holding & update(pending -> [check] -> enter -> [reg] -> active -> [self/interrupt] -> exit -> [unreg] -> pending)
 		this._pending_list = [];
 		this._enter_list = [];	//transition state
 		this._active_list = [];
 		this._exit_list = [];	//transition state
+		//only tag is stored here
 	};
 	
 	Module.prototype.update = function (delta_time) {
@@ -189,21 +194,18 @@ Dr.Implement('ActorStatePool', function (global, module_get) {
 		this.commitAction(result_action_priority_list);
 	};
 	
-	Module.prototype.removeState = function (tag) { this._control_data[tag] = null; };
-	Module.prototype.getState = function (tag) { return tag ? this._control_data[tag] : this._control_data; };
-	Module.prototype.addState = function (tag, data) {
-		if (!data || !data.update_func) {
-			Dr.log('[addState] error! invalid data', data);
-			return;
-		};
+	Module.prototype.addState = function (state, slot, priority) {
+		var tag = state.getTag();
 		
-		//add item
-		data.owner = this._owner;
-		data.tag = tag;
-		data.status = Module.status.PENDING;
-		
-		this._control_data[tag].data = data; 
+		this._state_data
 	};
+	
+	Module.prototype.removeStatebyTag = function (tag) {
+		var tag = state.getTag();
+		
+		this._state_data
+	};
+	
 	Module.prototype.applyState = function (state_priority_list) {
 		
 		
