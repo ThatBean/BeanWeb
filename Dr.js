@@ -379,7 +379,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 	Dr.author = DrAuthor;
 	Dr.verion = DrVersion;
 	
-	Dr.global = window;	//normally window
+	Dr.global = window;	//normally window, or {} for a sandbox?
 	Dr.window = window;	//normally window, always in fact
 	Dr.document = document;	//normally document, always in fact
 	Dr.devicePixelRatio = window.devicePixelRatio || 1;
@@ -471,6 +471,23 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			looped_time++;
 		};
 	};
+	
+	Dr.arrayDeduplication = function () {
+		var array_list = Dr.getArgumentArray(arguments);
+		var temp_object = {};
+		for (var i in array_list) {
+			var array = array_list[i];
+			for (var j in array) {
+				temp_object[array[j]] = true;
+			}
+		}
+		var res_array = array_list[0];
+		res_array.length = 0;
+		for (var key in temp_object) {
+			res_array.push(key);
+		}
+		return res_array;
+	}
 	
 	Dr.logList = _required_native.logList;
 	Dr.Log = (function () {
@@ -697,7 +714,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			
 			if (all_requirment_meet) {
 				var _this = this;	//for module get closure
-				var module = module_data.implement_func(this.global, function (module_name) {
+				var module = module_data.implement_func(Dr.global, function (module_name) {
 					return _this._module_get(module_name);
 				});
 				this._module_set(module_name, module);
