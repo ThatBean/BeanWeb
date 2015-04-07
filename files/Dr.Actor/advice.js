@@ -234,8 +234,8 @@ Dr.Implement('Advice_AdviceBag', function (global, module_get) {
 		
 		this._slot = [];	//occupied slot (to prevent advice conflict)
 		
-		//for advice holding & update(vacant -> pick -> active -> collect -> vacant)
-		this._vacant_list = [];
+		//for advice holding & update(pending -> pick -> active -> collect -> pending)
+		this._pending_list = [];
 		this._pick_list = [];	//transition state
 		this._active_list = [];
 		this._collect_list = [];	//transition state
@@ -280,6 +280,19 @@ Dr.Implement('Advice_AdviceBag', function (global, module_get) {
 	};
 	
 	
+	Module.prototype.reset = function () {
+		var pending_list = ([]).concat(
+			this._pending_list, 
+			this._pick_list, 
+			this._active_list, 
+			this._collect_list);
+		
+		this._pending_list = pending_list;
+		this._pick_list = [];	//transition state
+		this._active_list = [];
+		this._collect_list = [];	//transition state
+	};
+	
 	Module.prototype.update = function (delta_time) {
 		this.update_transition();
 		this.update_active(delta_time);
@@ -294,15 +307,15 @@ Dr.Implement('Advice_AdviceBag', function (global, module_get) {
 				this._active_list.push(advice);	//to active
 			}
 			else {
-				this._vacant_list.push(advice);	//slot full, drop
+				this._pending_list.push(advice);	//slot full, drop
 			}
 		}
 		this._pick_list = [];	//clear
-		//collect -> vacant
+		//collect -> pending
 		for (var index in this._collect_list) {
 			var advice = this._collect_list[index];
 			advice.applySlot(this._slot, false);
-			this._vacant_list.push(advice);
+			this._pending_list.push(advice);
 		}
 		this._collect_list = [];	//clear
 	};
@@ -323,25 +336,25 @@ Dr.Implement('Advice_AdviceBag', function (global, module_get) {
 	
 	
 	Module.prototype.pickAdvice = function (aspect) {
-		//vacant -> pick
-		var vacant_list = [];
-		for (var index in this._vacant_list) {
-			var advice = this._vacant_list[index];
+		//pending -> pick
+		var pending_list = [];
+		for (var index in this._pending_list) {
+			var advice = this._pending_list[index];
 			if (advice.checkCondition(this._owner)) {
 				//this advice is finished
 				this._pick_list.push(advice);
 			}
 			else {
-				vacant_list.push(advice);
+				pending_list.push(advice);
 			}
 		}
-		this._vacant_list = vacant_list;
+		this._pending_list = pending_list;
 	}
 	
 	Module.prototype.addAdvice = function (advice) {
 		var tag = advice.getTag();
 		if (!this._advice_list[tag]) {
-			this._vacant_list.push(advice);
+			this._pending_list.push(advice);
 			this._advice_list[tag] = advice;
 		}
 		else {
@@ -353,14 +366,16 @@ Dr.Implement('Advice_AdviceBag', function (global, module_get) {
 		}
 	}
 	
+	Module.prototype.removeAdviceByTag = function (tag) {
+		this._advice_list[tag] = null;
+	}
+	
 	Module.prototype.addSource = function (source) {
 		var tag = source.getTag();
-		if (!this._source_list[tag]) {
-			this._source_list[tag] = source;
-		}
-		else {
-			//already has this source
-		}
+		this._source_list[tag] = source;
+	}
+	Module.prototype.removeSourceByTag = function (tag) {
+		this._source_list[tag] = null;
 	}
 	
 	Module.create = function (tag, owner, opinion) {
