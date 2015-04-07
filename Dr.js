@@ -472,6 +472,10 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 		};
 	};
 	
+	Dr.arrayCopy = function (array) {
+		return Array.prototype.slice.call(array);
+	};
+	
 	Dr.arrayDeduplication = function () {
 		var array_list = Dr.getArgumentArray(arguments);
 		var temp_object = {};
@@ -479,15 +483,15 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			var array = array_list[i];
 			for (var j in array) {
 				temp_object[array[j]] = true;
-			}
-		}
+			};
+		};
 		var res_array = array_list[0];
 		res_array.length = 0;
 		for (var key in temp_object) {
 			res_array.push(key);
-		}
+		};
 		return res_array;
-	}
+	};
 	
 	Dr.logList = _required_native.logList;
 	Dr.Log = (function () {
@@ -587,7 +591,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 		}
 		
 		Module.prototype.emit = function (event_key) {
-			Dr.log("[Event.prototype.emit] Get", event_key)
+			Dr.log("[emit] Get", event_key)
 			
 			var args = Dr.getArgumentArray(arguments, 1);
 			args.unshift(event_key);
@@ -632,7 +636,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 		};
 		Module.prototype._module_set = function (module_name, module) {
 			if (!this._module_data_pool[module_name]) {
-				alert('[ModuleManager.prototype._module_set] module not declared', module_name, module);
+				alert('[_module_set] module not declared', module_name, module);
 				debugger;
 				return;
 			}
@@ -642,16 +646,16 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 		
 		Module.prototype.declare =  function (module_name, module_type) {
 			if (!module_name) {
-				alert('error declare nameless module');
+				alert('[declare] error declare nameless module');
 				return;
 			};
 			if (this._module_data_pool[module_name]) {
 				if (module_type != this._module_data_pool[module_name].type) {
-					alert('re-declare type mismatch');
+					alert('[declare] re-declare type mismatch');
 					return;
 				}
 				else {
-					Dr.log('re-declare', module_name, module_type);
+					Dr.log('[declare] re-declare', module_name, module_type);
 				}
 			}
 			this._module_init(module_name, module_type);
@@ -660,7 +664,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 		Module.prototype.implement =  function (module_name, module_implement_func) {
 			if (!this._module_data_pool[module_name] 
 				|| !this._module_data_pool[module_name].status.declare) {
-				alert('[ModuleManager.prototype.implement] module not declared', module_name, module_implement_func);
+				alert('[implement] module not declared', module_name, module_implement_func);
 				
 				debugger;
 				return;
@@ -672,7 +676,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 		Module.prototype.require =  function (module_name, required_module_name) {
 			if (!this._module_data_pool[module_name] 
 				|| !this._module_data_pool[module_name].status.declare) {
-				alert('[ModuleManager.prototype.require] module not declared', module_name, required_module_name);
+				alert('[load] module not declared', module_name, required_module_name);
 				
 				debugger;
 				return;
@@ -683,7 +687,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 		Module.prototype.load =  function (module_name) {
 			if (!this._module_data_pool[module_name] 
 				|| !this._module_data_pool[module_name].status.declare) {
-				alert('[ModuleManager.prototype.load] module not declared', module_name);
+				alert('[load] module not declared', module_name);
 				
 				debugger;
 				return;
@@ -695,20 +699,20 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 				return;
 			}
 			
-			Dr.log('try load module', module_name);
+			Dr.log('[load] try load module', module_name);
 			
 			//loop for all required
 			var require_name_list = module_data.require;
 			var all_requirment_meet = true;
 			for (var i in require_name_list) {
 				if (!this._module_get(require_name_list[i])) {
-					Dr.log('missing required module', i, require_name_list[i], 'for loading module', module_name);
+					Dr.log('[load] missing required module', i, require_name_list[i], 'for loading module', module_name);
 					all_requirment_meet = false;
 				}
 			}
 			
 			if (typeof(module_data.implement_func) != 'function') {
-				Dr.log('missing module implement func', module_data.implement_func, 'for loading module', module_name);
+				Dr.log('[load] missing module implement func', module_data.implement_func, 'for loading module', module_name);
 				all_requirment_meet = false;
 			}
 			
@@ -718,38 +722,42 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 					return _this._module_get(module_name);
 				});
 				this._module_set(module_name, module);
-				Dr.log('loaded', module_name);
+				Dr.log('[load] loaded', module_name);
 			}
 			else
 				return;
 		};
 		Module.prototype.loadAll = function () {
-			var left_to_load = -1;
-			var last_left_to_load = 0;
+			var left_to_load = 'init';
+			var last_left_to_load;
+			var left_module_name_list;
 			
 			while(left_to_load != 0) {
-				Dr.log('[loadAll] start', left_to_load, last_left_to_load);
+				Dr.log('[loadAll] start', left_to_load, last_left_to_load, left_module_name_list);
 				
 				if (last_left_to_load == left_to_load) {
-					alert('last_left_to_load == left_to_load, infinite loop load?');
+					alert('[loadAll] Still has ' + left_to_load + ' left ot load, infinite loop load?');
 					break;
 				}
 				
 				last_left_to_load = left_to_load;
 				left_to_load = 0;
+				left_module_name_list = [];
 				
 				for (var module_name in this._module_data_pool) {
 					var module_data = this._module_data_pool[module_name];
 					if (module_data.status.load == false) {
 						this.load(module_name);
-						if (module_data.status.load == true)
-							Dr.log('loop loaded', module_name);
-						else
+						if (module_data.status.load == true) {
+							Dr.log('[loadAll] loaded', module_name);
+						}
+						else {
 							left_to_load += 1;
+							left_module_name_list.push(module_name);
+						}
 					}
 				}
 			}
-			
 		};
 		
 		Module.prototype.get = function (module_name) {

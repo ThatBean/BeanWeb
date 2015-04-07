@@ -187,7 +187,7 @@ Dr.Implement('Advice_Advice', function (global, module_get) {
 			condition: this._condition,
 			slot: this._slot,
 			action: this._action,
-			source_tag_list: [],
+			source_tag_list: Dr.arrayCopy(this._source_tag_list),
 			opinion: this._opinion.copy(),
 		}; 
 	};
@@ -230,9 +230,9 @@ Dr.Implement('Advice_AdviceBag', function (global, module_get) {
 		this.proto_init(tag, owner, opinion);
 		
 		this._advice_list = {};	//where all advice is hold
+		this._source_list = {};	//where all known source is hold
 		
 		this._slot = [];	//occupied slot (to prevent advice conflict)
-		this._source_list = [];	//map: tag - source
 		
 		//for advice holding & update(vacant -> pick -> active -> collect -> vacant)
 		this._vacant_list = [];
