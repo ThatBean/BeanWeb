@@ -88,7 +88,7 @@ Dr.Implement('ActorSlot', function (global, module_get) {
 			return false;
 		}
 		else {
-			Dr.log('[ActorSlot] plug', slot, status_callback, priority);
+			Dr.log('[ActorSlot] plug', slot, priority);
 			this.pull(slot);	//pull what ever
 			//record new
 			this._status[slot] = status_callback;
@@ -179,7 +179,7 @@ Dr.Implement('ActorSlotPool', function (global, module_get) {
 		}
 		
 		if (is_valid) {
-			Dr.log('[ActorSlotPool] plug', tag_list, slot, status_callback, priority);
+			Dr.log('[ActorSlotPool] plug', tag_list, slot, priority);
 			for (var index in tag_list) {
 				var tag = tag_list[index];
 				this.get_slot(tag).plug(slot, status_callback, priority);
@@ -209,7 +209,11 @@ Dr.Implement('ActorSlotPool', function (global, module_get) {
 
 
 Dr.Declare('ActorState', 'class');
+Dr.Require('ActorState', 'ActorSlotPool');
 Dr.Implement('ActorState', function (global, module_get) {
+	
+	var ActorSlotPool = module_get('ActorSlotPool');
+	
 	var Module = function () {
 		//
 	};
@@ -220,6 +224,7 @@ Dr.Implement('ActorState', function (global, module_get) {
 		ACTIVE: 'ACTIVE',
 		EXIT: 'EXIT',
 	};
+	Module.slot_status = ActorSlotPool.status;
 	
 	Module.prototype.init = function (tag, owner, slot_list, priority) {
 		this._tag = tag;
@@ -252,6 +257,16 @@ Dr.Implement('ActorState', function (global, module_get) {
 	Module.prototype.update = function (delta_time) {
 		Dr.log('[update]', this._tag);
 		this._status = Module.status.ACTIVE;
+	};
+	
+	Module.prototype.getSlotStatusCallback = function () {
+		var _this = this;
+		this._slot_status_callback = this._slot_status_callback || function (tag, status) {
+			if (status == Module.slot_status.DISCONNECT) {
+				_this.setStatus(Module.status.EXIT);
+			};	
+		};
+		return this._slot_status_callback;
 	};
 	
 	Module.create = function (tag, owner, slot_list, priority) {
@@ -294,11 +309,13 @@ Dr.Implement('ActorStatePool', function (global, module_get) {
 		this._owner = owner;
 		this._state_data = {};	//map: tag - state, all available state
 		this._slot_pool = ActorSlotPool.create();	//slot for state exclude (priority & slot)
-		
+		this._upper_slot_pool = null;
 		this.reset();
 	};
 	
 	Module.prototype.getSlotPool = function () { return this._slot_pool; };
+	Module.prototype.setUpperSlotPool = function (upper_slot_pool) { this._upper_slot_pool = upper_slot_pool; };
+	Module.prototype.getUpperSlotPool = function () { return this._upper_slot_pool; };
 	
 	Module.prototype.reset = function () {
 		//for state holding & update(pending -> [check] -> enter -> [reg] -> active -> [self/interrupt] -> exit -> [unreg] -> pending)
@@ -312,6 +329,7 @@ Dr.Implement('ActorStatePool', function (global, module_get) {
 		};
 		//reset slot connection
 		this._slot_pool.reset();
+		if (this._upper_slot_pool) this._upper_slot_pool.reset();
 	};
 	
 	
@@ -329,12 +347,18 @@ Dr.Implement('ActorStatePool', function (global, module_get) {
 				if (this._slot_pool.plug(
 					state.getSlotList(), 
 					0, 
-					function (tag, status) { if (status == Module.slot_status.DISCONNECT) state.setStatus(Module.state_status.EXIT); }, 
+					state.getSlotStatusCallback(), 
 					state.getPriority()
 				)) {
 					Dr.log('[update_transition] enter', state.getTag(), state.getStatus());
 					state.enter();
 					this._active_list.push(tag);	//to active
+					if (this._upper_slot_pool) this._upper_slot_pool.plug(
+						[tag], 
+						1, 
+						state.getSlotStatusCallback(), 
+						state.getPriority()
+					);
 				}
 				else {
 					Dr.log('[update_transition] rejected', state.getTag(), state.getStatus());
@@ -351,6 +375,7 @@ Dr.Implement('ActorStatePool', function (global, module_get) {
 				Dr.log('[update_transition] exit', state.getTag(), state.getStatus());
 				state.exit();
 				this._slot_pool.pull(state.getSlotList());
+				if (this._upper_slot_pool) this._upper_slot_pool.pull([tag]);
 				this._pending_list.push(tag);
 			};
 		}
@@ -494,13 +519,16 @@ Dr.test_actor_state = {
 		Dr.test_actor_state.activateStateByTag2();
 	},
 	test_slot: function () {
+		var ActorSlotPool = Dr.Get('ActorSlotPool');
+		
 		Dr.test_actor_state.basic();
 		Dr.test_actor_state.activateStateByTag();
 		
+		Dr.test_state_pool.setUpperSlotPool(ActorSlotPool.create());
 		Dr.test_state_pool.getSlotPool().plug(
 			[1,2,3,4,5], 
 			1, 
-			function (tag, status) { Dr.log('[====test_slot====]', tag, status); debugger; }, 
+			function (tag, status) { Dr.log('[====test_slot====]', tag, status); }, 
 			10
 		);
 	},
