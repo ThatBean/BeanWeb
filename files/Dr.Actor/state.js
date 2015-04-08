@@ -341,14 +341,14 @@ Dr.Implement('ActorStatePool', function (global, module_get) {
 					state.getPriority()
 				)) {
 					Dr.log('[update_transition] enter', state.getTag(), state.getStatus());
-					state.enter();
-					this._active_list.push(tag);	//to active
 					if (this._upper_slot_pool) this._upper_slot_pool.plug(
 						[tag], 
 						1, 
 						state.getSlotStatusCallback(), 
 						state.getPriority()
 					);
+					state.enter();
+					this._active_list.push(tag);	//to active
 				}
 				else {
 					Dr.log('[update_transition] rejected', state.getTag(), state.getStatus());
