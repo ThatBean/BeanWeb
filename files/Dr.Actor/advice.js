@@ -6,7 +6,7 @@
  * Advice
  * AdviceBag
  * Opinion
- * OpinionSource
+ * ActorOpinionSource
  * 
  * 
  **/
@@ -38,8 +38,8 @@
 */
 
  
-Dr.Declare('Advice_Opinion', 'class');
-Dr.Implement('Advice_Opinion', function (global, module_get) {
+Dr.Declare('ActorOpinion', 'class');
+Dr.Implement('ActorOpinion', function (global, module_get) {
 	var Module = function () {
 		//
 	};
@@ -98,11 +98,11 @@ Dr.Implement('Advice_Opinion', function (global, module_get) {
 
 
 
-Dr.Declare('Advice_OpinionSource', 'class');
-Dr.Require('Advice_OpinionSource', 'Advice_Opinion');
-Dr.Implement('Advice_OpinionSource', function (global, module_get) {
+Dr.Declare('ActorOpinionSource', 'class');
+Dr.Require('ActorOpinionSource', 'ActorOpinion');
+Dr.Implement('ActorOpinionSource', function (global, module_get) {
 	
-	var Advice_Opinion = module_get('Advice_Opinion');
+	var ActorOpinion = module_get('ActorOpinion');
 	
 	var Module = function () {
 		//
@@ -111,7 +111,7 @@ Dr.Implement('Advice_OpinionSource', function (global, module_get) {
 	Module.prototype.init = function (tag, owner, opinion) {
 		this._tag = tag;
 		this._owner = owner;
-		this._opinion = opinion || new Advice_Opinion;
+		this._opinion = opinion || new ActorOpinion;
 	};
 	
 	Module.prototype.getTag = function () { return this._tag; };
@@ -138,11 +138,11 @@ Dr.Implement('Advice_OpinionSource', function (global, module_get) {
 
 
 
-Dr.Declare('Advice_Advice', 'class');
-Dr.Require('Advice_Advice', 'Advice_Opinion');
-Dr.Implement('Advice_Advice', function (global, module_get) {
+Dr.Declare('ActorAdvice', 'class');
+Dr.Require('ActorAdvice', 'ActorOpinion');
+Dr.Implement('ActorAdvice', function (global, module_get) {
 	
-	var Advice_Opinion = module_get('Advice_Opinion');
+	var ActorOpinion = module_get('ActorOpinion');
 	
 	var Module = function () {
 		//
@@ -156,7 +156,7 @@ Dr.Implement('Advice_Advice', function (global, module_get) {
 		this._slot = config_data.slot || [];	//occupy slot to prevent advice conflict
 		this._action = config_data.action || function (owner, advice) { return is_action_finished; };	//function to run(return true to keep update, or will be collected)
 		this._source_tag_list = config_data.source_tag_list || [];	//list: name only
-		this._opinion = config_data.opinion || new Advice_Opinion;	//advice holder's opinion to this advice
+		this._opinion = config_data.opinion || new ActorOpinion;	//advice holder's opinion to this advice
 	};
 	
 	Module.prototype.getTag = function () { return this._tag; };
@@ -166,6 +166,13 @@ Dr.Implement('Advice_Advice', function (global, module_get) {
 	//Module.prototype.getAction = function () { return this._action; };
 	Module.prototype.getSourceTagList = function () { return this._source_tag_list; };
 	Module.prototype.getOpinion = function () { return this._opinion; };
+	
+	Module.prototype.checkAspect = function (aspect) {
+		for (var index in this._aspect) {
+			if (aspect == this._aspect[index]) return true;
+		}
+		return false;
+	};
 	
 	Module.prototype.checkCondition = function (owner) {
 		return this._condition(owner, this);
@@ -220,18 +227,18 @@ Dr.Implement('Advice_Advice', function (global, module_get) {
 
 
 
-Dr.Declare('Advice_AdviceBag', 'class');
-//Dr.Require('Advice_AdviceBag', 'Advice_Opinion');
-Dr.Require('Advice_AdviceBag', 'Advice_OpinionSource');
-Dr.Implement('Advice_AdviceBag', function (global, module_get) {
+Dr.Declare('ActorAdviceBag', 'class');
+//Dr.Require('ActorAdviceBag', 'ActorOpinion');
+Dr.Require('ActorAdviceBag', 'ActorOpinionSource');
+Dr.Implement('ActorAdviceBag', function (global, module_get) {
 	
-	var Advice_OpinionSource = module_get('Advice_OpinionSource');
+	var ActorOpinionSource = module_get('ActorOpinionSource');
 	
 	var Module = function () {
 		//
 	};
 	
-	Module.prototype = new Advice_OpinionSource;
+	Module.prototype = new ActorOpinionSource;
 	Module.prototype.proto_init = Module.prototype.init;
 	
 	Module.prototype.init = function (tag, owner, opinion) {
@@ -357,7 +364,7 @@ Dr.Implement('Advice_AdviceBag', function (global, module_get) {
 			var tag = this._pending_list[index];
 			var advice = this._advice_data[tag];
 			if (advice) {
-				if (advice.checkCondition(this._owner)) {
+				if (advice.checkAspect(aspect) && advice.checkCondition(this._owner)) {
 					//this advice is finished
 					this._enter_list.push(tag);
 				}
@@ -404,3 +411,69 @@ Dr.Implement('Advice_AdviceBag', function (global, module_get) {
 	
 	return Module;
 });
+
+
+
+
+
+Dr.test_actor_advice = {
+	basic: function () {
+		var ActorAdvice = Dr.Get('ActorAdvice');
+		var ActorAdviceBag = Dr.Get('ActorAdviceBag');
+		var ActorOpinion = Dr.Get('ActorOpinion');
+		var ActorOpinionSource = Dr.Get('ActorOpinionSource');
+		
+		var test_advice_slot_list = [
+			[1],
+			[1, 2],
+			[1, 2, 3],
+			[1, 2, 3, 4],
+			[2],
+			[2, 3],
+			[2, 3, 4],
+			[3],
+			[3, 4],
+			[4]
+		];
+		
+		
+		
+		var advice_bag = ActorAdviceBag.create('test_ab', 'owner object', new ActorOpinion);
+		
+		
+		
+		
+		for (var index = 0; index < 10; index++) {
+			var state = ActorAdvice.create('advice_' + index, {
+				a: test_state_slot_list[index]
+			});
+			
+			state.update = function (delta_time) {
+				Dr.log('[update]', this._tag);
+				
+				this._status = 'ACTIVE';
+				
+				this._test_count = (this._test_count || 0) + 1;
+				if (this._test_count > 10) {
+					Dr.log('[update]', this._tag, 'test end');
+					this._status = 'EXIT';
+				}
+			};
+			
+			
+			state_pool.addState(state);
+		}
+		
+		
+		
+		
+		
+		Dr.UpdateLoop.add(function (delta_time) { 
+			advice_bag.update(delta_time);
+			return true;
+		})
+		
+		Dr.test_advice_bag = advice_bag;
+		return advice_bag;
+	},
+}

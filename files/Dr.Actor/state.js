@@ -56,6 +56,7 @@ Dr.Implement('ActorSlot', function (global, module_get) {
 		OFF: 'OFF',
 		CONNECT: 'CONNECT',
 		DISCONNECT: 'DISCONNECT',
+		ALLCONNECT: 'ALLCONNECT',
 		//RECONNECT: 'RECONNECT',
 	};
 	
@@ -80,30 +81,49 @@ Dr.Implement('ActorSlot', function (global, module_get) {
 		if (!this._status[slot]) {
 			Dr.assert(false, 'error slot', slot, this._capacity);
 			return false;
-		}
+		};
 		
 		if (!this.checkValid(slot, priority)) {	//not valid
 			//status_callback(this._tag, Module.status.DISCONNECT);	//not now
 			return false;
 		}
 		else {
+			Dr.log('[ActorSlot] plug', slot, status_callback, priority);
 			this.pull(slot);	//pull what ever
 			//record new
 			this._status[slot] = status_callback;
 			this._priority[slot] = priority;
-			status_callback(this._tag, Module.status.CONNECT);
+			
+			this._status[slot](this._tag, Module.status.CONNECT);
+			this.check_all_connect();
+			
 			return true;
 		}
 	};
 	
+	Module.prototype.check_all_connect = function () {
+		var is_all_connect = true;
+		for (var slot = 0; slot < Module.capacity; slot++) {
+			is_all_connect = is_all_connect && (this._status[slot] && this._status[slot] != Module.status.OFF);
+		}
+		if (is_all_connect) {
+			for (var slot = 0; slot < Module.capacity; slot++) {
+				this._status[slot](this._tag, Module.status.ALLCONNECT);
+			}
+		}
+	};
+	
 	Module.prototype.checkValid = function (slot, priority) {
+		var priority = priority || 0;
 		return (
 			this._status[slot] == Module.status.OFF 
-			|| priority >= this._priority[slot]);
+			|| priority >= this._priority[slot]
+		);
 	};
 	
 	Module.prototype.pull = function (slot) {
 		if (this._status[slot] != Module.status.OFF) {
+			Dr.log('[ActorSlot] pull', slot);
 			this._status[slot](this._tag, Module.status.DISCONNECT);
 			this._status[slot] = Module.status.OFF;
 			this._priority[slot] = 0;
@@ -159,6 +179,7 @@ Dr.Implement('ActorSlotPool', function (global, module_get) {
 		}
 		
 		if (is_valid) {
+			Dr.log('[ActorSlotPool] plug', tag_list, slot, status_callback, priority);
 			for (var index in tag_list) {
 				var tag = tag_list[index];
 				this.get_slot(tag).plug(slot, status_callback, priority);
@@ -169,6 +190,7 @@ Dr.Implement('ActorSlotPool', function (global, module_get) {
 	};
 	
 	Module.prototype.pull = function (tag_list) {
+		Dr.log('[ActorSlotPool] pull', tag_list);
 		for (var index in tag_list) {
 			var tag = tag_list[index];
 			this.get_slot(tag).pullAll();
@@ -264,6 +286,7 @@ Dr.Implement('ActorStatePool', function (global, module_get) {
 		//
 	};
 	
+	//Module.status = Dr.combine(ActorSlotPool.status, ActorState.status);
 	Module.state_status = ActorState.status;
 	Module.slot_status = ActorSlotPool.status;
 	
@@ -385,10 +408,15 @@ Dr.Implement('ActorStatePool', function (global, module_get) {
 					this._pending_list.splice(index, 1);
 					this._enter_list.push(tag);
 					return true;
-				}
-			};
+				};
+			};	
+			Dr.log('[activateStateByTag] state not pending', state_tag);
+			return false;
 		}
-		return false;
+		else {
+			Dr.log('[activateStateByTag] state not found', state_tag);
+			return false;
+		}
 	};
 	
 	Module.create = function (owner) {
@@ -451,16 +479,29 @@ Dr.test_actor_state = {
 		return state_pool;
 	},
 	activateStateByTag: function () {
-		for (var index = 0; index < 10; index++) {
+		for (var index = 0; index < 15; index++) {
 			Dr.test_state_pool.activateStateByTag('state_' + index);
 		}
 	},
 	activateStateByTag2: function () {
-		for (var index = 0; index < 10; index++) {
+		for (var index = 0; index < 15; index++) {
 			Dr.test_state_pool.activateStateByTag('state_' + (9 - index));
 		}
 	},
 	test: function () {
+		Dr.test_actor_state.basic();
+		Dr.test_actor_state.activateStateByTag();
+		Dr.test_actor_state.activateStateByTag2();
+	},
+	test_slot: function () {
+		Dr.test_actor_state.basic();
+		Dr.test_actor_state.activateStateByTag();
 		
+		Dr.test_state_pool.getSlotPool().plug(
+			[1,2,3,4,5], 
+			1, 
+			function (tag, status) { Dr.log('[====test_slot====]', tag, status); debugger; }, 
+			10
+		);
 	},
 }

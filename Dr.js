@@ -472,6 +472,13 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 		};
 	};
 	
+	Dr.combine = function (source, target) {
+		var result = (source instanceof Array && target instanceof Array) ? [] : {};
+		for (var i in source) result[i] = source[i];
+		for (var i in target) result[i] = target[i];
+		return result;
+	};
+	
 	Dr.arrayCopy = function (array) {
 		return Array.prototype.slice.call(array);
 	};
