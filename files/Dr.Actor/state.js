@@ -468,10 +468,10 @@ Dr.test_actor_state = {
 		for (var index = 0; index < 10; index++) {
 			var state = ActorState.create('state_' + index, 'owner object', test_state_slot_list[index], index);
 			
-			this._test_count = 0;
+			state._test_count = 0;
 			
 			state.update = function (delta_time) {
-				Dr.log('[update]============', this._tag);
+				Dr.log('[update]============', this._tag, this._test_count);
 				
 				this._status = 'ACTIVE';
 				this._test_count++;
