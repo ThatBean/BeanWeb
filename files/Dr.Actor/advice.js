@@ -20,13 +20,21 @@
 	AdvicePool - single in game will hold all advice, needed?
 	
 	AdviceBag - every Actor(owner) in game will hold one of these
-		pick - pick a advice of some aspect, for how many times
+		enter - pick a advice of some aspect, for how many times
 			
 			
 		update - update picked advice
 			
 		
-		collect - put back picked advice
+		exit - put back picked advice
+	
+	
+	|                                                         |
+	| Layer:        [Advice]  [Logic]   [Action]  [Animation] |
+	| Data Barrier:                   +                       |
+	|                                                         |
+	
+	
 */
 
  
@@ -229,29 +237,29 @@ Dr.Implement('Advice_AdviceBag', function (global, module_get) {
 	Module.prototype.init = function (tag, owner, opinion) {
 		this.proto_init(tag, owner, opinion);
 		
-		this._advice_list = {};	//where all advice is hold
-		this._source_list = {};	//where all known source is hold
+		this._advice_data = {};	//where all advice is hold
+		this._source_data = {};	//where all known source is hold
 		
 		this._slot = [];	//occupied slot (to prevent advice conflict)
 		
-		//for advice holding & update(pending -> pick -> active -> collect -> pending)
+		//for advice holding & update(pending -> enter -> active -> exit -> pending)
 		this._pending_list = [];
-		this._pick_list = [];	//transition state
+		this._enter_list = [];	//transition state
 		this._active_list = [];
-		this._collect_list = [];	//transition state
+		this._exit_list = [];	//transition state
 	};
 	
 	Module.prototype.getTag = function () { return this._tag; };
 	Module.prototype.getOwner = function () { return this._owner; };
 	Module.prototype.getSlot = function () { return this._slot; };
-	Module.prototype.getSourceList = function () { return this._source_list; };
+	Module.prototype.getSourceData = function () { return this._source_data; };
 	
 	Module.prototype.considerAdvice = function (advice) {
 		var source_tag_list = advice.getSourceTagList();
 		var source_total = 0;
 		
 		for (var index in source_tag_list) {
-			var source = this._source_list[source_tag_list[index]];
+			var source = this._source_data[source_tag_list[index]];
 			if (source) {
 				source_total += this.considerSource(source);
 			};
@@ -272,7 +280,7 @@ Dr.Implement('Advice_AdviceBag', function (global, module_get) {
 		advice.getOpinion().feedbackOpinion(value, true);
 		var source_tag_list = advice.getSourceTagList();
 		for (var index in source_list) {
-			var source = this._source_list[source_tag_list[index]];
+			var source = this._source_data[source_tag_list[index]];
 			if (source) {
 				source.feedbackSource(value, true);
 			};
@@ -281,16 +289,14 @@ Dr.Implement('Advice_AdviceBag', function (global, module_get) {
 	
 	
 	Module.prototype.reset = function () {
-		var pending_list = ([]).concat(
-			this._pending_list, 
-			this._pick_list, 
-			this._active_list, 
-			this._collect_list);
-		
-		this._pending_list = pending_list;
-		this._pick_list = [];	//transition state
+		this._pending_list = [];
+		this._enter_list = [];	//transition state
 		this._active_list = [];
-		this._collect_list = [];	//transition state
+		this._exit_list = [];	//transition state
+		
+		for (var tag in this._advice_data) {
+			this._pending_list.push(tag);
+		};
 	};
 	
 	Module.prototype.update = function (delta_time) {
@@ -299,83 +305,95 @@ Dr.Implement('Advice_AdviceBag', function (global, module_get) {
 	};
 	
 	Module.prototype.update_transition = function () {
-		//pick -> active
-		for (var index in this._pick_list) {
-			var advice = this._pick_list[index];
-			if (advice.checkSlot(this._slot)) {
-				advice.applySlot(this._slot, true);
-				this._active_list.push(advice);	//to active
-			}
-			else {
-				this._pending_list.push(advice);	//slot full, drop
+		//enter -> active
+		for (var index in this._enter_list) {
+			var tag = this._enter_list[index];
+			var advice = this._advice_data[tag];
+			if (advice) {
+				if (advice.checkSlot(this._slot)) {
+					advice.applySlot(this._slot, true);
+					this._active_list.push(tag);	//to active
+				}
+				else {
+					this._pending_list.push(tag);	//slot full, drop
+				}
 			}
 		}
-		this._pick_list = [];	//clear
-		//collect -> pending
-		for (var index in this._collect_list) {
-			var advice = this._collect_list[index];
-			advice.applySlot(this._slot, false);
-			this._pending_list.push(advice);
+		this._enter_list = [];	//clear
+		//exit -> pending
+		for (var index in this._exit_list) {
+			var tag = this._exit_list[index];
+			var advice = this._advice_data[tag];
+			if (advice) {
+				advice.applySlot(this._slot, false);
+				this._pending_list.push(tag);
+			};
 		}
-		this._collect_list = [];	//clear
+		this._exit_list = [];	//clear
 	};
 	
 	Module.prototype.update_active = function (delta_time) {
 		var active_list = [];
 		for (var index in this._active_list) {
-			var advice = this._active_list[index];
-			if (!advice.applyAction(this._owner, delta_time)) {
-				this._collect_list.push(advice);	//this advice is finished
-			}
-			else {
-				active_list.push(advice);
-			}
+			var tag = this._active_list[index];
+			var advice = this._advice_data[tag];
+			if (advice) {
+				if (!advice.applyAction(this._owner, delta_time)) {
+					this._exit_list.push(tag);	//this advice is finished
+				}
+				else {
+					active_list.push(tag);
+				};
+			};
 		}
 		this._active_list = active_list;
 	};
 	
 	
 	Module.prototype.pickAdvice = function (aspect) {
-		//pending -> pick
+		//pending -> enter
 		var pending_list = [];
 		for (var index in this._pending_list) {
-			var advice = this._pending_list[index];
-			if (advice.checkCondition(this._owner)) {
-				//this advice is finished
-				this._pick_list.push(advice);
-			}
-			else {
-				pending_list.push(advice);
-			}
+			var tag = this._pending_list[index];
+			var advice = this._advice_data[tag];
+			if (advice) {
+				if (advice.checkCondition(this._owner)) {
+					//this advice is finished
+					this._enter_list.push(tag);
+				}
+				else {
+					pending_list.push(tag);
+				};
+			};
 		}
 		this._pending_list = pending_list;
 	}
 	
 	Module.prototype.addAdvice = function (advice) {
 		var tag = advice.getTag();
-		if (!this._advice_list[tag]) {
-			this._pending_list.push(advice);
-			this._advice_list[tag] = advice;
+		if (!this._advice_data[tag]) {
+			this._pending_list.push(tag);
+			this._advice_data[tag] = advice;
 		}
 		else {
 			//already has this advice
-			//update new source_tag to this._advice_list[tag].getSourceTagList()
+			//update new source_tag to this._advice_data[tag].getSourceTagList()
 			Dr.arrayDeduplication(
-				this._advice_list[tag].getSourceTagList(), 
+				this._advice_data[tag].getSourceTagList(), 
 				advice.getSourceTagList());
 		}
 	}
 	
 	Module.prototype.removeAdviceByTag = function (tag) {
-		this._advice_list[tag] = null;
+		this._advice_data[tag] = null;
 	}
 	
 	Module.prototype.addSource = function (source) {
 		var tag = source.getTag();
-		this._source_list[tag] = source;
+		this._source_data[tag] = source;
 	}
 	Module.prototype.removeSourceByTag = function (tag) {
-		this._source_list[tag] = null;
+		this._source_data[tag] = null;
 	}
 	
 	Module.create = function (tag, owner, opinion) {
