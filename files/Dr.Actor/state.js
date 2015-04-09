@@ -53,17 +53,17 @@ Dr.Implement('ActorSlot', function (global, module_get) {
 	Module.capacity = 2;
 	
 	Module.status = {
-		OFF: 'OFF',
+		//OFF: 'OFF',
 		CONNECT: 'CONNECT',
-		DISCONNECT: 'DISCONNECT',
 		ALLCONNECT: 'ALLCONNECT',
+		DISCONNECT: 'DISCONNECT',
 		//RECONNECT: 'RECONNECT',
 	};
 	
 	Module.prototype.init = function (tag) {
 		this._tag = tag;
-		//this._status = {};	//for both OFF status and callback
-		//this._priority = {};	//only same or above allowed to replace, 0 when OFF
+		//this._status = {};	//for both DISCONNECT status and callback
+		//this._priority = {};	//only same or above allowed to replace, 0 when DISCONNECT
 		this.reset();
 	};
 	
@@ -71,7 +71,7 @@ Dr.Implement('ActorSlot', function (global, module_get) {
 		this._status = {};
 		this._priority = {};
 		for (var slot = 0; slot < Module.capacity; slot++) {
-			this._status[slot] = Module.status.OFF;
+			this._status[slot] = Module.status.DISCONNECT;
 			this._priority[slot] = 0;
 		}
 	};
@@ -90,7 +90,7 @@ Dr.Implement('ActorSlot', function (global, module_get) {
 	Module.prototype.check_all_connect = function () {
 		var is_all_connect = true;
 		for (var slot = 0; slot < Module.capacity; slot++) {
-			is_all_connect = is_all_connect && (this._status[slot] && this._status[slot] != Module.status.OFF);
+			is_all_connect = is_all_connect && (this._status[slot] && this._status[slot] != Module.status.DISCONNECT);
 		}
 		if (is_all_connect) {
 			for (var slot = 0; slot < Module.capacity; slot++) {
@@ -106,16 +106,16 @@ Dr.Implement('ActorSlot', function (global, module_get) {
 			return false;
 		};
 		return (
-			this._status[slot] == Module.status.OFF 
+			this._status[slot] == Module.status.DISCONNECT 
 			|| priority >= this._priority[slot]
 		);
 	};
 	
 	Module.prototype.pull = function (slot) {
-		if (this._status[slot] != Module.status.OFF) {
+		if (this._status[slot] != Module.status.DISCONNECT) {
 			Dr.log('[ActorSlot] pull', slot);
 			this._status[slot](this._tag, Module.status.DISCONNECT);
-			this._status[slot] = Module.status.OFF;
+			this._status[slot] = Module.status.DISCONNECT;
 			this._priority[slot] = 0;
 		}
 	};
@@ -225,6 +225,7 @@ Dr.Implement('ActorState', function (global, module_get) {
 		//for ActorSlot
 		this._slot_list = slot_list || [];
 		this._priority = priority || 0;
+		this._slot_staus = Module.slot_status.DISCONNECT;
 	};
 	
 	Module.prototype.getTag = function () { return this._tag; };
@@ -233,6 +234,8 @@ Dr.Implement('ActorState', function (global, module_get) {
 	Module.prototype.getSlotList = function () { return this._slot_list; };
 	Module.prototype.setPriority = function (priority) { this._priority = priority; };
 	Module.prototype.getPriority = function () { return this._priority; };
+	Module.prototype.setSlotStatus = function (slot_staus) { this._slot_staus = slot_staus; };
+	Module.prototype.getSlotStatus = function () { return this._slot_staus; };
 	
 	Module.prototype.enter = function (delta_time) {
 		Dr.log('[enter]', this._tag);
@@ -252,9 +255,10 @@ Dr.Implement('ActorState', function (global, module_get) {
 	Module.prototype.getSlotStatusCallback = function () {
 		var _this = this;
 		this._slot_status_callback = this._slot_status_callback || function (tag, status) {
+			_this.setSlotStatus(status);
 			if (status == Module.slot_status.DISCONNECT) {
 				_this.setStatus(Module.status.EXIT);
-			};	
+			};
 		};
 		return this._slot_status_callback;
 	};
@@ -334,19 +338,9 @@ Dr.Implement('ActorStatePool', function (global, module_get) {
 			var tag = this._enter_list[index];
 			var state = this._state_data[tag];
 			if (state) {
-				if (this._slot_pool.plug(
-					state.getSlotList(), 
-					0, 
-					state.getSlotStatusCallback(), 
-					state.getPriority()
-				)) {
+				if (this._slot_pool.plug(state.getSlotList(), 0, state.getSlotStatusCallback(), state.getPriority())) {
 					Dr.log('[update_transition] enter', state.getTag(), state.getStatus());
-					if (this._upper_slot_pool) this._upper_slot_pool.plug(
-						[tag], 
-						1, 
-						state.getSlotStatusCallback(), 
-						state.getPriority()
-					);
+					if (this._upper_slot_pool) this._upper_slot_pool.plug([tag], 1, state.getSlotStatusCallback(), state.getPriority());
 					state.enter();
 					this._active_list.push(tag);	//to active
 				}
@@ -364,7 +358,7 @@ Dr.Implement('ActorStatePool', function (global, module_get) {
 			if (state) {
 				Dr.log('[update_transition] exit', state.getTag(), state.getStatus());
 				state.exit();
-				this._slot_pool.pull(state.getSlotList());
+				if (state.getSlotStatus() != Module.slot_status.DISCONNECT) this._slot_pool.pull(state.getSlotList());
 				if (this._upper_slot_pool) this._upper_slot_pool.pull([tag]);
 				this._pending_list.push(tag);
 			};
@@ -531,7 +525,7 @@ Dr.test_actor_state = {
 			}
 			else {
 				Dr.log('=================Test pull');
-				Dr.test_state_pool.getSlotPool().pull([1,5]);
+				Dr.test_state_pool.getSlotPool().pull([1, 4]);
 				return false;
 			}
 		})
