@@ -42,15 +42,11 @@
 		
 */
 
-
-//one way, two slot, simple callback
-Dr.Declare('ActorSlot', 'class');
-Dr.Implement('ActorSlot', function (global, module_get) {
+Dr.Declare('ActorPluggable', 'class');
+Dr.Implement('ActorPluggable', function (global, module_get) {
 	var Module = function () {
 		//
 	};
-	
-	Module.capacity = 2;
 	
 	Module.status = {
 		//OFF: 'OFF',
@@ -59,6 +55,38 @@ Dr.Implement('ActorSlot', function (global, module_get) {
 		DISCONNECT: 'DISCONNECT',
 		//RECONNECT: 'RECONNECT',
 	};
+	
+	Module.prototype.init = function (slot_list, priority) {
+		//for ActorSlot
+		this._slot_list = slot_list || [];
+		this._priority = priority || 0;
+		this._slot_staus = Module.status.DISCONNECT;
+	};
+	
+	Module.prototype.getSlotList = function () { return this._slot_list; };
+	Module.prototype.setPriority = function (priority) { this._priority = priority; };
+	Module.prototype.getPriority = function () { return this._priority; };
+	Module.prototype.setSlotStatus = function (slot_staus) { this._slot_staus = slot_staus; };
+	Module.prototype.getSlotStatus = function () { return this._slot_staus; };
+	
+	return Module;
+});
+
+
+//one way, two slot, simple callback
+Dr.Declare('ActorSlot', 'class');
+Dr.Require('ActorSlot', 'ActorPluggable');
+Dr.Implement('ActorSlot', function (global, module_get) {
+	
+	var ActorPluggable = module_get('ActorPluggable');
+	
+	var Module = function () {
+		//
+	};
+	
+	Module.capacity = 2;
+	
+	Module.status = ActorPluggable.status;
 	
 	Module.prototype.init = function (tag) {
 		this._tag = tag;
@@ -199,10 +227,10 @@ Dr.Implement('ActorSlotPool', function (global, module_get) {
 
 
 Dr.Declare('ActorState', 'class');
-Dr.Require('ActorState', 'ActorSlotPool');
+Dr.Require('ActorState', 'ActorPluggable');
 Dr.Implement('ActorState', function (global, module_get) {
 	
-	var ActorSlotPool = module_get('ActorSlotPool');
+	var ActorPluggable = module_get('ActorPluggable');
 	
 	var Module = function () {
 		//
@@ -214,28 +242,22 @@ Dr.Implement('ActorState', function (global, module_get) {
 		ACTIVE: 'ACTIVE',
 		EXIT: 'EXIT',
 	};
-	Module.slot_status = ActorSlotPool.status;
+	Module.slot_status = ActorPluggable.status;
+	
+	Module.prototype = new ActorPluggable;
+	Module.prototype.proto_init = ActorPluggable.prototype.init;
 	
 	Module.prototype.init = function (tag, owner, slot_list, priority) {
+		this.proto_init(slot_list, priority);
+		
 		this._tag = tag;
 		this._owner = owner;
-		
 		this._status = Module.status.PENDING;
-		
-		//for ActorSlot
-		this._slot_list = slot_list || [];
-		this._priority = priority || 0;
-		this._slot_staus = Module.slot_status.DISCONNECT;
 	};
 	
 	Module.prototype.getTag = function () { return this._tag; };
 	Module.prototype.setStatus = function (status) { this._status = status; };
 	Module.prototype.getStatus = function () { return this._status; };
-	Module.prototype.getSlotList = function () { return this._slot_list; };
-	Module.prototype.setPriority = function (priority) { this._priority = priority; };
-	Module.prototype.getPriority = function () { return this._priority; };
-	Module.prototype.setSlotStatus = function (slot_staus) { this._slot_staus = slot_staus; };
-	Module.prototype.getSlotStatus = function () { return this._slot_staus; };
 	
 	Module.prototype.enter = function (delta_time) {
 		Dr.log('[enter]', this._tag);

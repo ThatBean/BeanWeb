@@ -239,7 +239,7 @@ Dr.Implement('ActorAdviceBag', function (global, module_get) {
 	};
 	
 	Module.prototype = new ActorOpinionSource;
-	Module.prototype.proto_init = Module.prototype.init;
+	Module.prototype.proto_init = ActorOpinionSource.prototype.init;
 	
 	Module.prototype.init = function (tag, owner, opinion) {
 		this.proto_init(tag, owner, opinion);
