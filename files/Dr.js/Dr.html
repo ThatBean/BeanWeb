@@ -7,6 +7,8 @@
 	<meta name="keywords" content="Dr.js,Bean,Dr.Eames,thatbean,DrEames,Personal">
 	<meta name="description" content="This is a web build by Bean/Dr.Eames">
 	
+	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+	
 	<title>Welcome to ThatBean.com!</title>
 	
     <link href="../../favicon.png" rel="shortcut icon">
@@ -18,7 +20,26 @@
 	<!-- -->
 	<script type="text/javascript">
 		
-		Dr.loadScript('../../Dr.base_module.js');
+		Dr.loadScript('../../Dr.base_module.js', function () {
+			var Spec = document.getElementById("Spec");
+			var text_list = [
+				['devicePixelRatio', window.devicePixelRatio],
+				['top.location.href', top.location.href],
+				['window.location.href', window.location.href],
+				['Dr.Get("Toolbox").getViewportSize()', 'width, height: (' + Dr.Get("Toolbox").getViewportSize().width + ', ' + Dr.Get("Toolbox").getViewportSize().height + ')'],
+				['Dr.Get("Toolbox").getPageSize()', 'width, height: (' + Dr.Get("Toolbox").getPageSize().width + ', ' + Dr.Get("Toolbox").getPageSize().height + ')'],
+			];
+			var result_line = '<table class="align-center font-small">';
+			for (var i in text_list) {
+				var key = text_list[i][0];
+				var value = text_list[i][1];
+				var line = '<tr><td><b>' + key + '</b></td><td>' + value + '</td></tr>';
+				result_line += line;
+			}
+			result_line += '</table>';
+			//document.write(result_line);
+			Spec.innerHTML = result_line;
+		});
 	
 	</script>
 	<!-- -->
@@ -102,7 +123,7 @@
 	</script>
 
 	<style>
-		td { text-align: left; padding: 0.1em; border-left: 1em solid #222; border-right: 1em solid #222; }
+		#page-header td, #page-footer td { text-align: left; padding: 0.1em; border-left: 1em solid #222; border-right: 1em solid #222; }
 		canvas {
 			background-color: #aaa;
 			margin: 0;
@@ -147,6 +168,13 @@
 		<p id="Log">
 			Log here
 		</p>
+		
+		<div id="Spec">
+			Spec here
+		</div>
+		
+		<button onclick="var size = Dr.Get('Toolbox').getViewportSize(); alert('width, height: (' + size.width + ', ' + size.height + ')')">getViewportSize</button>
+		<button onclick="var size = Dr.Get('Toolbox').getPageSize(); alert('width, height: (' + size.width + ', ' + size.height + ')')">getPageSize</button>
 	</div>
 <br />
 </body>

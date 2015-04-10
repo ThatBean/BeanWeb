@@ -11,7 +11,7 @@ button, .button { height: 2em; border: 2px solid #444; background: #555; }
 button:hover, .button:hover { border: 2px solid #666; background: #777; }
 button:active, .button:active { border: 2px solid #333; background: #111; }
 
-.fix-top, .fix-bottom { position: fixed; background: #222; }
+.fix-top, .fix-bottom { position: fixed; background: #222; overflow-x: auto}
 .fix-top { top: 0; }
 .fix-bottom { bottom: 0; }
 
