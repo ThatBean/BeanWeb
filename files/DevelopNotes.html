@@ -1,0 +1,48 @@
+<pre>
+<code>
+<h1>Some List</h1>
+<script>
+	var reading_list = [
+		["<b>Title</b>", "<b>Link</b>", "<b>Time Added</b>"],
+		
+		["End", "End", "End"],
+	];
+	var result_line = '<table>';
+	for (var i in reading_list) {
+		var title = reading_list[i][0];
+		var link = reading_list[i][1];
+		var time = reading_list[i][2];
+		var line = '<tr><td>' + title + '</td><td><a href="' + link + '">' + link + '</a></td><td>' + time + '</td></tr>';
+		
+		result_line += line;
+	}
+	result_line += '</table>';
+	document.write(result_line);
+</script>
+</code>
+</pre>
+
+<hr />
+
+<pre>
+<code>
+<h1>Some Notes</h1>
+<p>
+Develop|Apache|Ant|WinSetup
+To use 'ant' in windows env:
+	1.copy the downloaded 'apache-ant-1.9.4' folder (with 'bin', 'lib' inside)
+	2.add Env Variable like: 'ANT_HOME' - 'D:\Apache\apache-ant-1.9.4'
+	3.append Env Variable 'PATH' like: 'PATH' - '%PATH%;%ANT_HOME%\;%ANT_HOME%\bin\'
+	4.JDK needed (not JRE)
+	5.try in CMD: 'ant', should get 'Buildfile: build.xml does not exist!', 'Build failed'
+</p>
+<p>
+Develop|Java|JDK|WinSetup
+To use 'JDK' in windows env:
+	1.install JDK
+	2.add Env Variable like: 'JAVA_HOME' - 'C:\Program Files\Java\jdk1.8.0_40'
+	3.append Env Variable 'PATH' like: 'PATH' - '%PATH%;%JAVA_HOME%\bin\;%JAVA_HOME%\lib\;%JAVA_HOME%\jre\bin\;%JAVA_HOME%\jre\lib\'
+</p>
+
+</code>
+</pre>
