@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
 	
 	<title>Dr.Pixel3D Demo Page</title>
 	
@@ -30,29 +30,36 @@
 	
 	<script type="text/javascript"> 
 		function set_body_padding () {
+			var body = Dr.getBody();
+			
 			var page_header = document.getElementById("page-header");
 			var padding_header = (page_header ? page_header.offsetHeight : 0) + "px";
 			var page_footer = document.getElementById("page-footer");
 			var padding_footer = (page_footer ? page_footer.offsetHeight : 0) + "px";
 			
-			document.body.style.paddingTop = padding_header;
-			document.body.style.paddingBottom = padding_footer;
+			body.style.paddingTop = padding_header;
+			body.style.paddingBottom = padding_footer;
 			console.log("set_body_padding", padding_header, padding_footer);
 			//add watch
-			document.body.onresize = set_body_padding;
+			body.onresize = set_body_padding;
 		}
 		
-		function scale_canvas() {
+		function pixelate_canvas() {
 			var canvas = document.getElementById('Dr.Canvas');
-			var body = document.getElementsByTagName("body")[0];
+			var body = Dr.getBody();
 			var minSize = Math.floor(body.offsetWidth * 0.9 / 10) * 10;
 			canvas.style.width = Math.min(minSize, Dr.devicePixelRatio * 4 * (parseInt(canvas.style.width))) + 'px';
 			canvas.style.height = Math.min(minSize, Dr.devicePixelRatio * 4 * (parseInt(canvas.style.height))) + 'px';
+			
+			var context = canvas.getContext('2d');
+			if (context.imageSmoothingEnabled) context.imageSmoothingEnabled = false;
+			if (context.mozImageSmoothingEnabled) context.mozImageSmoothingEnabled = false;
+			if (context.webkitImageSmoothingEnabled) context.webkitImageSmoothingEnabled = false;
 		}
 		
 		window.onload = function () {
 			set_body_padding();
-			scale_canvas();
+			pixelate_canvas();
 		}
 	</script>
 </head>

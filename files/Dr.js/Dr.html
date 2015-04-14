@@ -7,40 +7,38 @@
 	<meta name="keywords" content="Dr.js,Bean,Dr.Eames,thatbean,DrEames,Personal">
 	<meta name="description" content="This is a web build by Bean/Dr.Eames">
 	
-	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
 	
 	<title>Welcome to ThatBean.com!</title>
+	
+	<style>
+		#page-header td, #page-footer td { text-align: left; padding: 0.1em; border-left: 1em solid #222; border-right: 1em solid #222; }
+		canvas { background-color: #ddd; margin: 0; padding: 0; border: 0; }
+		#Spec { overflow-x: auto; }
+		b { color: #900; }
+	</style>
 	
     <link href="../../favicon.png" rel="shortcut icon">
 	<link href="../../bean_common.css" rel="stylesheet" type="text/css">
 	<script src="../../Dr.js"></script>
 	<!-- -- >
-	<script src="Dr.base_module.js"></script>
+	<script type="text/javascript">
+		
+	</script>
 	<!-- -->
 	<!-- -->
 	<script type="text/javascript">
-		
 		Dr.loadScript('../../Dr.base_module.js', function () {
-			var Spec = document.getElementById("Spec");
-			var text_list = [
-				['devicePixelRatio', window.devicePixelRatio],
-				['top.location.href', top.location.href],
-				['window.location.href', window.location.href],
-				['Dr.Get("Toolbox").getViewportSize()', 'width, height: (' + Dr.Get("Toolbox").getViewportSize().width + ', ' + Dr.Get("Toolbox").getViewportSize().height + ')'],
-				['Dr.Get("Toolbox").getPageSize()', 'width, height: (' + Dr.Get("Toolbox").getPageSize().width + ', ' + Dr.Get("Toolbox").getPageSize().height + ')'],
-			];
-			var result_line = '<table class="align-center font-small">';
-			for (var i in text_list) {
-				var key = text_list[i][0];
-				var value = text_list[i][1];
-				var line = '<tr><td><b>' + key + '</b></td><td>' + value + '</td></tr>';
-				result_line += line;
-			}
-			result_line += '</table>';
-			//document.write(result_line);
-			Spec.innerHTML = result_line;
+			Dr.log("[Dr.base_module.js] loaded");
 		});
-	
+		/*
+		Dr.loadScriptByList([
+			'../../Dr.base_module.js',
+			'...',
+		], function () {
+			Dr.log("All script loaded");
+		})
+		*/
 	</script>
 	<!-- -->
 	<script type="text/javascript">
@@ -59,24 +57,29 @@
 		}
 		
 		function set_body_padding () {
+			var body = Dr.getBody();
+			
 			var page_header = document.getElementById("page-header");
 			var padding_header = (page_header ? page_header.offsetHeight : 0) + "px";
 			var page_footer = document.getElementById("page-footer");
 			var padding_footer = (page_footer ? page_footer.offsetHeight : 0) + "px";
 			
-			document.body.style.paddingTop = padding_header;
-			document.body.style.paddingBottom = padding_footer;
+			body.style.paddingTop = padding_header;
+			body.style.paddingBottom = padding_footer;
 			console.log("set_body_padding", padding_header, padding_footer);
 			//add watch
-			document.body.onresize = set_body_padding;
+			body.onresize = set_body_padding;
 		}
 		
 		function scale_canvas() {
 			var devicePixelRatio = window.devicePixelRatio || 1;
 			var canvas = document.getElementById('Dr.Canvas');
+			var body = Dr.getBody();
+			var minSize = Math.floor(body.offsetWidth * 0.9 / 10) * 10;
 			
-			var width = canvas.width || (parseInt(canvas.style.width));
-			var height = canvas.height || (parseInt(canvas.style.height));
+			var width = Math.min(minSize, canvas.width || (parseInt(canvas.style.width)));
+			var height = Math.min(minSize, canvas.height || (parseInt(canvas.style.height)));
+			
 			canvas.width = devicePixelRatio * width;
 			canvas.height = devicePixelRatio * height;
 			canvas.style.width = width + 'px';
@@ -86,18 +89,36 @@
 		function set_canvas_script() {
 			var canvas = document.getElementById("Dr.Canvas");
 			var ctx = canvas.getContext("2d");
-			ctx.font = "bold 20px monaco, consolas, monospace";
+			
+			var canvas_size = {
+				pixel_width: canvas.width,
+				pixel_height: canvas.height,
+				style_width: canvas.style.width,
+				style_height: canvas.style.height,
+			};
+			
+			var font_size = Math.min(30, canvas.height * 0.05);
+			
+			ctx.font = "bold " + font_size + "px monaco, consolas, monospace";
 			ctx.textAlign = "right";
 			ctx.textBaseline = "top";
-			ctx.fillStyle = "#888";
-			ctx.fillText("Test Canvas 640 x 480", 640, 0);
+			ctx.fillStyle = "#bbb";
+			ctx.fillText("Test Canvas", canvas_size.pixel_width, font_size * 0);
+			ctx.fillText("Pixel size: (" + canvas_size.pixel_width + ", " + canvas_size.pixel_height + ")", canvas_size.pixel_width, font_size * 1);
+			ctx.fillText("Style size: (" + canvas_size.style_width + ", " + canvas_size.style_height + ")", canvas_size.pixel_width, font_size * 2);
 			
-			for (var i = 0; i < 10; i++) {
-				ctx.font = "bold " + (48 - i * 4).toString() + "px monaco, consolas, monospace";
+			var count = 8;
+			var intStr = function (number, radix) { return Math.floor(number).toString(radix || 10); };
+			
+			for (var i = 0; i < count; i++) {
+				var ratio = i / count;
+				var left_ratio = (count - i) / count;
+				
+				ctx.font = "bold " + intStr(canvas_size.pixel_height * left_ratio / count) + "px monaco, consolas, monospace";
 				ctx.textAlign = "left";
 				ctx.textBaseline = "bottom";
-				ctx.fillStyle = "#" + (99 - i * 9).toString() + (99 - i * 9).toString() + (99 - i * 9).toString();
-				ctx.fillText("Hello Canvas World!", 0, 480 - 48 * i);
+				ctx.fillStyle = "#" + intStr(255 * left_ratio, 16) + intStr(255 * left_ratio, 16) + intStr(255 * left_ratio, 16);
+				ctx.fillText("Hello Canvas World!", 0, canvas_size.pixel_height * left_ratio);
 			}
 			
 			var FPS = Dr.Get("FPS")
@@ -121,17 +142,34 @@
 			Dr.UpdateLoop.start();
 		}
 		
+		function set_spec () {
+			var Spec = document.getElementById("Spec");
+			var text_list = [
+				['devicePixelRatio', window.devicePixelRatio],
+				['top.location.href', top.location.href],
+				['window.location.href', window.location.href],
+				['Dr.Get("Toolbox").getViewportSize()', 'width, height: (' + Dr.Get("Toolbox").getViewportSize().width + ', ' + Dr.Get("Toolbox").getViewportSize().height + ')'],
+				['Dr.Get("Toolbox").getPageSize()', 'width, height: (' + Dr.Get("Toolbox").getPageSize().width + ', ' + Dr.Get("Toolbox").getPageSize().height + ')'],
+			];
+			var result_line = '<table class="align-center font-small" style="background-color: #ddd;">';
+			for (var i in text_list) {
+				var key = text_list[i][0];
+				var value = text_list[i][1];
+				var line = '<tr><td><b>' + key + '</b></td><td>' + value + '</td></tr>';
+				result_line += line;
+			}
+			result_line += '</table>';
+			//document.write(result_line);
+			Spec.innerHTML = result_line;
+		}
+		
 		window.onload = function () {
 			set_body_padding();
 			scale_canvas();
 			set_canvas_script();
+			set_spec();
 		}
 	</script>
-
-	<style>
-		#page-header td, #page-footer td { text-align: left; padding: 0.1em; border-left: 1em solid #222; border-right: 1em solid #222; }
-		canvas { background-color: #ddd; margin: 0; padding: 0; border: 0; }
-	</style>
 </head>
 
 <body>
@@ -167,7 +205,6 @@
 		<p id="Log">
 			Log here
 		</p>
-		
 		<div id="Spec">
 			Spec here
 		</div>

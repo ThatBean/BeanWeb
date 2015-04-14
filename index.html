@@ -7,7 +7,7 @@
 	<meta name="keywords" content="Bean,Dr.Eames,thatbean,DrEames,Personal">
 	<meta name="description" content="This is a web build by Bean/Dr.Eames">
 	
-	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
 	
 	<title>Welcome to ThatBean.com!</title>
 	
@@ -30,24 +30,29 @@
 		}
 		
 		function set_body_padding () {
+			var body = document.getElementsByTagName("body")[0];
+			
 			var page_header = document.getElementById("page-header");
 			var padding_header = (page_header ? page_header.offsetHeight : 0) + "px";
 			var page_footer = document.getElementById("page-footer");
 			var padding_footer = (page_footer ? page_footer.offsetHeight : 0) + "px";
 			
-			document.body.style.paddingTop = padding_header;
-			document.body.style.paddingBottom = padding_footer;
+			body.style.paddingTop = padding_header;
+			body.style.paddingBottom = padding_footer;
 			console.log("set_body_padding", padding_header, padding_footer);
 			//add watch
-			document.body.onresize = set_body_padding;
+			body.onresize = set_body_padding;
 		}
 		
 		function scale_canvas() {
 			var devicePixelRatio = window.devicePixelRatio || 1;
 			var canvas = document.getElementById('Dr.Canvas');
+			var body = document.getElementsByTagName("body")[0];
+			var minSize = Math.floor(body.offsetWidth * 0.9 / 10) * 10;
 			
-			var width = canvas.width || (parseInt(canvas.style.width));
-			var height = canvas.height || (parseInt(canvas.style.height));
+			var width = Math.min(minSize, canvas.width || (parseInt(canvas.style.width)));
+			var height = Math.min(minSize, canvas.height || (parseInt(canvas.style.height)));
+			
 			canvas.width = devicePixelRatio * width;
 			canvas.height = devicePixelRatio * height;
 			canvas.style.width = width + 'px';
@@ -65,13 +70,15 @@
 				style_height: canvas.style.height,
 			};
 			
-			ctx.font = "bold 20px monaco, consolas, monospace";
+			var font_size = Math.min(30, canvas.height * 0.05);
+			
+			ctx.font = "bold " + font_size + "px monaco, consolas, monospace";
 			ctx.textAlign = "right";
 			ctx.textBaseline = "top";
-			ctx.fillStyle = "#888";
-			ctx.fillText("Test Canvas", canvas_size.pixel_width, 0);
-			ctx.fillText("Pixel size: (" + canvas_size.pixel_width + ", " + canvas_size.pixel_height + ")", canvas_size.pixel_width, 20);
-			ctx.fillText("Style size: (" + canvas_size.style_width + ", " + canvas_size.style_height + ")", canvas_size.pixel_width, 40);
+			ctx.fillStyle = "#bbb";
+			ctx.fillText("Test Canvas", canvas_size.pixel_width, font_size * 0);
+			ctx.fillText("Pixel size: (" + canvas_size.pixel_width + ", " + canvas_size.pixel_height + ")", canvas_size.pixel_width, font_size * 1);
+			ctx.fillText("Style size: (" + canvas_size.style_width + ", " + canvas_size.style_height + ")", canvas_size.pixel_width, font_size * 2);
 			
 			var count = 8;
 			var intStr = function (number, radix) { return Math.floor(number).toString(radix || 10); };

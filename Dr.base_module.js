@@ -117,16 +117,17 @@ Dr.Implement('Toolbox', function (global, module_get) {
 		};
 	}
 	Module.getPageSize = function () {
+		var body = Dr.getBody();
 		var scroll_x, scroll_y;
 		if (Dr.window.innerHeight && Dr.window.scrollMaxY) {
-			scroll_x = Dr.document.body.scrollWidth;
+			scroll_x = Dr.getBody().scrollWidth;
 			scroll_y = Dr.window.innerHeight + Dr.window.scrollMaxY;
-		} else if (Dr.document.body.scrollHeight > Dr.document.body.offsetHeight) {
-			scroll_x = Dr.document.body.scrollWidth;
-			scroll_y = Dr.document.body.scrollHeight;
+		} else if (body.scrollHeight > body.offsetHeight) {
+			scroll_x = body.scrollWidth;
+			scroll_y = body.scrollHeight;
 		} else {
-			scroll_x = Dr.document.body.offsetWidth;
-			scroll_y = Dr.document.body.offsetHeight;
+			scroll_x = body.offsetWidth;
+			scroll_y = body.offsetHeight;
 		}
 		
 		viewport_size = Module.getViewportSize();

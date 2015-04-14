@@ -212,6 +212,10 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			})(),
 			
 			//document related
+			getBody: function (document) {
+				var document = document || Dr.document;
+				return document.getElementsByTagName("body")[0];
+			},
 			loadScript: function (script_src, callback) {
 				Dr.log('Loading Script:', script_src);
 				var script_element = document.createElement('script');
@@ -336,9 +340,10 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 					};
 				}
 				else {
+					var body = Dr.getBody();
 					position_document = {
-						x: position_visible.x + Dr.document.body.scrollLeft + Dr.document.documentElement.scrollLeft,
-						y: position_visible.y + Dr.document.body.scrollTop + Dr.document.documentElement.scrollTop,
+						x: position_visible.x + body.scrollLeft + Dr.document.documentElement.scrollLeft,
+						y: position_visible.y + body.scrollTop + Dr.document.documentElement.scrollTop,
 					};
 				}
 				
@@ -435,6 +440,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 	Dr.getArgumentArray = _required_native.getArgumentArray;
 	
 	//document related
+	Dr.getBody = _required_native.getBody;
 	Dr.loadScript = _required_native.loadScript;
 	Dr.loadScriptByList = function (script_src_list, callback) {
 		var loop_load_script = function () {
