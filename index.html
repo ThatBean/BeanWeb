@@ -43,26 +43,48 @@
 		}
 		
 		function scale_canvas() {
+			var devicePixelRatio = window.devicePixelRatio || 1;
 			var canvas = document.getElementById('Dr.Canvas');
-			canvas.style.width = window.devicePixelRatio * (parseInt(canvas.style.width)) + 'px';
-			canvas.style.height = window.devicePixelRatio * (parseInt(canvas.style.height)) + 'px';
+			
+			var width = canvas.width || (parseInt(canvas.style.width));
+			var height = canvas.height || (parseInt(canvas.style.height));
+			canvas.width = devicePixelRatio * width;
+			canvas.height = devicePixelRatio * height;
+			canvas.style.width = width + 'px';
+			canvas.style.height = height + 'px';
 		}
 		
 		function set_canvas_script() {
 			var canvas = document.getElementById("Dr.Canvas");
 			var ctx = canvas.getContext("2d");
+			
+			var canvas_size = {
+				pixel_width: canvas.width,
+				pixel_height: canvas.height,
+				style_width: canvas.style.width,
+				style_height: canvas.style.height,
+			};
+			
 			ctx.font = "bold 20px monaco, consolas, monospace";
 			ctx.textAlign = "right";
 			ctx.textBaseline = "top";
 			ctx.fillStyle = "#888";
-			ctx.fillText("Test Canvas 640 x 480", 640, 0);
+			ctx.fillText("Test Canvas", canvas_size.pixel_width, 0);
+			ctx.fillText("Pixel size: (" + canvas_size.pixel_width + ", " + canvas_size.pixel_height + ")", canvas_size.pixel_width, 20);
+			ctx.fillText("Style size: (" + canvas_size.style_width + ", " + canvas_size.style_height + ")", canvas_size.pixel_width, 40);
 			
-			for (var i = 0; i < 10; i++) {
-				ctx.font = "bold " + (48 - i * 4).toString() + "px monaco, consolas, monospace";
+			var count = 8;
+			var intStr = function (number, radix) { return Math.floor(number).toString(radix || 10); };
+			
+			for (var i = 0; i < count; i++) {
+				var ratio = i / count;
+				var left_ratio = (count - i) / count;
+				
+				ctx.font = "bold " + intStr(canvas_size.pixel_height * left_ratio / count) + "px monaco, consolas, monospace";
 				ctx.textAlign = "left";
 				ctx.textBaseline = "bottom";
-				ctx.fillStyle = "#" + (99 - i * 9).toString() + (99 - i * 9).toString() + (99 - i * 9).toString();
-				ctx.fillText("Hello Canvas World!", 0, 480 - 48 * i);
+				ctx.fillStyle = "#" + intStr(255 * left_ratio, 16) + intStr(255 * left_ratio, 16) + intStr(255 * left_ratio, 16);
+				ctx.fillText("Hello Canvas World!", 0, canvas_size.pixel_height * left_ratio);
 			}
 		}
 		
@@ -75,14 +97,7 @@
 
 	<style>
 		#page-header td, #page-footer td { text-align: left; padding: 0.1em; border-left: 1em solid #222; border-right: 1em solid #222; }
-		canvas {
-			background-color: #aaa;
-			margin: 0;
-			padding: 0;
-			border: solid 4px #999;
-			/*width: 100%;
-			height: 100%;*/
-		}
+		canvas { background-color: #ddd; margin: 0; padding: 0; border: 0; }
 	</style>
 </head>
 

@@ -7,14 +7,7 @@
 	
 	<style>
 		#page-header td, #page-footer td { text-align: left; padding: 0.1em; border-left: 1em solid #222; border-right: 1em solid #222; }
-		canvas {
-			background-color: #aaa;
-			margin: 0;
-			padding: 0;
-			border: solid 4px #999;
-			/*width: 100%;
-			height: 100%;*/
-		}
+		canvas { background-color: #ddd; margin: 0; padding: 0; border: 0; }
 	</style>
 	
     <link href="../../favicon.png" rel="shortcut icon">
@@ -51,8 +44,10 @@
 		
 		function scale_canvas() {
 			var canvas = document.getElementById('Dr.Canvas');
-			canvas.style.width = Math.min(800, Dr.devicePixelRatio * 4 * (parseInt(canvas.style.width))) + 'px';
-			canvas.style.height = Math.min(800, Dr.devicePixelRatio * 4 * (parseInt(canvas.style.height))) + 'px';
+			var body = document.getElementsByTagName("body")[0];
+			var minSize = Math.floor(body.offsetWidth * 0.9 / 10) * 10;
+			canvas.style.width = Math.min(minSize, Dr.devicePixelRatio * 4 * (parseInt(canvas.style.width))) + 'px';
+			canvas.style.height = Math.min(minSize, Dr.devicePixelRatio * 4 * (parseInt(canvas.style.height))) + 'px';
 		}
 		
 		window.onload = function () {
