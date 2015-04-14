@@ -18,12 +18,13 @@ function init() {
 	var tag_log = new TagLog(function (log_text) {
 		document.getElementById("Log").innerHTML = log_text;
 	})
-	Dr.UpdateLoop.add(function (delta_time) { 
+	tag_log.Log("init log " + Dr.now()); 
+	/*Dr.UpdateLoop.add(function (delta_time) { 
 		if (!Dr.Switch.Log) {
 			tag_log.Log("update log " + Dr.now()); 
 		}
 		return true;
-	})
+	})*/
 	
 	
 	

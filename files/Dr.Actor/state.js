@@ -249,6 +249,11 @@ Dr.Implement('ActorState', function (global, module_get) {
 	
 	Module.prototype.init = function (tag, owner, slot_list, priority) {
 		this.proto_init(slot_list, priority);
+		//initialized in proto_init
+		//this._slot_list = slot_list || [];
+		//this._priority = priority || 0;
+		//this._slot_staus = Module.status.DISCONNECT;
+		
 		
 		this._tag = tag;
 		this._owner = owner;

@@ -1,7 +1,6 @@
 /** Advice 
  **** Dependency
  * Dr.js
- * state.js
  * 
  **** Content
  * Advice
@@ -140,32 +139,16 @@ Dr.Implement('ActorOpinionSource', function (global, module_get) {
 
 
 Dr.Declare('ActorAdvice', 'class');
-Dr.Require('ActorAdvice', 'ActorState');
 Dr.Require('ActorAdvice', 'ActorOpinion');
 Dr.Implement('ActorAdvice', function (global, module_get) {
 	
-	var ActorState = module_get('ActorState');
 	var ActorOpinion = module_get('ActorOpinion');
 	
 	var Module = function () {
 		//
 	};
 	
-	Module.prototype = new ActorState;
-	Module.prototype.proto_init = ActorState.prototype.init;
-	
 	Module.prototype.init = function (tag, config_data) {
-		this.proto_init(tag, owner, slot_list, priority);
-		//initialized in proto_init
-		//this._slot_list = slot_list || [];
-		//this._priority = priority || 0;
-		//this._slot_staus = Module.status.DISCONNECT;
-		//this._tag = tag;
-		//this._owner = owner;
-		//this._status = Module.status.PENDING;
-		
-		//redefine anyway
-		
 		this._tag = tag;
 		
 		this._aspect = config_data.aspect || [];	//aspect key list
@@ -255,12 +238,11 @@ Dr.Implement('ActorAdviceBag', function (global, module_get) {
 		//
 	};
 	
-	//Module.prototype = new ActorOpinionSource;
-	//Module.prototype.proto_init = ActorOpinionSource.prototype.init;
+	Module.prototype = new ActorOpinionSource;
+	Module.prototype.proto_init = ActorOpinionSource.prototype.init;
 	
 	Module.prototype.init = function (tag, owner, opinion) {
-		//this.proto_init(tag, owner, opinion);
-		this._opinion_source = ActorOpinionSource.create(tag, owner, opinion);
+		this.proto_init(tag, owner, opinion);
 		
 		this._advice_data = {};	//where all advice is hold
 		this._source_data = {};	//where all known source is hold
@@ -278,7 +260,6 @@ Dr.Implement('ActorAdviceBag', function (global, module_get) {
 	Module.prototype.getOwner = function () { return this._owner; };
 	Module.prototype.getSlot = function () { return this._slot; };
 	Module.prototype.getSourceData = function () { return this._source_data; };
-	Module.prototype.getOpinionSource = function () { return this._opinion_source; };
 	
 	Module.prototype.considerAdvice = function (advice) {
 		var source_tag_list = advice.getSourceTagList();
@@ -287,12 +268,12 @@ Dr.Implement('ActorAdviceBag', function (global, module_get) {
 		for (var index in source_tag_list) {
 			var source = this._source_data[source_tag_list[index]];
 			if (source) {
-				source_total += this.getOpinionSource().considerSource(source);
+				source_total += this.considerSource(source);
 			};
 		};
 		
 		var source_result = source_total / source_tag_list.length;
-		var advice_result = this.getOpinionSource().getOpinion().considerOpinion(advice.getOpinion());
+		var advice_result = this.getOpinion().considerOpinion(advice.getOpinion());
 		
 		return (advice_result + source_result) * 100 >= Dr.rollDice();	///TODO: fake an algorithm?
 	};
@@ -300,7 +281,7 @@ Dr.Implement('ActorAdviceBag', function (global, module_get) {
 	//for take in feedback of a decision
 	Module.prototype.feedbackAdvice = function (advice, value) {
 		//self is blind, add only favor
-		this.getOpinionSource().getOpinion().feedbackOpinion(value, false);
+		this.getOpinion().feedbackOpinion(value, false);
 		
 		//add credit and favor
 		advice.getOpinion().feedbackOpinion(value, true);
@@ -308,7 +289,7 @@ Dr.Implement('ActorAdviceBag', function (global, module_get) {
 		for (var index in source_list) {
 			var source = this._source_data[source_tag_list[index]];
 			if (source) {
-				source.getOpinionSource().feedbackSource(value, true);
+				source.feedbackSource(value, true);
 			};
 		};
 	};
