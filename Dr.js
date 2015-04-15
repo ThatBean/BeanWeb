@@ -506,6 +506,31 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 		return res_array;
 	};
 	
+	Dr.generateId = function () {
+		//var symbol_list = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');	//full 62
+		var symbol_list = '0123456789ACEFGHJKLMNPQRSTUVWXYZ'.split('');	//lite 32, easy to recognise
+		var symbol_count = symbol_list.length;
+		var result_count = 20;
+		var index_list = [];
+		var result_list = [];
+		for (var i = 0; i < result_count; i++) {
+			index_list[i] = 0;
+			result_list[i] = symbol_list[index_list[i]];
+		}
+		return function () {
+			//update index snd char
+			//for (var i = 0; i < result_count; i++) {
+			for (var i = result_count - 1; i >= 0; i--) {
+				index_list[i] = (index_list[i] + 1) % symbol_count;
+				result_list[i] = symbol_list[index_list[i]];
+				if (index_list[i] > 0) break;
+			}
+			//get string
+			return result_list.join('');
+		};
+	}();
+	
+	
 	Dr.logList = _required_native.logList;
 	Dr.Log = (function () {
 		var Log = function () {

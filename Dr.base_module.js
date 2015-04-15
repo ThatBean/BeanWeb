@@ -97,7 +97,7 @@ Dr.Implement('FPS', function (global, module_get) {
 
 Dr.Declare('Toolbox', 'function_pack');
 Dr.Implement('Toolbox', function (global, module_get) {
-	var Module = {}
+	var Module = {};
 	Module.getViewportSize = function () {
 		var client_width, client_height;
 		if (Dr.window.innerHeight) {

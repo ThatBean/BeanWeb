@@ -4,6 +4,7 @@ function init() {
 	Dr.LoadAll();
 	Dr.UpdateLoop.start();
 	
+	var generateUUID = Dr.generateUUID;
 	
 	var FPS = Dr.Get("FPS")
 	var fps = new FPS(function (averageFPS, currentFPS) {
@@ -21,7 +22,7 @@ function init() {
 	tag_log.Log("init log " + Dr.now()); 
 	/*Dr.UpdateLoop.add(function (delta_time) { 
 		if (!Dr.Switch.Log) {
-			tag_log.Log("update log " + Dr.now()); 
+			tag_log.Log(generateUUID() + "update log " + Dr.now()); 
 		}
 		return true;
 	})*/

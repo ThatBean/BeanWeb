@@ -246,39 +246,35 @@ Dr.Implement('ActorAdvice', function (global, module_get) {
 
 Dr.Declare('ActorAdviceBag', 'class');
 //Dr.Require('ActorAdviceBag', 'ActorOpinion');
+Dr.Require('ActorAdviceBag', 'ActorStatePool');
 Dr.Require('ActorAdviceBag', 'ActorOpinionSource');
 Dr.Implement('ActorAdviceBag', function (global, module_get) {
 	
+	var ActorStatePool = module_get('ActorStatePool');
 	var ActorOpinionSource = module_get('ActorOpinionSource');
 	
 	var Module = function () {
 		//
 	};
 	
-	//Module.prototype = new ActorOpinionSource;
-	//Module.prototype.proto_init = ActorOpinionSource.prototype.init;
-	
 	Module.prototype.init = function (tag, owner, opinion) {
-		//this.proto_init(tag, owner, opinion);
-		this._opinion_source = ActorOpinionSource.create(tag, owner, opinion);
+		this._tag = tag;
+		this._owner = owner;
 		
 		this._advice_data = {};	//where all advice is hold
 		this._source_data = {};	//where all known source is hold
 		
-		this._slot = [];	//occupied slot (to prevent advice conflict)
-		
-		//for advice holding & update(pending -> enter -> active -> exit -> pending)
-		this._pending_list = [];
-		this._enter_list = [];	//transition state
-		this._active_list = [];
-		this._exit_list = [];	//transition state
+		this._opinion_source = ActorOpinionSource.create(tag, owner, opinion);
+		this._advice_state_pool = new ActorStatePool.create(owner);
 	};
 	
 	Module.prototype.getTag = function () { return this._tag; };
 	Module.prototype.getOwner = function () { return this._owner; };
-	Module.prototype.getSlot = function () { return this._slot; };
+	Module.prototype.getAdviceData = function () { return this._advice_data; };
 	Module.prototype.getSourceData = function () { return this._source_data; };
 	Module.prototype.getOpinionSource = function () { return this._opinion_source; };
+	Module.prototype.getAdviceStatePool = function () { return this._advice_state_pool; };
+	
 	
 	Module.prototype.considerAdvice = function (advice) {
 		var source_tag_list = advice.getSourceTagList();
@@ -313,68 +309,13 @@ Dr.Implement('ActorAdviceBag', function (global, module_get) {
 		};
 	};
 	
-	
 	Module.prototype.reset = function () {
-		this._pending_list = [];
-		this._enter_list = [];	//transition state
-		this._active_list = [];
-		this._exit_list = [];	//transition state
-		
-		for (var tag in this._advice_data) {
-			this._pending_list.push(tag);
-		};
+		this._advice_state_pool.reset();
 	};
 	
 	Module.prototype.update = function (delta_time) {
-		this.update_transition();
-		this.update_active(delta_time);
+		this._advice_state_pool.update(delta_time);
 	};
-	
-	Module.prototype.update_transition = function () {
-		//enter -> active
-		for (var index in this._enter_list) {
-			var tag = this._enter_list[index];
-			var advice = this._advice_data[tag];
-			if (advice) {
-				if (advice.checkSlot(this._slot)) {
-					advice.applySlot(this._slot, true);
-					this._active_list.push(tag);	//to active
-				}
-				else {
-					this._pending_list.push(tag);	//slot full, drop
-				}
-			}
-		}
-		this._enter_list = [];	//clear
-		//exit -> pending
-		for (var index in this._exit_list) {
-			var tag = this._exit_list[index];
-			var advice = this._advice_data[tag];
-			if (advice) {
-				advice.applySlot(this._slot, false);
-				this._pending_list.push(tag);
-			};
-		}
-		this._exit_list = [];	//clear
-	};
-	
-	Module.prototype.update_active = function (delta_time) {
-		var active_list = [];
-		for (var index in this._active_list) {
-			var tag = this._active_list[index];
-			var advice = this._advice_data[tag];
-			if (advice) {
-				if (!advice.applyAction(this._owner, delta_time)) {
-					this._exit_list.push(tag);	//this advice is finished
-				}
-				else {
-					active_list.push(tag);
-				};
-			};
-		}
-		this._active_list = active_list;
-	};
-	
 	
 	Module.prototype.pickAdvice = function (aspect) {
 		//pending -> enter
