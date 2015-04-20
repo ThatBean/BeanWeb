@@ -15,7 +15,6 @@
 //a higher logic strategy
 
 /*
-
 	The Flow
 	
 	AdvicePool - single in game will hold all advice, needed?
@@ -23,18 +22,14 @@
 	AdviceBag - every Actor(owner) in game will hold one of these
 		enter - pick a advice of some aspect, for how many times
 			
-			
 		update - update picked advice
 			
-		
 		exit - put back picked advice
-	
 	
 	|                                                         |
 	| Layer:        [Advice]  [Logic]   [Action]  [Animation] |
 	| Data Barrier:                   +                       |
 	|                                                         |
-	
 	
 */
 

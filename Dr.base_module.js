@@ -220,24 +220,12 @@ Dr.Implement('ResourceLoader', function (global, module_get) {
 	
 	var _loader_image = Dr.loadImage;
 	var _loader_script =Dr.loadScript;
-	var _loader_text = function (src, callback) {
-		Dr.createHttpRequest(src, null, function (xml_http, response_text) {
-			callback(response_text);
-		});
-	};
-	var _loader_image_text = function (image_src, text_src, callback) {
-		_loader_image(image_src, function (image_element) {
-			_loader_text(text_src, function (response_text) {
-				callback(image_element, response_text);
-			});
-		});
-	};
+	var _loader_text = Dr.loadText;
 	
 	Module._loader_list = {
-		text: _loader_text,
-		image: _loader_image,
-		script: _loader_script,
-		multi: _loader_image_text,
+		'text': _loader_text,
+		'image': _loader_image,
+		'script': _loader_script,
 	};
 	
 	Module.prototype.getLoaderList = function () {
@@ -280,8 +268,7 @@ Dr.Implement('ResourceLoader', function (global, module_get) {
 			case 'script':
 				load_data.is_multi = false;
 				break;
-			case 'image_multi':
-			case 'font_bitmap':
+			case 'multi':
 				load_data.is_multi = true;
 				break;
 			default:

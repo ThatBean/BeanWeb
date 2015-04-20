@@ -211,6 +211,39 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 				}
 			})(),
 			
+			
+			//client related (the visible area, view port)
+			getElementAtClient: function (view, client_x, client_y) {
+				var element = view.document.elementFromPoint(client_x, client_y);	//view should be a window
+				//alert("Clicked at: "+getObject.tagName);
+				if (element.tagName.toUpperCase().search(/FRAME/) != -1) {	//deal with frames...
+					//for (int i=0;i<window.frames.length;i++) {
+						//if (window.self!=window.frames[i]) B_func_fakeMouseEvent(window.frames[i],client_x-getObject.offset,client_y,mouseEvent);
+					//}
+					alert('Element in another Frame');
+					return null;
+				}
+				return element;
+			},
+			simulateClientClick: (function() {
+				if (document.createEventObject) { //For IE 8
+					return function (type, element, view, client_x, client_y) {
+						var event = view.document.createEventObject();
+						event.clientX = client_x;
+						event.clientY = client_y;
+						element.fireEvent('on' + type, event);
+					}
+				}
+				else {
+					return function (type, element, view, client_x, client_y) {
+						var event = view.document.createEvent('MouseEvents');
+						//event.initMouseEvent(type, canBubble, cancelable, view, detail, screenX, screenY, clientX, clientY, ctrlKey, altKey, shiftKey, metaKey, button, relatedTarget);
+						event.initMouseEvent(type, true, true, view, 0, 0, 0, client_x, client_y, false, false, false, false, 0, null); 
+						element.dispatchEvent(event);
+					}	
+				};
+			})(),
+			
 			//document related
 			getBody: function (document) {
 				var document = document || Dr.document;
@@ -225,18 +258,11 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 				script_element.onload = function () {
 					callback(script_element);
 				};
-				//script_element.onload = 'Dr.log("sdfsdfdsfdsfdsfdsf")';
-				//script_element.onload = function () {
-				//	Dr.log("sdfsdfdsfdsfdsfdsf")	
-				//};
-				//script_element.onload = onload_script_string; //'Dr.Event.Emit("Loaded", ' + event_key + ')';
 				var exist_script_element = document.getElementsByTagName('script')[0];
 				exist_script_element.parentNode.insertBefore(script_element, exist_script_element);
 			},
 			loadImage: function (image_src, callback) {
 				var image_element = new Image();
-				//image_element.src = 'images/BeanFont.png';
-				//image_element.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjoAAAANCAYAAACgqMT8AAAFoElEQVR4Xu1c0bLVQAjT//9o9TizynATErrbnusVn7RlKYQQaM+M37/Nn0FgEBgEBoFBYBAYBL4oAt+/aF6T1iAwCAwCg8AgMAgMAt/cRefHL6yi7evfrz+va/Hvr2vLNp+J9xzos991hl2PPqsYVIxObKdsEEanfI8fjMDiz+Jv5pVzPfrYsc9+ck/FDFb/ofhRf1b2qweW/2ib+3z1ONIK9txuPKfwrPLKbEB5Md244zqKh3GR6QTjcvTjanxHn3d1q3PesXVsHD1UftR95xlj4yGA5ny1h5Re3SY4sehUYpaDjM/rJleJLFqGPNjPW7G88uBkAnRlYGdxZ4O2OzCYfXX9PKLaY3cwP22vBlQ3nqv+MufUoM0vPFmk7lgUnIVMaUEXz1P2ld5V/c70GtWHYV51iTvIXTv2LPf8KbuKv4hHu3FrJXqPhYvne6L7+1S3Xkrf/njcWXTQWyAbnN2mU/a7QLAl4ckCq2Uuv5FXDakGSRTP6rmMOArv7gB4Eudquc24ZV5081I4ZXxde9XQ3YGu6qz8sTwQnnG53sVT8VwJucqr6x/1kptjVVOUR5WbyrvTb44vx+bJhWo3HtVf7v0Ozu+wPYXT3bGf0sXtRcchMWr4dY4NcWcIO89Wb0zsrekpQleCu4ats9ioeJFwOxg7DVH5cQbGK/a8aKPcnVoiTqgccvwrnhjD+nv0H79eID53f+LJvhc32XXUOyxOlx/RjtWlyostODEX9VORyjf2bM4X/azu5OEuJYrPXZyfsj8xkCLW6OfQjDOyV5zOfZTtVX0dPjhaE+vs8ifqRn75Z1rO5qDCIcZUcVL56f5Urfh/pY8yN6sXe6dfEA//1PzqF52qgRgoWajQ525EFCSQ7PnuJljFGOM8IRTIhyJGtQhlfyjn3GBsKWECUQkHI11H4NhCoxadKldHmFTsFScRf7O/u/mneFPl113AnE/6bMHpxnkFN1Rv1Ruqr1xBR3aO7qn4HEF36nhKt3br6OLp8rYbTxfPSjfRXKj47y4l6gWA9SFboqqZfor/CNeqJ6o6ME3v8Fzx4oe76LiNkwck27JcwLtLhyuY1aLENk22sHTsWT6sYbqNyoSULTqOfdXgrkCpPBx+sdqqs865iP/yd0WAXP5VQ7HivGro3Xownuzm1R14bIFUfaIWiSu6gzBRcajnKF2rONsZDKo31P0u367wJMaAvro4X7YV3p241sxycK4WHRT3Lp6OjscZfBrPXd6rOqk54dYxcur3mdOLTmzgXBRG6Dxk8oBxBtWHxMKF7nk22FcDKHFY55k9a6Bo7xDCyStjW4kKq90di85qRudzclXbiDXC28Goyu+UMLl+uo2ehcdddLrnXIFRfndwYCJfib/qo+o+yqU72Nx6qAXN6YE7tTxrWu7fTt3jWdWfqj5sKVF1V3Wp9KlaYDo4ZL1F+o9mKPvZCc0lhYPjH/WX0xtZVxlnnLi7uvjBp9scipCoEdEZl7iosdxYq4HtLCl3LjrdgaEaUgmkqoE7eDoN4yxMlZCwBVGRXWHhDItl4/yGHf1l8UN+kP3CId+r+i2eUXHGPsq4Km4gIVZxKqFn8Tj5xhcgR0cQj1jOuV4V1yqRd/uV1T2eZzGxurj6iPhT6SJaTCIGiFcoduSn4ifS4Wjv8oH5YTqvfrJFgz/XvctPB0/3A4CqL4pt1VDpPNN2J99cr8w556W3ir3isP3/6JRO/pObnWXvCiSMoGywMaJcJborWEqAOn4QTnfjfKU2c2YQGASeR0BpgbqvIt49r/y79904XDv3uU/bvS1+9y3gaUA+2/PeVqDPBsTN8QzONwM87geBfwgB9YVhVy92z5+C0o3DtTsV164fVb9d//b5WXRsqMZwEBgEBoFB4CEE2FBXX6zd8D7T0uDG4tq5GDxhd6peW7H+BJpngDoKyzbXAAAAAElFTkSuQmCC';
 				image_element.src = image_src;
 				image_element.onload = function () {
 					callback(image_element);
@@ -281,6 +307,32 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 				canvas.height = height;
 				return canvas;
 			},
+			createStyle: function (css_text) {
+				var style = document.createElement('style');
+				style.type = 'text/css';
+				if (style.styleSheet) {	// IE
+					style.styleSheet.cssText = css_text;
+				}
+				else {
+					style.innerHTML = css_text;
+				}
+				document.getElementsByTagName("head")[0].appendChild(style);
+			},
+			setStyleTransformDegree: (function () {
+				var key_transform;
+				// will init upon first call
+				return function (element, rotate_degree) {
+					if (!key_transform) {
+						if (element.style.webkitTransform != null) key_transform = 'webkitTransform';
+						if (element.style.MozTransform != null) key_transform = 'MozTransform';
+						if (element.style.msTransform != null) key_transform = 'msTransform';
+						if (element.style.OTransform != null) key_transform = 'OTransform';
+						if (element.style.transform != null) key_transform = 'transform';
+						if (!key_transform) { alert('style unsupport transform'); key_transform = 'unsupport_transform'; }
+					}
+					element.style[key_transform] = 'rotate(' + rotate_degree + 'deg)';
+				}
+			})(),
 			
 			
 			//window related
@@ -439,6 +491,10 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 	//function argument to array
 	Dr.getArgumentArray = _required_native.getArgumentArray;
 	
+	//client related (the visible area, view port)
+	Dr.getElementAtClient = _required_native.getElementAtClient;
+	Dr.simulateClientClick = _required_native.simulateClientClick;
+	
 	//document related
 	Dr.getBody = _required_native.getBody;
 	Dr.loadScript = _required_native.loadScript;
@@ -454,10 +510,17 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 		loop_load_script();
 	};
 	Dr.loadImage = _required_native.loadImage;
+	Dr.loadText = function (src, callback) {
+		Dr.createHttpRequest(src, null, function (xml_http, response_text) {
+			callback(response_text);
+		});
+	};
 	Dr.createHttpRequest = _required_native.createHttpRequest;
 	Dr.createDownload = _required_native.createDownload;
 	Dr.createTextDownload = _required_native.createTextDownload;
 	Dr.createOffscreenCanvas = _required_native.createOffscreenCanvas;
+	Dr.createStyle = _required_native.createStyle;
+	Dr.setStyleTransformDegree = _required_native.setStyleTransformDegree;
 	
 	//window related
 	Dr.onNextScreenUpdate = _required_native.onNextScreenUpdate;

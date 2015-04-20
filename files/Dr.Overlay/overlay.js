@@ -1,76 +1,35 @@
 //Bean's Fake Mouse for Good JS
-function B_func_getPageSize() {
-	var xScroll,yScroll;
-	if (window.innerHeight && window.scrollMaxY) {
-		xScroll = document.body.scrollWidth;
-		yScroll = window.innerHeight + window.scrollMaxY;
-	} else if (document.body.scrollHeight > document.body.offsetHeight) {
-		xScroll = document.body.scrollWidth;
-		yScroll = document.body.scrollHeight;
-	} else {
-		xScroll = document.body.offsetWidth;
-		yScroll = document.body.offsetHeight;
-	}
 
-	var windowWidth,windowHeight;
-	if (self.innerHeight) {
-		windowWidth = self.innerWidth;
-		windowHeight = self.innerHeight;
-	} else if (document.documentElement && document.documentElement.clientHeight) {
-		windowWidth = document.documentElement.clientWidth;
-		windowHeight = document.documentElement.clientHeight;
-	} else if (document.body) {
-		windowWidth = document.body.clientWidth;
-		windowHeight = document.body.clientHeight;
-	}
 
-	var pageWidth,pageHeight
-	pageHeight = ( (yScroll < windowHeight) ? windowHeight : yScroll );
-	pageWidth = ( (xScroll < windowWidth) ? windowWidth : xScroll );
-
-	return {"pageX":pageWidth,"pageY":pageHeight,"winX":windowWidth,"winY":windowHeight};
-}
-
-function B_func_setDegree(obj,deg){  
-	obj.style.webkitTransform="rotate("+deg+"deg)";
-	obj.style.MozTransform="rotate("+deg+"deg)";
-	obj.style.msTransform="rotate("+deg+"deg)";
-	obj.style.OTransform="rotate("+deg+"deg)";
-	obj.style.transform="rotate("+deg+"deg)";
-}
-
-function B_func_setSizePX(obj,sizeX,sizeY){
-	obj.width=obj.style.minWidth=obj.style.maxWidth=sizeX+"px";
-	obj.height=obj.style.minHeight=obj.style.maxHeight=sizeY+"px";
-}
-
-function B_func_fakeMouseEvent(B_contentWin,iClientX,iClientY,mouseEvent){
-	//if in iframes
-	//var B_contentWin = window.frames["contentFrame"];
-	var getObject=B_contentWin.document.elementFromPoint(iClientX, iClientY);
-	//alert("Clicked at: "+getObject.tagName);
-	if (getObject.tagName.toUpperCase().search(/FRAME/)!=-1) {	//deal with frames...
-		//for (int i=0;i<window.frames.length;i++) {
-			//if (window.self!=window.frames[i]) B_func_fakeMouseEvent(window.frames[i],iClientX-getObject.offset,iClientY,mouseEvent);
-		//}
-		alert("Frames are tricky...Still Dealing with it...");
-		return;
-	}
-	//same window frame
-	//var getObject=document.elementFromPoint(iClientX, iClientY);
-	if (!getObject) return;
-	//if (mouseEvent=="click") alert("[B_func_fakeMouseEvent] GET:"+iClientX+"|"+iClientY+"|"+mouseEvent);
-	if (document.createEventObject) { //For IE
-		oEvent = document.createEventObject();
-		oEvent.clientX = iClientX;
-		oEvent.clientY = iClientY;
-		getObject.fireEvent("on"+mouseEvent, oEvent);    
-	} else {
-		oEvent = document.createEvent("MouseEvents");
-		oEvent.initMouseEvent(mouseEvent, true, true, document.defaultView, 0, 0, 0, iClientX, iClientY, false, false, false, false, 0, null); 
-		getObject.dispatchEvent(oEvent);
+function B_func_setDegree(){
+	var key_transform;
+	// will init upon first call
+	return function (element, rotate_degree) {
+		if (!key_transform) {
+			if (element.style.webkitTransform != null) key_transform = 'webkitTransform';
+			if (element.style.MozTransform != null) key_transform = 'MozTransform';
+			if (element.style.msTransform != null) key_transform = 'msTransform';
+			if (element.style.OTransform != null) key_transform = 'OTransform';
+			if (element.style.transform != null) key_transform = 'transform';
+		}
+		element.style[key_transform] = 'rotate(' + rotate_degree + 'deg)';
 	}
 }
+
+function B_func_setElementSize(element, size_x, size_y) {
+	element.style.width = element.style.minWidth = element.style.maxWidth = size_x + "px";
+	element.style.height = element.style.minHeight = element.style.maxHeight = size_y + "px";
+	element.width = size_x;
+	element.height = size_y;
+}
+
+function B_func_fakeMouseEvent(view, client_x, client_y, type){
+	var element = Dr.getElementAtClient(view, client_x, client_y);
+	if (element) {
+		Dr.simulateClientClick(type, element, view, client_x, client_y);
+	}
+}
+
 
 
 //creator func
