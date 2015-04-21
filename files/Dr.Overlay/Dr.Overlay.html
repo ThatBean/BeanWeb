@@ -3,17 +3,33 @@
 
 <head>
 	<meta charset="UTF-8">
-	<meta name="title" content="Welcome to ThatBean.com!">
-	<meta name="keywords" content="Bean,Dr.Eames,thatbean,DrEames,Personal">
+	<meta name="title" content="Welcome to Dr.js!">
+	<meta name="keywords" content="Dr.js,Bean,Dr.Eames,thatbean,DrEames,Personal">
 	<meta name="description" content="This is a web build by Bean/Dr.Eames">
 	
 	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
 	
 	<title>Welcome to ThatBean.com!</title>
 	
-    <link href="favicon.png" rel="shortcut icon">
-	<link href="bean_common.css" rel="stylesheet" type="text/css">
+	<style>
+		#page-header td, #page-footer td { text-align: left; padding: 0.1em; border-left: 1em solid #222; border-right: 1em solid #222; }
+		canvas { background-color: #ddd; margin: 0; padding: 0; border: 0; }
+		#Spec { overflow-x: auto; }
+		b { color: #900; }
+	</style>
 	
+    <link href="../../favicon.png" rel="shortcut icon">
+	<link href="../../bean_common.css" rel="stylesheet" type="text/css">
+	<script src="../../Dr.js"></script>
+	<script type="text/javascript">
+		Dr.loadScriptByList([
+			'../../Dr.base_module.js',
+			'overlay.js',
+		], function () {
+			Dr.log("All script loaded");
+		})
+	</script>
+	<!-- -->
 	<script type="text/javascript">
 		var site_url = "thatbean.com";
 		
@@ -30,7 +46,7 @@
 		}
 		
 		function set_body_padding () {
-			var body = document.getElementsByTagName("body")[0];
+			var body = Dr.getBody();
 			
 			var page_header = document.getElementById("page-header");
 			var padding_header = (page_header ? page_header.offsetHeight : 0) + "px";
@@ -47,7 +63,7 @@
 		function scale_canvas() {
 			var devicePixelRatio = window.devicePixelRatio || 1;
 			var canvas = document.getElementById('Dr.Canvas');
-			var body = document.getElementsByTagName("body")[0];
+			var body = Dr.getBody();
 			var minSize = Math.floor(body.offsetWidth * 0.9 / 10) * 10;
 			
 			var width = Math.min(minSize, canvas.width || (parseInt(canvas.style.width)));
@@ -93,69 +109,64 @@
 				ctx.fillStyle = "#" + intStr(255 * left_ratio, 16) + intStr(255 * left_ratio, 16) + intStr(255 * left_ratio, 16);
 				ctx.fillText("Hello Canvas World!", 0, canvas_size.pixel_height * left_ratio);
 			}
+			
+			var FPS = Dr.Get("FPS")
+			var fps = new FPS(function (averageFPS, currentFPS) {
+				document.getElementById("FPS").innerHTML = "AvgFPS:" + averageFPS.toFixed(2) + ", CurFPS:" + currentFPS.toFixed(2);
+			})
+			Dr.UpdateLoop.add(function (delta_time) { 
+				fps.FPS(); 
+				return true;
+			})
+			
+			var TagLog = Dr.Get("TagLog")
+			var tag_log = new TagLog(function (log_text) {
+				document.getElementById("Log").innerHTML = log_text;
+			})
+			Dr.UpdateLoop.add(function (delta_time) { 
+				tag_log.Log("update log " + Dr.now()); 
+				return true;
+			})
+			
+			Dr.UpdateLoop.start();
+		}
+		
+		function set_spec () {
+			var Spec = document.getElementById("Spec");
+			var text_list = [
+				['cordova', (typeof cordova != 'undefined')],
+				['devicePixelRatio', window.devicePixelRatio],
+				['top.location.href', top.location.href],
+				['window.location.href', window.location.href],
+				['Dr.getViewportSize()', 'width, height: (' + Dr.getViewportSize().width + ', ' + Dr.getViewportSize().height + ')'],
+				['Dr.getPageSize()', 'width, height: (' + Dr.getPageSize().width + ', ' + Dr.getPageSize().height + ')'],
+			];
+			var result_line = '<table class="align-center font-small" style="background-color: #ddd;">';
+			for (var i in text_list) {
+				var key = text_list[i][0];
+				var value = text_list[i][1];
+				var line = '<tr><td><b>' + key + '</b></td><td>' + value + '</td></tr>';
+				result_line += line;
+			}
+			result_line += '</table>';
+			//document.write(result_line);
+			Spec.innerHTML = result_line;
 		}
 		
 		window.onload = function () {
 			set_body_padding();
 			scale_canvas();
 			set_canvas_script();
+			set_spec();
 		}
 	</script>
-
-	<style>
-		#page-header td, #page-footer td { text-align: left; padding: 0.1em; border-left: 1em solid #222; border-right: 1em solid #222; }
-		canvas { background-color: #ddd; margin: 0; padding: 0; border: 0; }
-	</style>
 </head>
 
 <body>
 	<div id="page-header" class="fix-top">
-		<table class="align-center">
-			<tr>
-				<td rowspan=2>
-					<b class="font-big">Goto:</b>
-				</td>
-				<td>
-					<button onclick="switch_to_url('html/index.html')"><b>HTML</b></button>
-				</td>
-				<td>
-					<button onclick="switch_to_url('files/')"><b>Files</b></button>
-				</td>
-				<td>
-					<button onclick="switch_to_url('files/Dr.js/Dr.html')"><b>Dr.js</b></button>
-				</td>
-				<td>
-					<button onclick="switch_to_url('files/Dr.Overlay/Dr.Overlay.html')"><b>Dr.Overlay.js</b></button>
-				</td>
-				<td>
-					<button onclick="switch_to_url('files/Dr.Pixel3D/Dr.Pixel3D_demo.html')"><b>Dr.Pixel3D.js</b></button>
-				</td>
-				<td>
-					<button onclick="switch_to_url('files/Dr.Actor/Dr.Actor_demo.html')"><b>Dr.Actor.js</b></button>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<b class="font-small"> - the web site</b>
-				</td>
-				<td>
-					<b class="font-small"> - something useful for download</b>
-				</td>
-				<td>
-					<b class="font-small"> - test for Dr.js</b>
-				</td>
-				<td>
-					<b class="font-small"> - test for Dr.js + Dr.Overlay</b>
-				</td>
-				<td>
-					<b class="font-small"> - test for Dr.js + Dr.Pixel3D</b>
-				</td>
-				<td>
-					<b class="font-small"> - test for Dr.js + Dr.Actor</b>
-				</td>
-			</tr>
-		</table>
+		<p class="text-center">The test Html of Dr.js</p>
 	</div>
+	
 	<div id="page-footer" class="fix-bottom">
 		<table class="align-center">
 			<tr>
@@ -172,25 +183,24 @@
 	</div>
 	
 	<div id="page-content" class="align-center text-center">
-			<br />
-			<b class="font-biggest">Welcome to <span class="font-big">ThatBean.com!</span></b>
-			<hr />
-			
-			<p class="width-75 align-center text-center">
-				Welcome! It's always good to have a visitor!<br />
-				This site is under construction, temporarily or permanently.<br />
-				So, what should I say?<br />
-			</p>
-			
-			<br />
-			<canvas id="Dr.Canvas" class="pixelated" width=640 height=480 class="align-center text-center">This should be a canvas element. If you're seeing this, consider upgrade your browser</canvas>
-			<br />
-			<br />
-			
-			<hr />
-			<b>
-				Welcome to the entry of <a href="index.html"><b>thatbean.com</b></a>
-			</b>
+		<br />
+		
+		<canvas id="Dr.Canvas" class="pixelated" width=640 height=480 class="align-center text-center">
+			This should be a canvas element. If you're seeing this, consider upgrade your browser
+		</canvas>
+		
+		<p id="FPS">
+			FPS here
+		</p>
+		<p id="Log">
+			Log here
+		</p>
+		<div id="Spec">
+			Spec here
+		</div>
+		
+		<button onclick="var size = Dr.getViewportSize(); alert('width, height: (' + size.width + ', ' + size.height + ')')">getViewportSize</button>
+		<button onclick="var size = Dr.getPageSize(); alert('width, height: (' + size.width + ', ' + size.height + ')')">getPageSize</button>
 	</div>
 <br />
 </body>

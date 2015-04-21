@@ -149,8 +149,8 @@
 				['devicePixelRatio', window.devicePixelRatio],
 				['top.location.href', top.location.href],
 				['window.location.href', window.location.href],
-				['Dr.Get("Toolbox").getViewportSize()', 'width, height: (' + Dr.Get("Toolbox").getViewportSize().width + ', ' + Dr.Get("Toolbox").getViewportSize().height + ')'],
-				['Dr.Get("Toolbox").getPageSize()', 'width, height: (' + Dr.Get("Toolbox").getPageSize().width + ', ' + Dr.Get("Toolbox").getPageSize().height + ')'],
+				['Dr.getViewportSize()', 'width, height: (' + Dr.getViewportSize().width + ', ' + Dr.getViewportSize().height + ')'],
+				['Dr.getPageSize()', 'width, height: (' + Dr.getPageSize().width + ', ' + Dr.getPageSize().height + ')'],
 			];
 			var result_line = '<table class="align-center font-small" style="background-color: #ddd;">';
 			for (var i in text_list) {
@@ -210,8 +210,8 @@
 			Spec here
 		</div>
 		
-		<button onclick="var size = Dr.Get('Toolbox').getViewportSize(); alert('width, height: (' + size.width + ', ' + size.height + ')')">getViewportSize</button>
-		<button onclick="var size = Dr.Get('Toolbox').getPageSize(); alert('width, height: (' + size.width + ', ' + size.height + ')')">getPageSize</button>
+		<button onclick="var size = Dr.getViewportSize(); alert('width, height: (' + size.width + ', ' + size.height + ')')">getViewportSize</button>
+		<button onclick="var size = Dr.getPageSize(); alert('width, height: (' + size.width + ', ' + size.height + ')')">getPageSize</button>
 	</div>
 <br />
 </body>

@@ -333,7 +333,49 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 					element.style[key_transform] = 'rotate(' + rotate_degree + 'deg)';
 				}
 			})(),
-			
+			getViewportSize: function () {
+				var client_width, client_height;
+				if (Dr.window.innerHeight) {
+					client_width = Dr.window.innerWidth;
+					client_height = Dr.window.innerHeight;
+				} else if (Dr.document.documentElement && Dr.document.documentElement.clientHeight) {
+					client_width = Dr.document.documentElement.clientWidth;
+					client_height = Dr.document.documentElement.clientHeight;
+				} else if (Dr.document.body) {
+					client_width = Dr.document.body.clientWidth;
+					client_height = Dr.document.body.clientHeight;
+				}
+				
+				return {
+					width: client_width,
+					height: client_height,
+				};
+			},
+			getPageSize: function () {
+				var body = Dr.getBody();
+				var scroll_x, scroll_y;
+				if (Dr.window.innerHeight && Dr.window.scrollMaxY) {
+					scroll_x = Dr.getBody().scrollWidth;
+					scroll_y = Dr.window.innerHeight + Dr.window.scrollMaxY;
+				} else if (body.scrollHeight > body.offsetHeight) {
+					scroll_x = body.scrollWidth;
+					scroll_y = body.scrollHeight;
+				} else {
+					scroll_x = body.offsetWidth;
+					scroll_y = body.offsetHeight;
+				}
+				
+				viewport_size = Dr.getViewportSize();
+				
+				var page_width, page_height;
+				page_height = ( (scroll_y < viewport_size.height) ? viewport_size.height : scroll_y );
+				page_width = ( (scroll_x < viewport_size.width) ? viewport_size.width : scroll_x );
+				
+				return {
+					width: page_width,
+					height: page_height,
+				};
+			},
 			
 			//window related
 			onNextScreenUpdate: function (callback) {
@@ -521,6 +563,9 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 	Dr.createOffscreenCanvas = _required_native.createOffscreenCanvas;
 	Dr.createStyle = _required_native.createStyle;
 	Dr.setStyleTransformDegree = _required_native.setStyleTransformDegree;
+	Dr.getViewportSize = _required_native.getViewportSize;
+	Dr.getPageSize = _required_native.getPageSize;
+	
 	
 	//window related
 	Dr.onNextScreenUpdate = _required_native.onNextScreenUpdate;
