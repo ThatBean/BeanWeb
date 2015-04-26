@@ -26,7 +26,10 @@
 			'../../Dr.base_module.js',
 			'overlay.js',
 		], function () {
+			Dr.LoadAll();
 			Dr.log("All script loaded");
+			
+			Dr.Get('OverlayCursor').create();
 		})
 	</script>
 	<!-- -->
@@ -41,6 +44,7 @@
 	</script>
 	
 	<script type="text/javascript"> 
+		
 		function switch_to_url (target_url) {
 			window.location.href = target_url;
 		}

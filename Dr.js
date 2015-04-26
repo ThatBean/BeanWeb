@@ -216,7 +216,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 			getElementAtClient: function (view, client_x, client_y) {
 				var element = view.document.elementFromPoint(client_x, client_y);	//view should be a window
 				//alert("Clicked at: "+getObject.tagName);
-				if (element.tagName.toUpperCase().search(/FRAME/) != -1) {	//deal with frames...
+				if (element && element.tagName.toUpperCase().search(/FRAME/) != -1) {	//deal with frames...
 					//for (int i=0;i<window.frames.length;i++) {
 						//if (window.self!=window.frames[i]) B_func_fakeMouseEvent(window.frames[i],client_x-getObject.offset,client_y,mouseEvent);
 					//}
@@ -510,8 +510,23 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 	};
 	
 	Dr.window.addEventListener(("onorientationchange" in window ? "orientationchange" : "resize"), function (event) {
-		Dr.Event.emit("WINDOW_RESIZE", event);
+		Dr.Event.emit('WINDOW_RESIZE', event);
 	});
+	
+	Dr.window.addEventListener('load', function (event) {
+		Dr.WINDOW_LOADED = true;
+		Dr.Event.emit('WINDOW_LOADED', event);
+	});
+	
+	Dr.afterWindowLoaded = function (callback) {
+		if (Dr.WINDOW_LOADED) {
+			callback('WINDOW_LOADED');
+		}
+		else {
+			Dr.Event.subscribe('WINDOW_LOADED', callback);
+		}
+	}
+	
 	
 	//time related
 	Dr.startTimestamp = _required_native.getUTCTimeStamp();

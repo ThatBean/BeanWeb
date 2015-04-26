@@ -1,9 +1,9 @@
 //Bean's Fake Mouse for Good JS
 
 
-
-Dr.Declare('OverlayMouse', 'class');
-Dr.Implement('OverlayMouse', function (global, module_get) {
+/*
+Dr.Declare('OverlayBase', 'prototype_class');
+Dr.Implement('OverlayBase', function (global, module_get) {
 	var Module = function () {
 		//
 	};
@@ -13,11 +13,6 @@ Dr.Implement('OverlayMouse', function (global, module_get) {
 	Module.slot_status = ActorSlotPool.status;
 	
 	Module.prototype.init = function (owner) {
-		this._owner = owner;
-		this._state_data = {};	//map: tag - state, all available state
-		this._slot_pool = ActorSlotPool.create();	//slot for state exclude (priority & slot)
-		this._upper_slot_pool = null;
-		this.reset();
 	};
 	
 	Module.prototype.getSlotPool = function () { return this._slot_pool; };
@@ -27,398 +22,418 @@ Dr.Implement('OverlayMouse', function (global, module_get) {
 	return Module;
 });
 
+*/
 
+//to use
+//Dr.Get('OverlayCursor').create();
 
-
-
-
-
-
-
-
-
-function quickSetElementSize(element, size_x, size_y) {
-	element.style.width = element.style.minWidth = element.style.maxWidth = size_x + "px";
-	element.style.height = element.style.minHeight = element.style.maxHeight = size_y + "px";
-	element.width = size_x;
-	element.height = size_y;
-}
-function quickCreateElement(eleParent,eleType,eleId,eleText) {
-	var newEleNode = document.createElement(eleType);
-	if (eleText) {
-		var newEleText = document.createTextNode(eleText);
-		newEleNode.appendChild(newEleText);
-	}
-	newEleNode.id = eleId;
-	eleParent.appendChild(newEleNode);
-}
-
-function quickCreateCssText(config, config) {
-	var css_text_array = [,
-		'#Bean_Cursor {',
-			'position:fixed; margin:0; padding:0;',
-			'right:',config.CursorMargin+'px;',
-			'bottom:',config.CursorMargin+'px;',
-			'z-index:2090;',
-			
-			'font-size:',config.CursorFont+'px;',
-			'line-height:',config.CursorRad+'px;',
-			'font-weight:bold;',
-			'text-align:center;',
-			'color:#FFF;',
-			
-			'width:',config.CursorRad+'px;',
-			'height:',config.CursorRad+'px;',
-			//+'border:5px solid;',
-			'border-radius:',config.CursorRad+'px;',
-			'border-style:none;',
-			
-			'border:#427AC7;',
-			'background-color: #5091E9;',
-		'}',
-		
-		'#Bean_Cursor:hover {',
-			'cursor:pointer;',
-			'border:#427AC7;',
-			'background-color:#436EEE;',
-		'}',
-		
-		'#Bean_Cursor_bg {',
-			'position:fixed; margin:0; padding:0;',
-			'right:',(config.CursorMargin-(config.CursorBgRad-config.CursorRad)/2)+'px;',
-			'bottom:',(config.CursorMargin-(config.CursorBgRad-config.CursorRad)/2)+'px;',
-			'z-index:2080;',
-			
-			'font-size:',config.CursorBgFont+'px;',
-			'line-height:',config.CursorBgRad+'px;',
-			'font-weight:bold;',
-			'text-align:center;',
-			'color:#FFF;',
-			
-			'width:',config.CursorBgRad+'px;',
-			'height:',config.CursorBgRad+'px;',
-			'border-radius:',config.CursorBgRad+'px ',config.CursorBgRad+'px ',config.CursorBgRadR/*right corner*/+'px ',config.CursorBgRadL/*left corner*/+'px;',
-			'border-style:none;',
-			
-			'background-color: #505050;',
-		'}',
-		
-		'#Bean_Cursor_Marker {',
-			'position:fixed; margin:0; padding:0;',
-			'display:none;',
-			'z-index:2100;',
-			'width:',config.MarkerRad+'px;',
-			'height:',config.MarkerRad+'px;',
-			'border-radius:',config.MarkerRad+'px;',
-			'border:',config.MarkerBorder+'px solid ',config.MarkerColor,';',
-		'}',
-		
-		'#Bean_Menu {',
-			'position:fixed; padding:0;',
-			'display:none;',
-			'z-index:2080;',
-			'overflow-x:auto;',
-			
-			'font-size:',config.MenuFont+'px;',
-			'line-height:',config.MenuFontHeight+'px;',
-			'text-align:center;',
-			'color:#FFF;',
-			
-			'left:50%;',
-			'top:50%;',
-			
-			'filter:alpha(opacity=90);',
-			'opacity:0.9;',
-			
-			'width:',config.MenuX+'px;',
-			'height:',config.MenuY+'px;',
-			'margin-left:',-config.MenuX/2+'px;',
-			'margin-top:',-config.MenuY/2+'px;',
-			
-			'border-radius:',config.MenuRad+'px;',
-			'border:',config.MenuBorder+'px solid ',config.MenuBorderColor,';',
-			'background-color:',config.MenuBgColor,';',
-		'}'
-	];
-	
-	var css_text = css_text_array.join(' ');
-	Dr.log(css_text);
-	return css_text;
-}
-
-
-window.addEventListener('load',function(){
-	var viewport_size = Dr.getViewportSize();
-	
-	//create CSS
-	var config = {
-		"CursorRad":80,
-		"CursorFont":20,
-		"CursorMargin":15,
-		
-		"CursorBgFont":18,
-		"CursorBgRad":100,
-		"CursorBgRadL":100,
-		"CursorBgRadR":30,
-		"CursorOffset":10,
-		
-		"MarkerRad":6,
-		"MarkerOffset":5,
-		"MarkerBorder":3,
-		
-		"MoveDet":20,
-		
-		"MenuX":Math.min(500, viewport_size.width * 0.8),
-		"MenuY":Math.min(500, viewport_size.height * 0.8),
-		"MenuRad":10,
-		"MenuBorder":5,
-		"MenuFont":20,
-		"MenuFontHeight":30,
-		
-		//color
-		
-		"MarkerColor":"#FF0000",
-		"MenuBorderColor":"#436EEE",
-		"MenuBgColor":"#222222",
+Dr.Declare('OverlayCursor', 'class');
+Dr.Implement('OverlayCursor', function (global, module_get) {
+	var Module = function () {
+		//
 	};
 	
-	Dr.createStyle(quickCreateCssText(config, config));
-	
-	var body = Dr.getBody();
-	//create Cursor Element
-	quickCreateElement(body,"div","Bean_Cursor","MENU");
-	quickCreateElement(body,"div","Bean_Cursor_bg","Bean's");
-	quickCreateElement(body,"div","Bean_Cursor_Marker");
-	//create Menu Element 
-	quickCreateElement(body,"div","Bean_Menu");
-	
-	//the cursor offset
-	var B_cursor = document.getElementById('Bean_Cursor');
-	var B_marker = document.getElementById('Bean_Cursor_Marker');
-	var B_cursor_bg = document.getElementById('Bean_Cursor_bg');
-	var B_menu = document.getElementById('Bean_Menu');
-	
-	B_menu.innerHTML="<br /><b>Bean's Fake Mouse for Good</b>"
-	+"<br />"
-	+"<br />[To Click]<br />Drag&Release"
-	+"<br />[To Cancel]<br />Drag&Drag Back&Release"
-	+"<br />[To Menu]<br />Just Click(You know)"
-	+"<br />"
-	+"<br /><button>Exit</button>"
-	+"<br />"
-	+"<br />Mostly for Idea Showing<br />"
-	+"<br /><b>ThatBean.com</b><sup>ver 6.0</sup>"
-	+"<br />";
-	
-	var triggered=false;
-	
-	var B_cursor_width=config.CursorRad/2;
-	var B_marker_width=config.MarkerRad/2;
-	
-																			//document.getElementById("pageinfo_1").innerHTML="page:"+pageinfo.pageX+"x"+pageinfo.pageY+" | win:"+pageinfo.winX+"x"+pageinfo.winY+" | DPR:"+window.devicePixelRatio+" | devDPI:"+screen.deviceXDPI+"/"+screen.deviceYDPI+" | logDPI:"+screen.logicalXDPI+"/"+screen.logicalYDPI;
-																			//document.getElementById("pageinfo_2").innerHTML=navigator.userAgent;
-	var B_cur_max_deg=0.1;
-																			//document.getElementById("pageinfo_1").innerHTML+="|MX/MY:"+B_cur_max_X+"-"+B_cur_min_X+"|"+B_cur_max_Y+"-"+B_cur_min_Y+"|"+B_cursor_width;
-	var R_offset=config.CursorOffset;
-	var R_offset_M=B_cursor_width*Math.SQRT2+B_marker_width+config.MarkerOffset;
+	Module.prototype.init = function () {
+		this.is_triggered = false;
+		this.action_state = '';
+		this.config = this.get_config();
+		this.element_map = this.init_element();
 		
-																			//document.getElementById("pageinfo_2").innerHTML+="|x/y org="+X_org+"|"+Y_org;
-	var B_cur_max_X,
-		B_cur_min_X,
-		B_cur_max_Y,
-		B_cur_min_Y,
-		X_org,
-		Y_org;
+		this.set_element_style(this.config, this.element_map);
+		this.calculate_position();
+		this.init_event();
+	};
 	
-	function win_resize(){
-		//get page size info
-		viewport_size = Dr.getViewportSize();
-		//B_cur_max_X=B_cursor.offsetLeft+B_cursor.offsetWidth-2*B_cursor_width;
-		//B_cur_min_X=viewport_size.width-B_cur_max_X-2*B_cursor_width;
-		//B_cur_max_Y=B_cursor.offsetTop+B_cursor.offsetWidth-2*B_cursor_width;
-		//B_cur_min_Y=viewport_size.height-B_cur_max_Y-2*B_cursor_width;
-		B_cur_max_X=B_cursor.offsetLeft+B_cursor_width;
-		B_cur_min_X=viewport_size.width-B_cur_max_X-2*B_cursor_width;
-		B_cur_max_Y=B_cursor.offsetTop+B_cursor.offsetWidth//-2*B_cursor_width;
-		B_cur_min_Y=viewport_size.height-B_cur_max_Y//-2*B_cursor_width;
-		X_org=B_cursor.offsetLeft+B_cursor.offsetWidth/2;
-		Y_org=B_cursor.offsetTop+B_cursor.offsetHeight/2;
+	Module.prototype.clear = function () {
+		for (var element_id in this.element_map) {
+			Dr.log('removed', element_id);
+			var element = this.element_map[element_id];
+			element.parentNode.removeChild(element);
+		}
+	};
+	
+	
+	Module.prototype.get_config = function () {
+		var viewport_size = Dr.getViewportSize();
+		
+		//create CSS
+		var config = {
+			'CursorRad':40,
+			'CursorOffset':10,
+			'CursorFont':20,
+			'CursorMargin':15,
+			
+			'CursorBgFont':18,
+			'CursorBgRad':50,
+			'CursorBgRadL':50,
+			'CursorBgRadR':30,
+			
+			'CursorTipRad':6,
+			'CursorTipOffset':60,
+			'CursorTipBorder':3,
+			
+			'MoveThreshold':30,
+			
+			'MenuX':Math.min(500, viewport_size.width * 0.8),
+			'MenuY':Math.min(500, viewport_size.height * 0.8),
+			'MenuRad':10,
+			'MenuBorder':5,
+			'MenuFont':20,
+			'MenuFontHeight':30,
+			
+			//color
+			
+			'CursorTipColor':'#FF0000',
+			'MenuBorderColor':'#436EEE',
+			'MenuBgColor':'#222222',
+		};
+		
+		return config;
 	}
 	
-	win_resize();
-	//window.addEventListener('resize',win_resize,false);
-	//window.addEventListener('orientationchange',win_resize,false);
-
 	
-	
-	
-	function cur_update(coors,mouseEvent){
-		var tempA=Math.atan2((coors.y-Y_org),(coors.x-X_org));
-		
-		var R_offsetX=Math.cos(tempA);
-		var R_offsetY=Math.sin(tempA);
-		
-		Dr.log(tempA, R_offsetX, R_offsetY);
-		
-		B_cursor.style.left=Math.min(Math.max(coors.x-B_cursor_width+R_offset*R_offsetX,B_cur_min_X),B_cur_max_X)+"px";
-		B_cursor.style.top=Math.min(Math.max(coors.y-B_cursor_width+R_offset*R_offsetY,B_cur_min_Y),B_cur_max_Y)+"px";
-		
-		//B_marker
-		B_marker.style.left=parseInt(B_cursor.style.left)+B_cursor_width-B_marker_width+R_offset_M*Math.cos(tempA)+"px";
-		B_marker.style.top=parseInt(B_cursor.style.top)+B_cursor_width-B_marker_width+R_offset_M*Math.sin(tempA)+"px";
-		
-		if (mouseEvent && mouseEvent != "") {
-			var type = mouseEvent;
-			var view = Dr.window;
-			var client_x = parseInt(B_marker.style.left)+B_marker_width;
-			var client_y = parseInt(B_marker.style.top)+B_marker_width;
+	Module.prototype.set_element_style = function (config, element_map) {
+		var element_style_config = {
+			ELEMENT_CURSOR: {
+				'position': 'fixed',
+				'margin': 0,
+				'padding': 0,
+				'right': config.CursorMargin + 'px',
+				'bottom': config.CursorMargin + 'px',
+				'z-index': 2090,
+				
+				'font-size': config.CursorFont + 'px',
+				'line-height': config.CursorRad * 2 + 'px',
+				'font-weight': 'bold',
+				'text-align': 'center',
+				'color': '#FFF',
+				
+				'cursor': 'pointer',
+				
+				'width': config.CursorRad * 2 + 'px',
+				'height': config.CursorRad * 2 + 'px',
+				
+				'border-radius': config.CursorRad + 'px',
+				'border-style': 'none',
+				
+				'border': '#427AC7',
+				'background-color': '#5091E9',
+			},
 			
-			B_marker.style.display="none";
-			var element = Dr.getElementAtClient(view, client_x, client_y);
-			B_marker.style.display="block";
-			if (element) {
-				Dr.simulateClientClick(type, element, view, client_x, client_y);
+			
+			ELEMENT_CURSOR_BG: {
+				'position': 'fixed',
+				'margin': 0,
+				'padding': 0,
+				'right': (config.CursorMargin - (config.CursorBgRad - config.CursorRad)) + 'px',
+				'bottom': (config.CursorMargin - (config.CursorBgRad - config.CursorRad)) + 'px',
+				'z-index': 2080,
+				
+				'font-size': config.CursorBgFont + 'px',
+				'line-height': config.CursorBgRad * 2 + 'px',
+				'font-weight': 'bold',
+				'text-align': 'center',
+				'color': '#FFF',
+				
+				'width': config.CursorBgRad * 2 + 'px',
+				'height': config.CursorBgRad * 2 + 'px',
+				'border-radius': config.CursorBgRad + 'px ' + config.CursorBgRad + 'px ' + config.CursorBgRadR + 'px ' + config.CursorBgRadL + 'px',
+				'border-style': 'none',
+				
+				'background-color': '#505050',
+			},
+			
+			ELEMENT_CURSOR_TIP: {
+				'position': 'fixed',
+				'margin': 0,
+				'padding': 0,
+				'display': 'none',
+				'z-index': 2100,
+				'width': config.CursorTipRad + 'px',
+				'height': config.CursorTipRad + 'px',
+				'border-radius': config.CursorTipRad + 'px',
+				'border': config.CursorTipBorder + 'px solid ' + config.CursorTipColor,
+			},
+			
+			ELEMENT_MENU: {
+				'position': 'fixed',
+				'padding': 0,
+				'display': 'none',
+				'z-index': 2080,
+				'overflow-x': 'auto',
+				
+				'font-size': config.MenuFont + 'px',
+				'line-height': config.MenuFontHeight + 'px',
+				'text-align': 'center',
+				'color': '#FFF',
+				
+				'left': '50%',
+				'top': '50%',
+				
+				'filter': 'alpha(opacity=90)',
+				'opacity': 0.9,
+				
+				'width': config.MenuX + 'px',
+				'height': config.MenuY + 'px',
+				'margin-left': - config.MenuX * 0.5 + 'px',
+				'margin-top': - config.MenuY * 0.5 + 'px',
+				
+				'border-radius': config.MenuRad + 'px',
+				'border': config.MenuBorder + 'px solid ' + config.MenuBorderColor,
+				'background-color': config.MenuBgColor,
+			},
+		};
+		
+		for (var tag_name in element_style_config) {
+			var element_style = element_map[tag_name].style;
+			var style_list = element_style_config[tag_name];
+			for (style_name in style_list) {
+				element_style[style_name] = style_list[style_name];
 			}
 		}
-		Dr.setStyleTransformDegree(B_cursor,(tempA*180/Math.PI + 180 - 45));
 	}
 	
-	var touch_orgX, touch_orgY;
-	var away;
-	function cur_draw(coors){
+	
+	Module.prototype.init_element = function () {
+		var body = Dr.getBody();
+		
+		var create_element = function (parent, type, id, innerHTML) {
+			var element = document.createElement(type);
+			element.innerHTML = innerHTML || '';
+			element.id = id;
+			parent.appendChild(element);
+			return element;
+		}
+		
+		var Menu_innerHTML = '<br /><b>Bean\'s Fake Mouse for Good</b>'
+			+ '<br />'
+			+ '<br />[To Click]<br />Drag&Release'
+			+ '<br />[To Cancel]<br />Drag&Drag Back&Release'
+			+ '<br />[To Menu]<br />Just Click(You know)'
+			+ '<br />'
+			+ '<br /><button>Close Menu</button>'
+			+ '<br /><button>Exit Mouse</button>'
+			+ '<br />'
+			+ '<br /><b>ThatBean.com</b><sup>ver 6.0</sup>'
+			+ '<br />';
+		
+		return {
+			ELEMENT_CURSOR: create_element(body,'div','ELEMENT_CURSOR','MENU'),
+			ELEMENT_CURSOR_BG: create_element(body,'div','ELEMENT_CURSOR_BG','Bean\'s'),
+			ELEMENT_CURSOR_TIP: create_element(body,'div','ELEMENT_CURSOR_TIP'),
+			ELEMENT_MENU: create_element(body,'div','ELEMENT_MENU', Menu_innerHTML),
+		};
+	}
+	
+	
+	Module.prototype.calculate_position = function () {
+		//get page size info
+		//viewport_size = Dr.getViewportSize();
+		var cursor_offset_left = this.element_map.ELEMENT_CURSOR.offsetLeft;
+		var cursor_offset_top = this.element_map.ELEMENT_CURSOR.offsetTop;
+		
+		this.cursor_offset_left_max = cursor_offset_left + this.config.CursorRad;
+		this.cursor_offset_left_min = this.config.CursorOffset;
+		this.cursor_offset_top_max = cursor_offset_top + this.config.CursorRad;
+		this.cursor_offset_top_min = this.config.CursorOffset;
+		this.cursor_center_left = cursor_offset_left + this.config.CursorRad;
+		this.cursor_center_top = cursor_offset_top + this.config.CursorRad;
+	}
+	
+	
+	function clamp (value, min, max) {
+		return ( value < min ) ? min : ( ( value > max ) ? max : value );
+	}
+	
+	Module.prototype.action_update = function (x, y){
+		var rad = Math.atan2((y - this.cursor_center_top), (x - this.cursor_center_left));
+		var cos = Math.cos(rad);
+		var sin = Math.sin(rad);
+		//Dr.log(rad, cos, sin);
+		
+		var cursor_left = clamp(x + this.config.CursorOffset * cos - this.config.CursorRad, this.cursor_offset_left_min, this.cursor_offset_left_max);
+		var cursor_top = clamp(y + this.config.CursorOffset * sin - this.config.CursorRad, this.cursor_offset_top_min, this.cursor_offset_top_max);
+		
+		var cursor_tip_left = cursor_left + this.config.CursorRad - this.config.CursorTipRad + this.config.CursorTipOffset * cos;
+		var cursor_tip_top = cursor_top + this.config.CursorRad - this.config.CursorTipRad + this.config.CursorTipOffset * sin;
+		
+		this.element_map.ELEMENT_CURSOR.style.left = cursor_left + 'px';
+		this.element_map.ELEMENT_CURSOR.style.top = cursor_top + 'px';
+		
+		this.element_map.ELEMENT_CURSOR_TIP.style.left = cursor_tip_left + 'px';
+		this.element_map.ELEMENT_CURSOR_TIP.style.top = cursor_tip_top + 'px';
+		
+		Dr.setStyleTransformDegree(this.element_map.ELEMENT_CURSOR, (rad * 180 / Math.PI + 90));
+		
+		//Dr.log(cursor_left, cursor_top, '||', this.config.CursorTipOffset * cos, this.config.CursorTipOffset * sin, (rad * 180 / Math.PI + 180));
+	}
+	
+	Module.prototype.action_commit = function (event_type){
+		var view = Dr.window;
+		
+		var client_x = this.element_map.ELEMENT_CURSOR_TIP.offsetLeft + this.config.CursorTipRad;
+		var client_y = this.element_map.ELEMENT_CURSOR_TIP.offsetTop + this.config.CursorTipRad;
+		
+		this.element_map.ELEMENT_CURSOR_TIP.style.display='none';
+		var element = Dr.getElementAtClient(view, client_x, client_y);
+		this.element_map.ELEMENT_CURSOR_TIP.style.display='block';
+		
+		if (element) {
+			Dr.simulateClientClick(event_type, element, view, client_x, client_y);
+		}
+	}
+	
+	
+	Module.prototype.action_start = function (x, y, event){
 		event.preventDefault();
 		event.stopPropagation();
 		
-		if (!triggered) {
+		if (!this.is_active) {
 			//set reigger
-			triggered=true;
-			//show && move
-			win_resize();
-			touch_orgX=coors.x;
-			touch_orgY=coors.y;
-			away=0;
+			this.is_active = true;
+			this.is_away = false;
+			this.action_start_x = x;
+			this.action_start_y = y;
+			this.action_state = 'action_start';
 		}
-		//cur_update(coors,"");
-		//cur_update(coors,"mouseover");
 	}
 	
-	function cur_redraw(coors){
-		//check "swipe"
-		if (!triggered) return;
+	
+	Module.prototype.action_move = function (x, y, event){
+		if (!this.is_active) return;
 		event.preventDefault();
 		event.stopPropagation();
-		if ((touch_orgX-coors.x)<config.MoveDet && (touch_orgY-coors.y)<config.MoveDet) {
-			B_marker.style.display="none";
-			B_cursor.style.left="";//B_cursor_org_left;
-			B_cursor.style.top="";//B_cursor_org_top;
-			B_cursor.innerHTML=(away==1?"Cancel":"MENU");
-			return;
+		
+		//check 'swipe' minimum distance
+		if (Math.abs(this.cursor_center_left - x) + Math.abs(this.cursor_center_top - y) < this.config.MoveThreshold) {
+			this.element_map.ELEMENT_CURSOR_TIP.style.display = 'none';
+			this.element_map.ELEMENT_CURSOR.style.left = '';
+			this.element_map.ELEMENT_CURSOR.style.top = '';
+			this.element_map.ELEMENT_CURSOR.innerHTML = (this.is_away ? 'Cancel' : 'MENU');
+			this.action_state = (this.is_away ? 'action_cancel' : 'open_menu');
 		}
 		else {
-			away=1;
-			B_cursor.innerHTML="Click";
+			//show && move
+			this.is_away = true;
+			this.element_map.ELEMENT_CURSOR.innerHTML = 'Click';
+			this.element_map.ELEMENT_CURSOR_TIP.style.display = 'block';
+			this.action_update(x, y);
+			this.action_state = 'action_move';
 		}
-		//show && move
-		B_marker.style.display="block";
-		cur_update(coors,"");
-		//cur_update(coors,"mouseover");
 	}
 	
-	function cur_hide(coors){
+	Module.prototype.action_stop = function (event){
+		if (!this.is_active) return;
+		event.preventDefault();
+		event.stopPropagation();
+		
 		//clear trigger
-		if (triggered) {
-			event.preventDefault();
-			event.stopPropagation();
-			triggered=false;
-			
-			if (away==0) {
-				//alert("Menu, please!");
-				B_menu.style.display="block";
+		this.is_active = false;
+		
+		Dr.log(this.action_state);
+		switch (this.action_state) {
+			case 'action_start':
+			case 'open_menu':
+				this.element_map.ELEMENT_MENU.style.display = 'block';
+				break;
+			case 'action_cancel':
+				//nothing
+				break;
+			case 'action_move':
+				this.action_commit('click');
+				break;
+		}
+		
+		this.action_reset();
+	}
+	
+	Module.prototype.action_reset = function (){
+		this.element_map.ELEMENT_CURSOR_TIP.style.display = 'none';
+		this.element_map.ELEMENT_CURSOR.style.left = '';
+		this.element_map.ELEMENT_CURSOR.style.top = '';
+		this.element_map.ELEMENT_CURSOR.innerHTML = 'MENU';
+		Dr.setStyleTransformDegree(this.element_map.ELEMENT_CURSOR, 0);
+	}
+	
+	Module.prototype.init_event = function (){
+		
+		// create a function to pass touch events and coordinates to drawer
+		function getEventXY (event) {
+			if (event.targetTouches) {
+				return {
+					x: event.targetTouches[0].clientX,
+					y: event.targetTouches[0].clientY,
+				}
 			}
 			else {
-				if ((touch_orgX-coors.x)<config.MoveDet && (touch_orgY-coors.y)<config.MoveDet) {
-					//do nothing
-				}
-				else {
-					cur_update(coors,"click");
+				return {
+					x: event.clientX,
+					y: event.clientY,
 				}
 			}
-			
-			//clear
-			B_marker.style.display="none";
-			//B_cursor.style.display="block";
-			//reset Cursor
-			B_cursor.style.left="";//B_cursor_org_left;
-			B_cursor.style.top="";//B_cursor_org_top;
-			Dr.setStyleTransformDegree(B_cursor,0);
-			B_cursor.innerHTML="MENU";
-																			//document.getElementById("xycoordinates").innerHTML="try swipe/drag from the \"Cursor\" button";
 		}
+		
+		var _this = this;
+		function _action_start (event) {
+			var pos = getEventXY(event);
+			return _this.action_start(pos.x, pos.y, event);
+		}
+		
+		function _action_move (event) {
+			var pos = getEventXY(event);
+			return _this.action_move(pos.x, pos.y, event);
+		}
+		
+		function _action_stop (event) {
+			return _this.action_stop(event);
+		}
+		
+		function _action_reset () {
+			return _this.action_reset();
+		}
+		
+		function _calculate_position (event) {
+			return _this.calculate_position();
+		}
+		
+		function _action_menu_close (event) {
+			event.preventDefault();
+			event.stopPropagation();
+			_this.element_map.ELEMENT_MENU.style.display='none';
+		}
+		
+		function _action_menu_exit (event) {
+			event.preventDefault();
+			event.stopPropagation();
+			_this.clear();
+		}
+		
+		var body = Dr.getBody();
+		// attach the touchstart, touchmove, touchend event listeners.
+		this.element_map.ELEMENT_CURSOR.addEventListener('touchstart', _action_start, false);
+		this.element_map.ELEMENT_CURSOR.addEventListener('mousedown', _action_start, false);
+		
+		body.addEventListener('touchmove', _action_move, false);
+		body.addEventListener('mousemove', _action_move, false);
+		
+		body.addEventListener('touchend', _action_stop, false);
+		body.addEventListener('mouseup', _action_stop, false);
+		
+		body.addEventListener('touchcancel', _action_reset, false);
+		//body.addEventListener('mouseout', _action_reset, false);	//fires too often(cross elements), cause error...
+		
+		this.element_map.ELEMENT_MENU.getElementsByTagName('button')[0].addEventListener('click', _action_menu_close, false);
+		this.element_map.ELEMENT_MENU.getElementsByTagName('button')[1].addEventListener('click', _action_menu_exit, false);
+		
+		Dr.Event.subscribe('WINDOW_RESIZE', _calculate_position);
 	}
 	
-	// create a drawer which tracks touch movements
-	var Bean_cursorEventDispenser = {
-		touchstart: cur_draw,
-		mousedown: cur_draw,
-		touchmove: cur_redraw,
-		mousemove: cur_redraw,
-		touchend: cur_hide,
-		touchcancel: cur_hide,
-		//mouseout: cur_hide,	//cause error...
-		mouseup: cur_hide
+	
+	Module.create = function (owner) {
+		var instance = new Module;
+		Dr.afterWindowLoaded(function () { instance.init(); });
+		return instance;
 	};
-	// create a function to pass touch events and coordinates to drawer
-	var lastX, lastY;
-	function Bean_func_cursorEvent(event){
-		// get the touch coordinates
-																			//document.getElementById("pageinfo_2").innerHTML=event.type;
-		var coors;
-		if (event.type=="touchend" || event.type=="mouseup") {
-			coors = {
-				x: lastX,
-				y: lastY
-			}
-		}
-		else if (event.targetTouches) {
-			coors = {
-				x: event.targetTouches[0].clientX,
-				y: event.targetTouches[0].clientY
-			}
-		}
-		else {
-			coors = {
-				x: event.clientX,
-				y: event.clientY
-			}
-		}
-		// pass the coordinates to the appropriate handler
-		lastX=coors.x;
-		lastY=coors.y;
-		if(!lastX && !lastY) ;//alert(event.type+" coor error "+event.target+"|"+event.currentTarget);
-		else Bean_cursorEventDispenser[event.type](coors);
-	}
 	
-	function Bean_func_menuEvent(event){
-		event.preventDefault();
-		event.stopPropagation();
-		B_menu.style.display="none";
-	}
-	var body = Dr.getBody();
-	// attach the touchstart, touchmove, touchend event listeners.
-	B_cursor.addEventListener('touchstart',Bean_func_cursorEvent, false);
-	body.addEventListener('touchmove',Bean_func_cursorEvent, false);
-	body.addEventListener('touchend',Bean_func_cursorEvent, false);
-	body.addEventListener('touchcancel',Bean_func_cursorEvent, false);
-	
-	B_cursor.addEventListener('mousedown',Bean_func_cursorEvent, false);
-	body.addEventListener('mousemove',Bean_func_cursorEvent, false);
-	body.addEventListener('mouseup',Bean_func_cursorEvent, false);
-	//body.addEventListener('mouseout',Bean_func_cursorEvent, false);	//cause error...
-	
-	B_menu.addEventListener('click',Bean_func_menuEvent, false);
-	B_menu.addEventListener('touchend',Bean_func_menuEvent, false);
-	B_menu.addEventListener('mouseup',Bean_func_menuEvent, false);
-},false);	// end window.onLoad
-
-//test if multiple onload can be processed()stupid huh?
-//window.addEventListener('load',function(){alert("Bean's Fake Mouse for Good loaded")},false);
+	return Module;
+});
