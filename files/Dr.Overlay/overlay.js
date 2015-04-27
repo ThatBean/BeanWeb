@@ -66,7 +66,7 @@ Dr.Implement('OverlayCursor', function (global, module_get) {
 			'CursorBgFont':18,
 			'CursorBgRad':50,
 			'CursorBgRadL':50,
-			'CursorBgRadR':30,
+			'CursorBgRadR':20,
 			
 			'CursorTipRad':6,
 			'CursorTipOffset':60,
@@ -134,6 +134,9 @@ Dr.Implement('OverlayCursor', function (global, module_get) {
 				'font-weight': 'bold',
 				'text-align': 'center',
 				'color': '#FFF',
+				
+				'filter': 'alpha(opacity=90)',
+				'opacity': 0.9,
 				
 				'width': config.CursorBgRad * 2 + 'px',
 				'height': config.CursorBgRad * 2 + 'px',
@@ -218,7 +221,7 @@ Dr.Implement('OverlayCursor', function (global, module_get) {
 			+ '<br />';
 		
 		return {
-			ELEMENT_CURSOR: create_element(body,'div','ELEMENT_CURSOR','MENU'),
+			ELEMENT_CURSOR: create_element(body,'div','ELEMENT_CURSOR','Menu'),
 			ELEMENT_CURSOR_BG: create_element(body,'div','ELEMENT_CURSOR_BG','Bean\'s'),
 			ELEMENT_CURSOR_TIP: create_element(body,'div','ELEMENT_CURSOR_TIP'),
 			ELEMENT_MENU: create_element(body,'div','ELEMENT_MENU', Menu_innerHTML),
@@ -309,8 +312,9 @@ Dr.Implement('OverlayCursor', function (global, module_get) {
 			this.element_map.ELEMENT_CURSOR_TIP.style.display = 'none';
 			this.element_map.ELEMENT_CURSOR.style.left = '';
 			this.element_map.ELEMENT_CURSOR.style.top = '';
-			this.element_map.ELEMENT_CURSOR.innerHTML = (this.is_away ? 'Cancel' : 'MENU');
-			this.action_state = (this.is_away ? 'action_cancel' : 'open_menu');
+			this.element_map.ELEMENT_CURSOR.innerHTML = (this.is_away ? 'Cancel' : 'Menu');
+			Dr.setStyleTransformDegree(this.element_map.ELEMENT_CURSOR, 0);
+			this.action_state = (this.is_away ? 'action_cancel' : 'toggle_menu');
 		}
 		else {
 			//show && move
@@ -333,8 +337,10 @@ Dr.Implement('OverlayCursor', function (global, module_get) {
 		Dr.log(this.action_state);
 		switch (this.action_state) {
 			case 'action_start':
-			case 'open_menu':
-				this.element_map.ELEMENT_MENU.style.display = 'block';
+			case 'toggle_menu':
+				//this.element_map.ELEMENT_MENU.style.display = 'block';
+				var menu_style = this.element_map.ELEMENT_MENU.style;
+				menu_style.display = menu_style.display == 'block' ? 'none' : 'block';
 				break;
 			case 'action_cancel':
 				//nothing
@@ -351,7 +357,7 @@ Dr.Implement('OverlayCursor', function (global, module_get) {
 		this.element_map.ELEMENT_CURSOR_TIP.style.display = 'none';
 		this.element_map.ELEMENT_CURSOR.style.left = '';
 		this.element_map.ELEMENT_CURSOR.style.top = '';
-		this.element_map.ELEMENT_CURSOR.innerHTML = 'MENU';
+		this.element_map.ELEMENT_CURSOR.innerHTML = 'Menu';
 		Dr.setStyleTransformDegree(this.element_map.ELEMENT_CURSOR, 0);
 	}
 	
@@ -399,7 +405,7 @@ Dr.Implement('OverlayCursor', function (global, module_get) {
 		function _action_menu_close (event) {
 			event.preventDefault();
 			event.stopPropagation();
-			_this.element_map.ELEMENT_MENU.style.display='none';
+			_this.element_map.ELEMENT_MENU.style.display = 'none';
 		}
 		
 		function _action_menu_exit (event) {
