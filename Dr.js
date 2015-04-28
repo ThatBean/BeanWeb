@@ -2,7 +2,31 @@
 var DrAuthor = 'Bean/Dr.Eames';
 var DrVersion = '0.11';
 
-var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVersion) ? Dr : (function (window, undefined) {
+var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVersion) ? Dr : (function (undefined) {
+	
+	// Check Environment
+	console.log('[Dr] Check Environment...');
+	var environment = 'default';
+	
+	if (typeof(window) !== 'undefined' && typeof(document) !== 'undefined') {
+		environment = 'browser';
+		console.log('detected', environment);
+	}
+	
+	if (typeof(process) !== 'undefined' && typeof(process.versions) !== 'undefined' && process.versions.node) {
+		environment = 'node';
+		console.log('detected', environment, process.versions.node);
+		return;
+	}
+	
+	if (typeof(cordova) !== 'undefined') {
+		environment = 'cordova';
+		console.log('detected', environment);
+		return;
+	}
+	
+	console.log('[Dr] Environment is', environment);
+	
 	
 	// Check Function & add Fall-back(polyfill)
 	console.log('[Dr] Checking Function & add Fall-back...');
@@ -40,7 +64,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 		if (res == to + 1) return _get_random_int(from, to);
 		return res;
 	}
-	
+
 	
 	// Pack required
 	var _collect_required = function () {
@@ -999,7 +1023,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 	console.log('[Dr] Finished Initialize.');
 	
 	return Dr;
-})(window);
+})();
 
 /*
 Dr.ModuleManager.declare('test_module', 'class');
