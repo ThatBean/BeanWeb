@@ -5,19 +5,19 @@ var util = require('util');
 var port = 888;
 
 http.createServer(function (request, response) {
-	console.log('Get request', request.url, request.method);
+	//console.log('Get request', request.url, request.method);
 	
 	request_info = url.parse(request.url, true);
 	
 	var buffer = '';
 	
 	request.addListener('data', function(chunk){
-		console.log('Get data', arguments);
+		//console.log('Get data', arguments);
 		buffer += chunk;
 	});
 	request.addListener('end', function(){
-		console.log('Get end', arguments);
-		console.log('Get message', buffer.toString());
+		//console.log('Get end', arguments);
+		//console.log('Get message', buffer.toString());
 		
 		sendRespond();
 	});
@@ -30,6 +30,16 @@ http.createServer(function (request, response) {
 		
 		response.write('request_info:');
 		response.write(util.inspect(request_info));
+		
+		response.write('\n');
+		
+		response.write('url:');
+		response.write(request.url);
+		
+		response.write('\n');
+		
+		response.write('method:');
+		response.write(request.method);
 		
 		response.write('\n');
 		
