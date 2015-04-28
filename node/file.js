@@ -49,6 +49,77 @@ var PathContent = (function () {
 		return content;
 	}
 	
+	
+	Module.deleteContent = function (path) {
+		var path_type = Module.getPathType(path);
+		switch (path_type) {
+			case 'File':
+			case 'SymbolicLink':
+				return Fs.unlinkSync(path);
+				break;
+			case 'Directory':
+				return Fs.rmdirSync(path);
+				break;
+			default:
+				console.log('[deleteContent] strange path type', path_type);
+				return false;
+				break;
+		}
+	}
+	
+	Module.moveContent = function (from_path, to_path) {
+		var path_type = Module.getPathType(from_path);
+		switch (path_type) {
+			case 'File':
+			case 'SymbolicLink':
+			case 'Directory':
+				return Fs.renameSync(from_path, to_path);
+				break;
+			default:
+				console.log('[moveContent] strange path type', path_type);
+				return false;
+				break;
+		}
+	}
+	
+	Module.copyFileSync = function (from_file_path, to_file_path) {
+		var fd_from	= Fs.openSync(from_file_path, 'r');
+		var stat = Fs.fstatSync(fd_from);
+		var fd_to = Fs.openSync(to_file_path, 'w', stat.mode);
+		var bytes_read = stat.size;
+		var pos = 0;
+		
+		var BUFFER_LENGTH = 64 * 1024;
+		var buffer = new Buffer(BUFFER_LENGTH);
+		
+		while (bytes_read > 0) {
+			bytes_read = Fs.readSync(fd_from, buffer, 0, BUFFER_LENGTH, pos);
+			Fs.writeSync(fd_to, buffer, 0, bytes_read);
+			pos += bytes_read;
+		}
+
+		Fs.closeSync(fd_from);
+		Fs.closeSync(fd_to);
+	}
+	
+	Module.copyContent = function (from_path, to_path) {
+		var path_type = Module.getPathType(from_path);
+		switch (path_type) {
+			case 'File':
+			case 'SymbolicLink':
+				return copyFileSync(from_path, to_path);
+				break;
+			case 'Directory':
+				return Fs.mkdirSync(to_path);
+				break;
+			default:
+				console.log('[copyContent] strange path type', path_type);
+				return false;
+				break;
+		}
+	}
+	
+	
 	Module.prototype.init = function (path) {
 		//for ActorSlot
 		this.content = {
