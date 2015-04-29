@@ -603,7 +603,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 						if (callback) callback(null);
 					}
 					catch (error) {
-						Dr.log('[loadLocalScript] Failed to load Script', script_src);
+						Dr.log('[loadLocalScript] Failed to load Script', script_src, 'Error', error);
 					};
 				};
 		}

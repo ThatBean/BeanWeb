@@ -1,12 +1,13 @@
 require('../Dr.js');
 
-
 Dr.loadLocalScript('./file.js', function () {
 	Dr.log("All script loaded");
 	Dr.LoadAll();
-	
-	test_path = './test';
 	var Directory = Dr.Get('Directory');
+	
+	var test_path = './test';
+	Directory.create('./').modify('copy', test_path);
+	
 	var test = Directory.create(test_path);
 	test.walk(function (path, name, type) {
 		//console.log('Get', ' - ', path, ' - ', name, ' - ', type);
