@@ -22,14 +22,14 @@
 	<link href="../../bean_common.css" rel="stylesheet" type="text/css">
 	<script src="../../Dr.js"></script>
 	<script type="text/javascript">
-		Dr.loadScriptByList([
-			'../../Dr.base_module.js',
-			'overlay.js',
-		], function () {
-			Dr.LoadAll();
-			Dr.log("All script loaded");
-			
-			Dr.Get('OverlayCursor').create();
+		Dr.loadLocalScript('../../Dr.browser.js', function () {
+			Dr.loadScriptByList([
+				'overlay.js',
+			], function () {
+				Dr.log("All script loaded");
+				Dr.LoadAll();
+				Dr.Get('OverlayCursor').create();
+			})
 		})
 	</script>
 	<!-- -->

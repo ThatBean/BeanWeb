@@ -42,12 +42,6 @@ var _zoom_modifier = 1.0;
 var _zoom_modify_speed = -0.5;
 
 
-
-var Switch = new (Dr.Get("Switch"));
-Dr.log(Switch);
-
-
-
 //document.addEventListener("DOMContentLoaded", init, false);
 
 function init() {
@@ -69,7 +63,7 @@ function init() {
 		document.getElementById("Log").innerHTML = log_text;
 	})
 	Dr.UpdateLoop.add(function (delta_time) { 
-		if (!Dr.Switch.Log) {
+		if (!Dr.Toggle.Log) {
 			tag_log.Log("update log " + Dr.now()); 
 		}
 		return true;
@@ -89,7 +83,7 @@ function init() {
 	Dr._rotate_ratio = 0;
 	Dr._center_vec = new Pixel3D_Math.Vector3(0, 0, 0);
 	Dr._rotate_vec = new Pixel3D_Math.Vector3(0, 0, 0);
-	Dr.Switch.PixelRotationSpeed = 0.1;
+	Dr.Toggle.PixelRotationSpeed = 0.1;
 	
 	
 	canvas = document.getElementById("Dr.Canvas");
@@ -564,8 +558,8 @@ function init() {
 	var adjust_func = function (event_key, event, K_def) {
 		var target_model_data;
 		
-		if (Dr.Switch.Model) {
-			switch (Dr.Switch.Model_Type) {
+		if (Dr.Toggle.Model) {
+			switch (Dr.Toggle.Model_Type) {
 				case 4:
 					target_model_data = model_data4;
 					break;
@@ -651,13 +645,13 @@ function drawingLoop(delta_time) {
 	device.clear();
 	
 	
-	if (!Dr.Switch.Render) {
+	if (!Dr.Toggle.Render) {
 		
 		var target_zoom;
 		var target_model_data;
 		
-		if (Dr.Switch.Model) {
-			switch (Dr.Switch.Model_Type) {
+		if (Dr.Toggle.Model) {
+			switch (Dr.Toggle.Model_Type) {
 				case 4:
 					target_model_data = model_data4;
 					break;
@@ -683,7 +677,7 @@ function drawingLoop(delta_time) {
 		
 		
 		var meshes = target_model_data.meshes;
-		if (Dr.Switch.Rotate) {
+		if (Dr.Toggle.Rotate) {
 			/** /
 			meshes[0].Rotation.y += 0.001*delta_time;
 			meshes[0].Rotation.x += 0.0002*delta_time;
@@ -700,7 +694,7 @@ function drawingLoop(delta_time) {
 			//camera.rotateTarget(0, 0.001*delta_time, 0, 0);
 		}
 		
-		if (Dr.Switch.Zoom) {	
+		if (Dr.Toggle.Zoom) {	
 			_zoom_modifier += _zoom_modifier * delta_time * _zoom_modify_speed;
 			if (_zoom_modifier > 10) {
 				_zoom_modify_speed = -_zoom_modify_speed;
@@ -712,22 +706,22 @@ function drawingLoop(delta_time) {
 			}
 		}
 		
-		if (Dr.Switch.PixelRotation) {
+		if (Dr.Toggle.PixelRotation) {
 			var Pixel3D_Math = Dr.Get("Pixel3D_Math");
 			var center_vec = new Pixel3D_Math.Vector3(10, 0, 0);
 			//var rotate_vec = new Pixel3D_Math.Vector3(0.5 * delta_time, 0.5 * delta_time, 0);
 			/*var rotate_vec = new Pixel3D_Math.Vector3(
-				Dr.Switch.PixelRotationX ? 0.5 * delta_time : 0,
-				Dr.Switch.PixelRotationY ? 0.5 * delta_time : 0,
-				Dr.Switch.PixelRotationZ ? 0.5 * delta_time : 0
+				Dr.Toggle.PixelRotationX ? 0.5 * delta_time : 0,
+				Dr.Toggle.PixelRotationY ? 0.5 * delta_time : 0,
+				Dr.Toggle.PixelRotationZ ? 0.5 * delta_time : 0
 			);*/
 			
-			Dr._rotate_ratio = (Dr._rotate_ratio + Dr.Switch.PixelRotationSpeed * delta_time) % 4;
+			Dr._rotate_ratio = (Dr._rotate_ratio + Dr.Toggle.PixelRotationSpeed * delta_time) % 4;
 			Dr._center_vec = new Pixel3D_Math.Vector3(0, 0, 0);
 			Dr._rotate_vec = new Pixel3D_Math.Vector3(
-				Dr.Switch.PixelRotationX ? Dr._rotate_ratio : 0,
-				Dr.Switch.PixelRotationY ? Dr._rotate_ratio : 0,
-				Dr.Switch.PixelRotationZ ? Dr._rotate_ratio : 0
+				Dr.Toggle.PixelRotationX ? Dr._rotate_ratio : 0,
+				Dr.Toggle.PixelRotationY ? Dr._rotate_ratio : 0,
+				Dr.Toggle.PixelRotationZ ? Dr._rotate_ratio : 0
 			);
 			
 			/*
@@ -744,7 +738,7 @@ function drawingLoop(delta_time) {
 			target_zoom * _zoom_modifier, 
 			camera, 
 			target_model_data, 
-			(Dr.Switch.Skeleton ? "skeleton" : null)
+			(Dr.Toggle.Skeleton ? "skeleton" : null)
 		);
 		
 		// TODO: Add Editor Marking

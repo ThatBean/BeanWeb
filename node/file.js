@@ -1,19 +1,8 @@
-//console.log("ok");
-
-var Assert = require('assert')
-
-var Os = require('os')
-var Path = require('path')
-var ChildProcess = require('child_process')
-var Fs = require('fs')
-var Spawn = require('child_process').spawn;
-
-console.log(process.argv)
-
-
-var PathContent = (function () {
-	var Fs = require('fs');
-	var Path = require('path');
+Dr.Declare('PathContent', 'class');
+Dr.Implement('PathContent', function (global, module_get) {
+	var Fs = Dr.require('fs');
+	var Path = Dr.require('path');
+	var Assert = Dr.require('assert')
 	
 	var Module = function () {
 		//
@@ -26,7 +15,6 @@ var PathContent = (function () {
 		DISCONNECT: 'DISCONNECT',
 		//RECONNECT: 'RECONNECT',
 	};
-	
 	
 	Module.getPathType = function (path) {
 		var path_type;
@@ -50,8 +38,7 @@ var PathContent = (function () {
 	}
 	
 	
-	Module.deleteContent = function (path) {
-		var path_type = Module.getPathType(path);
+	Module._delete = function (path_type, path) {
 		switch (path_type) {
 			case 'File':
 			case 'SymbolicLink':
@@ -67,8 +54,7 @@ var PathContent = (function () {
 		}
 	}
 	
-	Module.moveContent = function (from_path, to_path) {
-		var path_type = Module.getPathType(from_path);
+	Module._move = function (path_type, from_path, to_path) {
 		switch (path_type) {
 			case 'File':
 			case 'SymbolicLink':
@@ -77,6 +63,23 @@ var PathContent = (function () {
 				break;
 			default:
 				console.log('[moveContent] strange path type', path_type);
+				return false;
+				break;
+		}
+	}
+	
+	
+	Module._copy = function (path_type, from_path, to_path) {
+		switch (path_type) {
+			case 'File':
+			case 'SymbolicLink':
+				return Module.copyFileSync(from_path, to_path);
+				break;
+			case 'Directory':
+				return Fs.mkdirSync(to_path);
+				break;
+			default:
+				console.log('[copyContent] strange path type', path_type);
 				return false;
 				break;
 		}
@@ -100,23 +103,6 @@ var PathContent = (function () {
 
 		Fs.closeSync(fd_from);
 		Fs.closeSync(fd_to);
-	}
-	
-	Module.copyContent = function (from_path, to_path) {
-		var path_type = Module.getPathType(from_path);
-		switch (path_type) {
-			case 'File':
-			case 'SymbolicLink':
-				return copyFileSync(from_path, to_path);
-				break;
-			case 'Directory':
-				return Fs.mkdirSync(to_path);
-				break;
-			default:
-				console.log('[copyContent] strange path type', path_type);
-				return false;
-				break;
-		}
 	}
 	
 	
@@ -155,12 +141,19 @@ var PathContent = (function () {
 		}
 	}
 	
-	Module.prototype.walk = function (callback) {
+	Module.prototype.walk = function (callback, is_call_before_walk) {
 		for (var type in this.content) {
 			var list = this.content[type];
 			for (var index in list) {
 				if (type == 'Directory') {
-					list[index].walk(callback);
+					if (is_call_before_walk) {
+						callback(this.path, name, type);
+						list[index].walk(callback, is_call_before_walk);
+					}
+					else {
+						list[index].walk(callback, is_call_before_walk);
+						callback(this.path, name, type);
+					}
 				}
 				else {
 					var name = list[index];
@@ -170,6 +163,36 @@ var PathContent = (function () {
 		}
 	}
 	
+	Module.prototype.modify = function (operation, to_path) {
+		var callback;
+		var is_call_before_walk;
+		
+		switch (operation) {
+			case 'copy':
+				callback = function (path, name, type)  {
+					var from_path = Path.join(path, name);
+					return Module._copy(type, from_path, to_path);
+				};
+				is_call_before_walk = true;
+				break
+			case 'delete':
+				callback = function (path, name, type)  {
+					var path = Path.join(path, name);
+					return Module._delete(type, path);
+				};
+				is_call_before_walk = false;
+				break
+			case 'move':
+				callback = function (path, name, type)  {
+					var from_path = Path.join(path, name);
+					return Module._move(type, from_path, to_path);
+				};
+				is_call_before_walk = true;
+				break
+		}
+		
+		this.walk(callback, is_call_before_walk);
+	}
 	Module.create = function (path) {
 		var instance = new Module;
 		instance.init(path);
@@ -177,13 +200,12 @@ var PathContent = (function () {
 	};
 	
 	return Module;
-})();
+});
 
+/*
 var test_path = process.argv[2];
-
 var test = PathContent.create(test_path);
 test.walk(function (path, name, type) {
 	console.log('Get', ' - ', path, ' - ', name, ' - ', type);
 })
-
-//console.log(PathContent.create(destination_dir));
+*/

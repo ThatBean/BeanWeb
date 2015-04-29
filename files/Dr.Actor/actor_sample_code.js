@@ -21,7 +21,7 @@ function init() {
 	})
 	tag_log.Log("init log " + Dr.now()); 
 	/*Dr.UpdateLoop.add(function (delta_time) { 
-		if (!Dr.Switch.Log) {
+		if (!Dr.Toggle.Log) {
 			tag_log.Log(generateUUID() + "update log " + Dr.now()); 
 		}
 		return true;
@@ -40,8 +40,8 @@ function init() {
 	var adjust_func = function (event_key, event, K_def) {
 		var target_model_data;
 		
-		if (Dr.Switch.Model) {
-			switch (Dr.Switch.Model_Type) {
+		if (Dr.Toggle.Model) {
+			switch (Dr.Toggle.Model_Type) {
 				case 4:
 					target_model_data = model_data4;
 					break;
@@ -104,7 +104,7 @@ function drawingLoop(delta_time) {
 	//Dr.log("drawingLoop", delta_time);
 	
 	
-	if (!Dr.Switch.Render) {
+	if (!Dr.Toggle.Render) {
 		
 	}
 	

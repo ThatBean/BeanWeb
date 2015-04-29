@@ -15,14 +15,15 @@
 	<!-- load page utility script -->
 	<script src="../../Dr.js"></script>
 	<script type="text/javascript">
-		Dr.loadScriptByList([
-			'../../Dr.base_module.js',
-			'actor.js',
-			'advice.js',
-			'state.js',
-			'actor_sample_code.js'
-		], function () {
-			Dr.log("All script loaded");
+		Dr.loadLocalScript('../../Dr.browser.js', function () {
+			Dr.loadScriptByList([
+				'actor.js',
+				'advice.js',
+				'state.js',
+				'actor_sample_code.js'
+			], function () {
+				Dr.log("All script loaded");
+			})
 		})
 	</script>
 	
