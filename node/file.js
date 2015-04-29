@@ -1,19 +1,11 @@
-Dr.Declare('PathContent', 'class');
-Dr.Implement('PathContent', function (global, module_get) {
+Dr.Declare('Directory', 'class');
+Dr.Implement('Directory', function (global, module_get) {
 	var Fs = Dr.require('fs');
 	var Path = Dr.require('path');
 	var Assert = Dr.require('assert')
 	
 	var Module = function () {
 		//
-	};
-	
-	Module.status = {
-		//OFF: 'OFF',
-		CONNECT: 'CONNECT',
-		ALLCONNECT: 'ALLCONNECT',
-		DISCONNECT: 'DISCONNECT',
-		//RECONNECT: 'RECONNECT',
 	};
 	
 	Module.getPathType = function (path) {
@@ -32,56 +24,67 @@ Dr.Implement('PathContent', function (global, module_get) {
 	}
 
 
-	Module.getDirContent = function (dir_path) {
-		var content = Fs.readdirSync(dir_path);
-		return content;
-	}
+	Module.getDirContent = function (dir_path) { return Fs.readdirSync(dir_path); }
+	
+	Module.createDirRecursive = function (dir_path) {
+		var dir_path = Path.resolve(dir_path);
+		var upper_dir_path = Path.dirname(dir_path);
+		if (Module.getPathType(upper_dir_path) != 'Directory') Module.createDirRecursive(upper_dir_path);
+		if (Module.getPathType(dir_path) != 'Directory') Fs.mkdirSync(dir_path);
+	};
 	
 	
 	Module._delete = function (path_type, path) {
+		Dr.log('[_delete]', arguments);
+		if (Module.getPathType(path) === 'Error') {
+			Dr.log('[_delete] non-exist, skipped');
+			return;
+		}
 		switch (path_type) {
 			case 'File':
 			case 'SymbolicLink':
 				return Fs.unlinkSync(path);
-				break;
 			case 'Directory':
 				return Fs.rmdirSync(path);
-				break;
 			default:
-				console.log('[deleteContent] strange path type', path_type);
+				Dr.log('[deleteContent] strange path type', path_type);
 				return false;
-				break;
 		}
 	}
 	
 	Module._move = function (path_type, from_path, to_path) {
+		Dr.log('[_move]', arguments);
+		if (Module.getPathType(to_path) === path_type) {
+			Dr.log('[_move] exist, skipped');
+			return;
+		}
 		switch (path_type) {
 			case 'File':
 			case 'SymbolicLink':
 			case 'Directory':
 				return Fs.renameSync(from_path, to_path);
-				break;
 			default:
-				console.log('[moveContent] strange path type', path_type);
+				Dr.log('[moveContent] strange path type', path_type);
 				return false;
-				break;
 		}
 	}
 	
 	
 	Module._copy = function (path_type, from_path, to_path) {
+		Dr.log('[_copy]', arguments);
+		if (Module.getPathType(to_path) === path_type) {
+			Dr.log('[_copy] exist, skipped');
+			return;
+		}
 		switch (path_type) {
 			case 'File':
 			case 'SymbolicLink':
 				return Module.copyFileSync(from_path, to_path);
-				break;
 			case 'Directory':
 				return Fs.mkdirSync(to_path);
-				break;
 			default:
-				console.log('[copyContent] strange path type', path_type);
+				Dr.log('[copyContent] strange path type', path_type);
 				return false;
-				break;
 		}
 	}
 	
@@ -106,21 +109,25 @@ Dr.Implement('PathContent', function (global, module_get) {
 	}
 	
 	
-	Module.prototype.init = function (path) {
-		//for ActorSlot
+	Module.prototype.init = function (dir_path) {
+		if (Module.getPathType(dir_path) !== 'Directory') {
+			Dr.log('[init] Error! path not Directory', dir_path);
+			return;
+		}
+		
+		this.path = dir_path;
 		this.content = {
 			'Directory': {},
 			'File': [],
 			'SymbolicLink': [],
 			'Other': [],
 		};
-		this.path = path;
 		
 		this.init_content();
 	};
 	
 	Module.prototype.init_content = function () {
-		console.log('init_content', Path.dirname(this.path));
+		Dr.log('init_content', Path.dirname(this.path));
 		var content = Module.getDirContent(this.path);
 		for (var index in content) {
 			var name = content[index];
@@ -146,6 +153,7 @@ Dr.Implement('PathContent', function (global, module_get) {
 			var list = this.content[type];
 			for (var index in list) {
 				if (type == 'Directory') {
+					var name = index;
 					if (is_call_before_walk) {
 						callback(this.path, name, type);
 						list[index].walk(callback, is_call_before_walk);
@@ -163,36 +171,48 @@ Dr.Implement('PathContent', function (global, module_get) {
 		}
 	}
 	
-	Module.prototype.modify = function (operation, to_path) {
-		var callback;
+	Module.prototype.modify = function (operation, to_path_root) {
+		var callback_name;
 		var is_call_before_walk;
+		var to_path_list = {};
+		
+		if (to_path_root) to_path_list[this.path] = to_path_root;
 		
 		switch (operation) {
 			case 'copy':
-				callback = function (path, name, type)  {
-					var from_path = Path.join(path, name);
-					return Module._copy(type, from_path, to_path);
-				};
+				callback_name = '_copy';
 				is_call_before_walk = true;
-				break
+				Module.createDirRecursive(to_path_root);
+				break;
 			case 'delete':
-				callback = function (path, name, type)  {
-					var path = Path.join(path, name);
-					return Module._delete(type, path);
-				};
+				callback_name = '_delete';
 				is_call_before_walk = false;
-				break
+				break;
 			case 'move':
-				callback = function (path, name, type)  {
-					var from_path = Path.join(path, name);
-					return Module._move(type, from_path, to_path);
-				};
+				callback_name = '_move';
 				is_call_before_walk = true;
-				break
+				Module.createDirRecursive(to_path_root);
+				break;
+			default:
+				Dr.log('[modify] Error operation', operation);
+				break;
 		}
 		
+		var callback = function (path, name, type)  {
+			Dr.log(path, name, type);
+			var from_path = Path.join(path, name);
+			if (to_path_root) {
+				to_path_list[from_path] = Path.join(to_path_list[path], name);
+				return Module[callback_name](type, from_path, to_path_list[from_path]);
+			}
+			else {
+				return Module[callback_name](type, from_path);
+			}
+		};
+		
 		this.walk(callback, is_call_before_walk);
-	}
+	};
+	
 	Module.create = function (path) {
 		var instance = new Module;
 		instance.init(path);
@@ -201,11 +221,3 @@ Dr.Implement('PathContent', function (global, module_get) {
 	
 	return Module;
 });
-
-/*
-var test_path = process.argv[2];
-var test = PathContent.create(test_path);
-test.walk(function (path, name, type) {
-	console.log('Get', ' - ', path, ' - ', name, ' - ', type);
-})
-*/

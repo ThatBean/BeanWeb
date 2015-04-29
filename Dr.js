@@ -595,11 +595,16 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 				};
 			case 'node':
 				return function (script_src, callback) {
-					var Fs = require('fs');
-					var Vm = require('vm');
-					var script_data = Fs.readFileSync(script_src);
-					Vm.runInThisContext(script_data.toString());
-					if (callback) callback(null);
+					try {
+						var Fs = require('fs');
+						var Vm = require('vm');
+						var script_data = Fs.readFileSync(script_src);
+						Vm.runInThisContext(script_data.toString(), script_src);
+						if (callback) callback(null);
+					}
+					catch (error) {
+						Dr.log('[loadLocalScript] Failed to load Script', script_src);
+					};
 				};
 		}
 	})();
