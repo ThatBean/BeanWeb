@@ -12,7 +12,7 @@ Dr.Implement('Server', function (global, module_get) {
 		this.callback = callback;
 		this.port = port;
 		this.host_name = host_name;
-		this.is_server_active = false;
+		this.is_active = false;
 		
 		var _this = this;
 		this.server = Http.createServer(function (request, response) {
@@ -22,30 +22,27 @@ Dr.Implement('Server', function (global, module_get) {
 	};
 	
 	Module.prototype.start = function () {
-		if (this.is_server_active) return;
+		if (this.is_active) return;
 		this.server.listen(this.port, this.host_name);
-		this.is_server_active = true;
+		this.is_active = true;
 		Dr.log('Server running at port', this.port, 'host_name', this.host_name);
 	};
 	
 	Module.prototype.stop = function () {
-		if (!this.is_server_active) return;
+		if (!this.is_active) return;
 		this.server.close();
-		this.is_server_active = false;
+		this.is_active = false;
 		Dr.log('Server stopped');
 	};
 	
 	Module.prototype.onRequest = function (request, response) {
-		var request_info = Url.parse(request.url, true);
 		var buffer = '';
-		
 		var _this = this;
 		request.addListener('data', function(chunk){
 			//console.log('Get data', arguments);
 			buffer += chunk;
 		});
 		request.addListener('end', function(){
-			//console.log('Get end', arguments);
 			//console.log('Get message', buffer.toString());
 			_this.onRequestEnd(request, response, buffer);
 		});
@@ -64,25 +61,16 @@ Dr.Implement('Server', function (global, module_get) {
 				'Access-Control-Allow-Origin': '*',
 			});
 			
-			response.write('request_info:');
-			response.write(Util.inspect(request_info));
-			
-			
-			response.write('\n');
-			
 			response.write('url:');
 			response.write(request.url);
-			
 			response.write('\n');
 			
 			response.write('method:');
 			response.write(request.method);
-			
 			response.write('\n');
 			
 			response.write('message:');
 			response.write(buffer.toString());
-			
 			response.write('\n');
 			response.end();
 		}
@@ -97,3 +85,7 @@ Dr.Implement('Server', function (global, module_get) {
 	
 	return Module;
 });
+
+
+
+
