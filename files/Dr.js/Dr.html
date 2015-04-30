@@ -48,6 +48,17 @@
 			window.location.href = target_url;
 		}
 		
+		function requestGitPull (operation) {
+			Dr.createHttpRequest(
+				'http://thatbean.com:888', 
+				operation, 
+				function (xml_http, text) {
+					var GitPullLog = document.getElementById("GitPullLog");
+					GitPullLog.innerHTML = text;
+				}
+			);
+		}
+		
 		function set_body_padding () {
 			var body = Dr.getBody();
 			
@@ -204,6 +215,13 @@
 		
 		<button onclick="var size = Dr.getViewportSize(); alert('width, height: (' + size.width + ', ' + size.height + ')')">getViewportSize</button>
 		<button onclick="var size = Dr.getPageSize(); alert('width, height: (' + size.width + ', ' + size.height + ')')">getPageSize</button>
+		
+		<hr />
+		
+		<button onclick="requestGitPull('start');">Git Pull Start</button>
+		<button onclick="requestGitPull('status');">Git Pull Status</button>
+		<br />
+		<pre id="GitPullLog">Git Pull Log here</pre>
 	</div>
 <br />
 </body>
