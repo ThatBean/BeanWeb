@@ -355,6 +355,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 		return res_array;
 	};
 	
+	//only safe within one runtime
 	Dr.generateId = function () {
 		//var symbol_list = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');	//full 62
 		var symbol_list = '0123456789ACEFGHJKLMNPQRSTUVWXYZ'.split('');	//lite 32, easy to recognise
