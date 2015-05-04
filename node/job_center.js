@@ -63,14 +63,14 @@ Dr.Implement('JobCenter', function (global, module_get) {
 		if (!this.job_callback) {
 			var _this = this;
 			this.job_callback = function (status) {
-				var is_stop = false;
+				var is_continue = true;
 				
 				if (status == 'Error') {
 					Dr.log('[Error] arguments:', arguments);
-					is_stop = _this.callback.apply(_this, arguments);
+					is_continue = _this.callback.apply(_this, arguments);
 				};
 				
-				if (!is_stop) {
+				if (is_continue) {
 					_this.start();
 				}
 				else {

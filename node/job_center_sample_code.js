@@ -26,11 +26,16 @@ Dr.loadLocalScript('./job_center.js', function () {
 	}
 	
 	var job_data_list = [1,2,3,4,5,6,7,8];
-	var finish_callback = function () {
-		Dr.log('[finish_callback] arguments:', arguments);
+	var common_callback = function (status) {
+		Dr.log('[common_callback] status:', status, 'arguments:', arguments);
+		
+		if (status == 'Error') {
+			Dr.log('get error!!! omit');
+			return true;
+		}
 	}
 	
-	job_center.init(job_data_list, job_create_func, finish_callback);
+	job_center.init(job_data_list, job_create_func, common_callback);
 	
 	job_center.start();
 	
