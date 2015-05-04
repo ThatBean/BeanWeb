@@ -11,7 +11,7 @@ Dr.Implement('JobBase', function (global, module_get) {
 		Finish: 'Finish',
 	}
 	
-	Job.prototype.start = function () {
+	Module.prototype.start = function () {
 		console.warn('[job start]');
 		return this.callback();
 	}
@@ -27,7 +27,7 @@ Dr.Implement('JobCenter', function (global, module_get) {
 		//
 	};
 	
-	function init(job_data_list, job_create_func, callback) {
+	Module.prototype.init = function (job_data_list, job_create_func, callback) {
 		this.job_data_list = job_data_list;
 		this.job_create_func = job_create_func;
 		this.callback = callback;
@@ -42,9 +42,11 @@ Dr.Implement('JobCenter', function (global, module_get) {
 			var job = this.job_create_func(job_data, this.getJobCallback());
 			this.job_list.push(job);
 		}
+		Dr.log('inited', this.job_list.length, 'Job');
 	}
 
 	Module.prototype.start = function () {
+		Dr.log('start next job...', this.job_list.length);
 		var next_job = this.job_list.shift();
 		if (next_job) {
 			next_job.start();
@@ -64,7 +66,7 @@ Dr.Implement('JobCenter', function (global, module_get) {
 				var is_stop = false;
 				
 				if (status == 'Error') {
-					Dr.log('[Error] arguments: ' + arguments);
+					Dr.log('[Error] arguments:', arguments);
 					is_stop = _this.callback.apply(_this, arguments);
 				};
 				
@@ -72,7 +74,7 @@ Dr.Implement('JobCenter', function (global, module_get) {
 					_this.start();
 				}
 				else {
-					console.warn('[JobCenter] stopped with status: ' + status);
+					console.warn('[JobCenter] stopped with status:', status);
 					_this.callback.apply(_this, arguments);
 				}
 			};
