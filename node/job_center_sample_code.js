@@ -9,7 +9,8 @@ Dr.loadLocalScript('./job_center.js', function () {
 	
 	var job_center = new JobCenter;
 	var job_create_func = function (data, callback) {
-		var job_base = new JobBase(data, callback);
+		var job_base = new JobBase;
+		job_base.init(data, callback);
 		job_base.id = Dr.generateId();
 		Dr.log('job_base', data, job_base.id);
 	

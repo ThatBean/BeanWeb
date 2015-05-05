@@ -42,7 +42,7 @@ Dr.Implement('Command', function (global, module_get) {
 			if (options.callbackOutput) options.callbackOutput('data', 'stdout', data);
 		});
 		sub_process.stdout.on('end', function() {
-			if (options.stdoutStream) options.stdoutStream.end();
+			//if (options.stdoutStream) options.stdoutStream.end();
 			if (options.callbackOutput) options.callbackOutput('end', 'stdout');
 		});
 
@@ -51,7 +51,7 @@ Dr.Implement('Command', function (global, module_get) {
 			if (options.callbackOutput) options.callbackOutput('data', 'stderr', data);
 		});
 		sub_process.stderr.on('end', function() {
-			if (options.stderrStream) options.stderrStream.end();
+			//if (options.stderrStream) options.stderrStream.end();
 			if (options.callbackOutput) options.callbackOutput('end', 'stderr');
 		});
 
@@ -59,6 +59,13 @@ Dr.Implement('Command', function (global, module_get) {
 		sub_process.on('exit', function(code, signal) {
 			console.warn('[Exit] code:', code, ' signal:', signal);
 			if (options.callback) options.callback(code, signal);
+		});
+
+		///on exit
+		sub_process.on('error', function(error) {
+			console.warn('[Error] error:', error);
+			if (error.stack) Dr.log(error.stack);
+			if (options.callback) options.callback(-1, error);
 		});
 
 		return sub_process;

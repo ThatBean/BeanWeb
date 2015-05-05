@@ -15,84 +15,91 @@ Dr.loadLocalScript('../Dr.node.js', function () {
 	], function () {
 		Dr.log("All script loaded");
 		
-		Dr.Declare('CommandJob', 'class');
-		Dr.Require('CommandJob', 'JobBase');
-		Dr.Implement('CommandJob', function (global, module_get) {
-			var JobBase = Dr.Get('JobBase');
-			
-			var Module = function (job_config, callback) {
-				this.job_config = job_config;
-				
-				job_config.callback = callback;
-				job_config.callbackOutput: function (event, from, data) {
-					Dr.log(arguments);
-					if (data) Dr.log(data.toString());
-				};
-			}
-			
-			Module.status = JobBase.status;
-			
-			Module.prototype = new JobBase;	//in fact not so useful
-			
-			Module.prototype.start = function () {
-				console.warn('[job start]');
-				return Command.run(job_config.command, job_config);
-			}
-
-			return Module;
-		});
+		defineCommandJobModule();
 		
 		Dr.LoadAll();
 		
-		var Command = Dr.Get('Command');
-		var JobCenter = Dr.Get('JobCenter');
-		var CommandJob = Dr.Get('CommandJob');
-		
 		var job_config_list = loadJobConfig(config_file);
+		//Dr.log(job_config_list);
 		
-		
-		/*
-		
-		var job_center = new JobCenter;
-		var job_create_func = function (data, callback) {
-			var job_base = new JobBase(data, callback);
-			job_base.id = Dr.generateId();
-			Dr.log('job_base', data, job_base.id);
-		
-		
-			job_base.start = function () {
-				var job_id = this.id;
-				Dr.log('job_base', job_id);
-				setTimeout(function () {
-					callback('Error', data, job_id);
-				}, 1000);
-			}
-			
-			return job_base;
-		}
-		
-		var job_data_list = [1,2,3,4,5,6,7,8];
-		var common_callback = function (status) {
-			Dr.log('[common_callback] status:', status, 'arguments:', arguments);
-			
-			if (status == 'Error') {
-				Dr.log('get error!!! omit');
-				return true;
-			}
-		}
-		
-		job_center.init(job_data_list, job_create_func, common_callback);
-		
-		job_center.start();
-		*/
-		
+		startJobCenter(job_config_list);
 		//Dr.startREPL();
 	});
 });
 
+//called above...
 
+function defineCommandJobModule () {
+	Dr.Declare('CommandJob', 'class');
+	Dr.Require('CommandJob', 'JobBase');
+	Dr.Require('CommandJob', 'Command');
+	Dr.Implement('CommandJob', function (global, module_get) {
+		var JobBase = module_get('JobBase');
+		var Command = module_get('Command');
+		
+		var Module = function () {
+			//
+		};
+		
+		Module.status = JobBase.status;
+			
+		Module.prototype.init = function (job_config, callback) {
+			this.job_config = job_config;
+			this.callback = callback;
+			this.id = Dr.generateId();
+			
+			if (!this.job_config.callbackOutput) {
+				this.job_config.stdoutStream = this.job_config.stdoutStream || process.stdout;
+				this.job_config.stderrStream = this.job_config.stderrStream || process.stdout;
+			}
+			
+			var _this = this;
+			this.job_config.callback = function (code, signal) {
+				var status = (code == 0 ? Module.status.End : Module.status.Error);
+				Dr.log('[CommandJob][callback] id:', _this.id, 'status:', status, code, signal);
+				if (_this.job_config.sync) _this.callback(status, _this.id, code, signal);
+			}
+		}
+		
+		//Module.prototype = new JobBase;	//in fact not so useful
+		Module.prototype.start = function () {
+			Dr.log('[CommandJob][start] id:', this.id);
+			Command.run(this.job_config.command, this.job_config);
+			if (!this.job_config.sync) this.callback(Module.status.End, this.id, 'sync == false');
+		}
+
+		return Module;
+	});
+}
+
+function startJobCenter (job_config_list) {
+	var JobCenter = Dr.Get('JobCenter');
+	var CommandJob = Dr.Get('CommandJob');
+	
+	var job_create_func = function (data, callback) {
+		var job = new CommandJob;
+		job.init(data, callback);
+		return job;
+	}
+	
+	var common_callback = function (status) {
+		Dr.log('[common_callback] status:', status, 'arguments:', arguments);
+		if (status == JobCenter.status.Error) {
+			Dr.log('[Error] get error! stop execution...');
+			return false;
+		}
+		if (status == JobCenter.status.Finish) {
+			Dr.log('[Finish] all finished...');
+		}
+	}
+	
+	var job_center = new JobCenter;
+	job_center.init(job_config_list, job_create_func, common_callback);
+	job_center.start();
+}
 
 function loadJobConfig (config_file) {
+	Dr.log('[loadJobConfig] config_file:', config_file);
 	var config_src = Dr.loadJsonFile(config_file);
 	
 	var global_config = {
@@ -117,18 +124,11 @@ function loadJobConfig (config_file) {
 			command: job_config_src.command,
 		};
 		
-		if (!job_config.command) {
-			throw new Error('job_config.command undefined');
-		}
-		else {
-			job_config_list.push(job_config);
-		}
+		if (!job_config.command) throw new Error('job_config.command undefined');
+		else job_config_list.push(job_config);
 	}
-	
 	return job_config_list;
 }
-
-
 
 function combineConfig (global_config, job_config) {
 	for (var key in global_config) {

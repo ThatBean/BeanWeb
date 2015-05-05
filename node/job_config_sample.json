@@ -44,16 +44,20 @@
     "job_list": [
                  //the jobs to do
                  {
-                 "dir": "./res",
-                 "command": "node ../script/VersionSwitcherASync.js ../script/switch_cn.json"
+                 "dir": "..",
+                 "command": "cd"
                  },
                  {
                  "dir": "./",
-                 "command": "./script/build_develop.sh"
+                 "command": "node command_sample_code.js"
                  },
                  {
-                 "dir": "./res",
-                 "command": "svn revert ./ -R"
+                 "dir": "../html",
+                 "command": "dir"
+                 },
+                 {
+                 "dir": "./",
+                 "command": "echo %WORKSPACE%"
                  }
                  ]
 }

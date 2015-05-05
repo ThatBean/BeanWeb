@@ -55,14 +55,13 @@ Dr.Implement('JobCenter', function (global, module_get) {
 	}
 
 	Module.prototype.start = function () {
-		Dr.log('start next job...', this.job_list.length);
 		var next_job = this.job_list.shift();
 		if (next_job) {
+			Dr.log('start next job, left:', this.job_list.length);
 			next_job.start();
-			console.warn('[JobCenter] start next job');
 		}
 		else {
-			console.warn('[JobCenter] all job finished');
+			Dr.log('[JobCenter] all job finished');
 			this.callback(Module.status.Finish);
 		}
 	}
