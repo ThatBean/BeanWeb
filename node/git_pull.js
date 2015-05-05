@@ -4,6 +4,7 @@ var port = 888;
 var host_name = undefined;
 var is_running = false;
 var last_log = '';
+var last_change_log = '';
 
 Dr.loadLocalScript('../Dr.node.js', function () {
 	Dr.loadScriptByList([
@@ -40,14 +41,15 @@ Dr.loadLocalScript('../Dr.node.js', function () {
 						var buffer = '';
 						Command.run('git pull', {
 							cwd: '/var/www/root',
-							stdoutLog: true,
-							stderrLog: true,
 							callback: function (code, signal) {
 								//Dr.log(arguments);
 								//if (data) Dr.log(data.toString());
 								console.warn('[Exit] code:', code, ' signal:', signal);
-								is_running = false;
-								last_log = buffer;
+								is_running = false
+								if (last_log.search('up-to-date') != -1) {
+									last_change_log = last_log;
+								}
+								last_log = buffer.toString();
 							},
 							callbackOutput: function (event, from, data) {
 								if (data && event == 'data' && from == 'stdout') {
@@ -62,7 +64,8 @@ Dr.loadLocalScript('../Dr.node.js', function () {
 				default:
 					return '[status] \n'
 						+ 'is_running: ' + is_running.toString() + '\n'
-						+ 'last_log: ' + last_log.toString() + '\n';
+						+ 'last_log: ' + last_log + '\n';
+						+ 'last_change_log: ' + last_change_log + '\n';
 					break;
 				
 			}
