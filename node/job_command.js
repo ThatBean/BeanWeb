@@ -1,18 +1,33 @@
 require('../Dr.js');
 
-var Path = Dr.require('path');
-
 var global_args = process.argv;
 
-//var node_exe = global_args[0];
-//var script_file = global_args[1];
+var node_exe = global_args[0];
+var script_file = global_args[1];
 var config_file = global_args[2];
+
+var usuage = node_exe + ' + ' + script_file + ' + ' + (config_file || '<config json file>');
+
+if (global_args.length != 3)
+	Dr.log('[Usuage]\n' + usuage);
+
+if (!config_file) {
+	Dr.log('[Error] config_file missing!');
+	process.exit(-1);
+}
+
+
+
+//check pass
+
+var Path = Dr.require('path');
 
 Dr.loadLocalScript('../Dr.node.js', function () {
 	Dr.loadScriptByList([
 		'./command.js',
 		'./job_center.js',
 	], function () {
+		
 		Dr.log("All script loaded");
 		
 		defineCommandJobModule();
