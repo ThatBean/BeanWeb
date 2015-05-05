@@ -1,0 +1,59 @@
+/// Format and default values
+/// 
+/// Job = {
+///     
+///     //will be read and deleted by job
+///     sync:         true,
+///     dir:          '../../',		//will append after JobPack
+///     
+///     env:          process.env,   
+///     env_append:   {}, 
+///       //json env like: {Path: 'aaa/bbb;ddd/kkk', OS: 'linux'}
+///     
+///     command:      'ls',
+///     
+/// }
+/// 
+/// JobList = [
+///     <job>,
+///     <job>,
+///     <job>,
+///     <job>,
+/// }
+/// 
+/// JobPack = {
+///     dir:        '/user/',
+///     sync:         true,
+///     env:          process.env,
+///     env_append:        {},
+///     job_list:      [],
+/// }
+/// 
+/// 
+/// 
+//Job Pack
+
+
+{
+    "dir": ".",
+    "sync": true,
+    "env_append": {
+        "WORKSPACE": "/Users/ago/workspace/jenkins/workspace/cc_cn",
+        "LANG_VERSION": "agocn"
+    },
+    "job_list": [
+                 //the jobs to do
+                 {
+                 "dir": "./res",
+                 "command": "node ../script/VersionSwitcherASync.js ../script/switch_cn.json"
+                 },
+                 {
+                 "dir": "./",
+                 "command": "./script/build_develop.sh"
+                 },
+                 {
+                 "dir": "./res",
+                 "command": "svn revert ./ -R"
+                 }
+                 ]
+}

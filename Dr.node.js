@@ -28,7 +28,7 @@ else {
 		loop_load_script();
 	};
 	
-	Dr.LoadJsonFile = function (file_path) {
+	Dr.loadJsonFile = function (file_path) {
 		var file_text = Fs.readFileSync(file_path, {encoding: 'utf8'});
 		//delete the '//...' from each line to support basic comment
 		var file_line_array = file_text.split('\n');
@@ -38,6 +38,8 @@ else {
 			if (text_without_comment) json_line_array.push(text_without_comment);
 		}
 		var json_text = json_line_array.join('\n');
+		//Dr.log('Get Json from file:', file_path);
+		//Dr.log(json_text);
 		return JSON.parse(json_text);
 	}
 }

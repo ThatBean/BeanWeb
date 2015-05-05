@@ -327,6 +327,14 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 		}
 	})();
 	
+	Dr.pick = function (pack, key) {
+		if (pack instanceof Object) {
+			var temp = pack[key];
+			delete pack[key];
+			return temp;
+		}
+	}
+	
 	Dr.combine = function (base, addon) {
 		var result = (base instanceof Array && addon instanceof Array) ? [] : {};
 		for (var i in base) result[i] = base[i];

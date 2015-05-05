@@ -1,19 +1,24 @@
 Dr.Declare('JobBase', 'class');
 Dr.Implement('JobBase', function (global, module_get) {
-	var Module = function (data, callback) {
+	var Module = function () {
+		
+	};
+		
+	Module.prototype.init = function (data, callback) {
 		this.data = data;
 		this.callback = callback;
-	}
+	};
 	
 	Module.status = {
 		Error: 'Error',
 		Start: 'Start',
-		Finish: 'Finish',
+		End: 'End',		//end of a job
+		Finish: 'Finish',	//end of all job
 	}
 	
 	Module.prototype.start = function () {
 		console.warn('[job start]');
-		return this.callback();
+		return this.callback(Module.status.End);
 	}
 
 	return Module;
@@ -21,11 +26,15 @@ Dr.Implement('JobBase', function (global, module_get) {
 
 
 Dr.Declare('JobCenter', 'class');
+Dr.Require('JobCenter', 'JobBase');
 Dr.Implement('JobCenter', function (global, module_get) {
+	var JobBase = Dr.Get('JobBase');
 	
 	var Module = function () {
 		//
 	};
+	
+	Module.status = JobBase.status;
 	
 	Module.prototype.init = function (job_data_list, job_create_func, callback) {
 		this.job_data_list = job_data_list;
@@ -54,7 +63,7 @@ Dr.Implement('JobCenter', function (global, module_get) {
 		}
 		else {
 			console.warn('[JobCenter] all job finished');
-			this.callback('Finish');
+			this.callback(Module.status.Finish);
 		}
 	}
 
@@ -65,7 +74,7 @@ Dr.Implement('JobCenter', function (global, module_get) {
 			this.job_callback = function (status) {
 				var is_continue = true;
 				
-				if (status == 'Error') {
+				if (status == Module.status.Error) {
 					Dr.log('[Error] arguments:', arguments);
 					is_continue = _this.callback.apply(_this, arguments);
 				};
