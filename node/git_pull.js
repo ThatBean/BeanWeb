@@ -64,7 +64,7 @@ Dr.loadLocalScript('../Dr.node.js', function () {
 				default:
 					return '[status] \n'
 						+ 'is_running: ' + is_running.toString() + '\n'
-						+ 'last_log: ' + last_log + '\n';
+						+ 'last_log: ' + last_log + '\n'
 						+ 'last_change_log: ' + last_change_log + '\n';
 					break;
 				
