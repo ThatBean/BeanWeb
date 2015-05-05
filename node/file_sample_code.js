@@ -8,21 +8,23 @@ Dr.loadLocalScript('./file.js', function () {
 	var test_path = './test';
 	Directory.create('./').modify('copy', test_path);
 	
-	var test = Directory.create(test_path);
-	test.walk(function (path, name, type) {
-		//console.log('Get', ' - ', path, ' - ', name, ' - ', type);
-	})
+	var test_directory = Directory.create(test_path);
+	test_directory.walk(function (path, name, type) {
+		console.log('Get', ' - ', path, ' - ', name, ' - ', type);
+		if (type == 'Directory') return 'continue';
+	}, true);
 	
-	test.modify('copy', './test_copy/');
+	test_directory.modify('copy', './test_copy/');
 	
-	test.modify('copy', './test_move/');
+	test_directory.modify('copy', './test_move/');
 	Directory.create('./test_move').modify('move', './test_move_to/');
 	
-	test.modify('copy', './test_delete/');
+	test_directory.modify('copy', './test_delete/');
 	Directory.create('./test_delete').modify('delete');
 	
 	Directory._delete('Directory', './test_move/');
 	Directory._delete('Directory', './test_delete/');
+	
 	
 	//Dr.startREPL();
 });

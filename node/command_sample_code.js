@@ -6,8 +6,6 @@ Dr.loadLocalScript('./command.js', function () {
 	var Command = Dr.Get('Command');
 	
 	Command.run('cd', {
-		stdoutLog: true,
-		stderrLog: true,
 		callbackOutput: function (event, from, data) {
 			Dr.log(arguments);
 			if (data) Dr.log(data.toString());

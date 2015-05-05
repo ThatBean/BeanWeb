@@ -152,20 +152,22 @@ Dr.Implement('Directory', function (global, module_get) {
 		for (var type in this.content) {
 			var list = this.content[type];
 			for (var index in list) {
-				if (type == 'Directory') {
-					var name = index;
-					if (is_call_before_walk) {
-						callback(this.path, name, type);
-						list[index].walk(callback, is_call_before_walk);
-					}
-					else {
-						list[index].walk(callback, is_call_before_walk);
-						callback(this.path, name, type);
-					}
+				var name;
+				if (type == 'Directory') name = index;
+				else name = list[index];
+				
+				if (type == 'Directory' && !is_call_before_walk) {
+					list[index].walk(callback, is_call_before_walk);
 				}
-				else {
-					var name = list[index];
-					callback(this.path, name, type);
+				
+				var option = callback(this.path, name, type);
+				
+				if (option == 'continue') continue;	//skip current (should be sub Directory + is_call_before_walk == false)
+				if (option == 'break') break;	//skip current content type
+				if (option == 'return') return;	//skip the rest of content
+				
+				if (type == 'Directory' && is_call_before_walk) {
+					list[index].walk(callback, is_call_before_walk);
 				}
 			}
 		}
