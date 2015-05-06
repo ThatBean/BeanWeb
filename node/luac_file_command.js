@@ -39,7 +39,7 @@ if (global_args.length < 4) {
 	process.exit(-1);
 }
 
-var regexp_selector = RegExp(reg_exp_selector_string);
+var regexp_selector = RegExp(regexp_selector_string);
 
 var job_func_list = [];
 var run_job_func = function () {
@@ -72,7 +72,7 @@ Dr.loadLocalScript('../Dr.node.js', function () {
 		var directory = Directory.create(target_dir);
 		
 		directory.walk(function (path, name, type) {
-			if (type == 'File' && name.match(reg_exp_selector)) {
+			if (type == 'File' && name.match(regexp_selector)) {
 				var current_path = Path.join(path, name);
 				
 				var luac_command = ([
@@ -83,7 +83,7 @@ Dr.loadLocalScript('../Dr.node.js', function () {
 				]).join(' ');
 				
 				var command_config = {
-					cwd: path,
+					cwd: process.cwd(),
 					stdoutStream: process.stdout,
 					stderrStream: process.stdout,
 				};
