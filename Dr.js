@@ -3,7 +3,7 @@ var DrAuthor = 'Bean/Dr.Eames';
 var DrVersion = '0.11';
 var DrEnvironment = 'default';
 
-var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVersion) ? Dr : (function (undefined) {
+var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.version >= DrVersion) ? Dr : (function (undefined) {
 	
 	// Check Environment
 	console.log('[Dr] Check Environment...');
@@ -30,12 +30,12 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 	
 	var Dr = function () {
 		Dr.log('[Dr] A Frame by ' + Dr.author);
-		Dr.log('[Dr] Version ' + Dr.verion);
+		Dr.log('[Dr] Version ' + Dr.version);
 		Dr.log('[Dr] Environment ' + Dr.environment);
 	}
 	
 	Dr.author = DrAuthor;
-	Dr.verion = DrVersion;
+	Dr.version = DrVersion;
 	Dr.environment = DrEnvironment;
 	
 	Dr.global = this.global || this;	//normally window, or {} for a sandbox?
@@ -604,6 +604,8 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.verion >= DrVe
 				};
 			case 'node':
 				return function (script_src, callback) {
+					var script_src = Dr.getLocalPath(script_src);
+					
 					try {
 						var Fs = require('fs');
 						var Vm = require('vm');
@@ -633,6 +635,16 @@ switch (Dr.environment) {
 		//Dr.loadLocalScript('./Dr.node.js');
 		global.Dr = Dr;
 		module.exports = Dr;
+		
+		//Dr.log('process.argv', process.argv);
+		Dr.node_exe = process.argv[0];
+		
+		var Path = require('path');
+		Dr.node_start_script_path = Path.resolve(process.cwd(), Path.dirname(process.argv[1]));
+		Dr.getLocalPath = function (relative_path) {
+			return Path.join(Dr.node_start_script_path, relative_path);
+		}
+		Dr.log('node_start_script_path:', Dr.node_start_script_path);
 		
 		Dr.require = require;
 		Dr.startREPL = function () {

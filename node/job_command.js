@@ -79,6 +79,8 @@ function defineCommandJobModule () {
 		//Module.prototype = new JobBase;	//in fact not so useful
 		Module.prototype.start = function () {
 			Dr.log('[CommandJob][start] id:', this.id);
+			Dr.log('--dir:', this.job_config.cwd);
+			Dr.log('--command:', this.job_config.command);
 			Command.run(this.job_config.command, this.job_config);
 			if (!this.job_config.sync) this.callback(Module.status.End, this.id, 'sync == false');
 		}
