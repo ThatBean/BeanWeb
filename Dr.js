@@ -335,6 +335,12 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.version >= DrV
 		}
 	}
 	
+	Dr.reverseKeyValue = function (pack, key_override) {
+		var reverse_pack = {};
+		for (var key in pack) reverse_pack[pack[key]] = key_override || key;
+		return reverse_pack;
+	}
+	
 	Dr.combine = function (base, addon) {
 		var result = (base instanceof Array && addon instanceof Array) ? [] : {};
 		for (var i in base) result[i] = base[i];

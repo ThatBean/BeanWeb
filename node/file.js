@@ -14,7 +14,7 @@ Dr.Implement('Directory', function (global, module_get) {
 			var stat = Fs.lstatSync(path);
 			if (stat.isDirectory()) path_type = 'Directory';
 			else if (stat.isFile()) path_type = 'File';
-			else if (stat.isSymbolicLink()) path_type = 'SymbolicLink';
+			//else if (stat.isSymbolicLink()) path_type = 'SymbolicLink';
 			else path_type = 'Other';
 		}
 		catch (error) {
@@ -42,7 +42,7 @@ Dr.Implement('Directory', function (global, module_get) {
 		}
 		switch (path_type) {
 			case 'File':
-			case 'SymbolicLink':
+			//case 'SymbolicLink':
 				return Fs.unlinkSync(path);
 			case 'Directory':
 				return Fs.rmdirSync(path);
@@ -60,7 +60,7 @@ Dr.Implement('Directory', function (global, module_get) {
 		}
 		switch (path_type) {
 			case 'File':
-			case 'SymbolicLink':
+			//case 'SymbolicLink':
 			case 'Directory':
 				return Fs.renameSync(from_path, to_path);
 			default:
@@ -78,7 +78,7 @@ Dr.Implement('Directory', function (global, module_get) {
 		}
 		switch (path_type) {
 			case 'File':
-			case 'SymbolicLink':
+			//case 'SymbolicLink':
 				return Module.copyFileSync(from_path, to_path);
 			case 'Directory':
 				return Fs.mkdirSync(to_path);
@@ -119,7 +119,7 @@ Dr.Implement('Directory', function (global, module_get) {
 		this.content = {
 			'Directory': {},
 			'File': [],
-			'SymbolicLink': [],
+			//'SymbolicLink': [],
 			'Other': [],
 		};
 		
@@ -127,7 +127,7 @@ Dr.Implement('Directory', function (global, module_get) {
 	};
 	
 	Module.prototype.init_content = function () {
-		Dr.log('init_content', Path.dirname(this.path));
+		//Dr.log('init_content', this.path);
 		var content = Module.getDirContent(this.path);
 		for (var index in content) {
 			var name = content[index];
@@ -135,7 +135,7 @@ Dr.Implement('Directory', function (global, module_get) {
 			var path_type = Module.getPathType(sub_path);
 			switch (path_type) {
 				case 'File':
-				case 'SymbolicLink':
+				//case 'SymbolicLink':
 					this.content[path_type].push(name);
 					break;
 				case 'Directory':
