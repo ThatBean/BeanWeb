@@ -648,7 +648,7 @@ switch (Dr.environment) {
 		var Path = require('path');
 		Dr.node_start_script_path = Path.resolve(process.cwd(), Path.dirname(process.argv[1]));
 		Dr.getLocalPath = function (relative_path) {
-			return Path.join(Dr.node_start_script_path, relative_path);
+			return Path.resolve(Dr.node_start_script_path, relative_path);
 		}
 		Dr.log('node_start_script_path:', Dr.node_start_script_path);
 		

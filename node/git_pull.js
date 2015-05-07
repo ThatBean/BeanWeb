@@ -1,4 +1,4 @@
-require('../Dr.js');
+require('./Dr.js');
 
 var port = 888;
 var host_name = undefined;
@@ -6,10 +6,10 @@ var is_running = false;
 var last_log = '';
 var last_change_log = '';
 
-Dr.loadLocalScript('../Dr.node.js', function () {
+Dr.loadLocalScript('./Dr.node.js', function () {
 	Dr.loadScriptByList([
-		'./command.js',
-		'./server.js',
+		'./module/command.js',
+		'./module/server.js',
 	], function () {
 		Dr.log("All script loaded");
 		

@@ -1,0 +1,2 @@
+// redirect
+require('../Dr.js');

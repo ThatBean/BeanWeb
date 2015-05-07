@@ -1,4 +1,4 @@
-require('../Dr.js');
+require('./Dr.js');
 
 var global_args = process.argv;
 
@@ -22,10 +22,10 @@ if (!config_file) {
 
 var Path = Dr.require('path');
 
-Dr.loadLocalScript('../Dr.node.js', function () {
+Dr.loadLocalScript('./Dr.node.js', function () {
 	Dr.loadScriptByList([
-		'./command.js',
-		'./job_center.js',
+		'./module/command.js',
+		'./module/job_center.js',
 	], function () {
 		
 		Dr.log("All script loaded");
