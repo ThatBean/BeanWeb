@@ -1,0 +1,21 @@
+//// JSON config file
+
+{
+	//// [Required]
+	// Version suffix is located at the end of file name, before file extension, like:
+	//   "file_cn.txt"
+	//   "tar_ko.tar.gz"
+	// The file name itself should not contain "."
+
+	"version_suffix_list": [
+		"agocn",
+		"agoko"
+	],
+	"version_suffix_seperator": "_",	//so that a suffix looks better
+
+	//// [Optional]
+	// the command line version is first used, then this is used
+
+	"target_version": "agocn",	// For no suffix version, use "DEFAULT"
+	"target_dir": "."		//default: "./"
+}

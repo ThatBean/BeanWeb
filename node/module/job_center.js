@@ -17,7 +17,7 @@ Dr.Implement('JobBase', function (global, module_get) {
 	}
 	
 	Module.prototype.start = function () {
-		console.warn('[job start]');
+		Dr.debug(5, '[job start]');
 		return this.callback(Module.status.End);
 	}
 
@@ -51,17 +51,17 @@ Dr.Implement('JobCenter', function (global, module_get) {
 			var job = this.job_create_func(job_data, this.getJobCallback());
 			this.job_list.push(job);
 		}
-		Dr.log('inited', this.job_list.length, 'Job');
+		Dr.debug(5, 'inited', this.job_list.length, 'Job');
 	}
 
 	Module.prototype.start = function () {
 		var next_job = this.job_list.shift();
 		if (next_job) {
-			Dr.log('start next job, left:', this.job_list.length);
+			Dr.debug(5, 'start next job, left:', this.job_list.length);
 			next_job.start();
 		}
 		else {
-			Dr.log('[JobCenter] all job finished');
+			Dr.debug(10, '[JobCenter] all job finished');
 			this.callback(Module.status.Finish);
 		}
 	}
@@ -82,7 +82,7 @@ Dr.Implement('JobCenter', function (global, module_get) {
 					_this.start();
 				}
 				else {
-					console.warn('[JobCenter] stopped with status:', status);
+					Dr.log('[JobCenter] stopped with status:', status);
 					_this.callback.apply(_this, arguments);
 				}
 			};

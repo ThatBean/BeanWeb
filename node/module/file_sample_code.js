@@ -5,6 +5,8 @@ Dr.loadLocalScript('./file.js', function () {
 	Dr.LoadAll();
 	var Directory = Dr.Get('Directory');
 	
+	Dr.debugLogLevel = 1;
+	
 	var test_path = './test';
 	Directory.create('./').modify('copy', test_path);
 	
@@ -25,6 +27,16 @@ Dr.loadLocalScript('./file.js', function () {
 	Directory._delete('Directory', './test_move/');
 	Directory._delete('Directory', './test_delete/');
 	
+	//test modify
+	
+	var test_path = './test_modify';
+	Directory.modify('copy', 'Directory', './', test_path);
+	Directory.modify('copy', 'Directory', test_path, './test_modify_copy');
+	Directory.modify('copy', 'Directory', test_path, './test_modify_delete');
+	Directory.modify('copy', 'Directory', test_path, './test_modify_move');
+	
+	Directory.modify('delete', 'Directory', './test_modify_delete');
+	Directory.modify('move', 'Directory', './test_modify_move', './test_modify_move_to');
 	
 	//Dr.startREPL();
 });

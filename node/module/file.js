@@ -35,7 +35,7 @@ Dr.Implement('Directory', function (global, module_get) {
 	
 	
 	Module._delete = function (path_type, path) {
-		Dr.log('[_delete]', arguments);
+		Dr.debug(5, '[_delete]', arguments);
 		if (Module.getPathType(path) === 'Error') {
 			Dr.log('[_delete] non-exist, skipped');
 			return;
@@ -53,7 +53,7 @@ Dr.Implement('Directory', function (global, module_get) {
 	}
 	
 	Module._move = function (path_type, from_path, to_path) {
-		Dr.log('[_move]', arguments);
+		Dr.debug(5, '[_move]', arguments);
 		if (Module.getPathType(to_path) === path_type) {
 			Dr.log('[_move] exist, skipped');
 			return;
@@ -71,7 +71,7 @@ Dr.Implement('Directory', function (global, module_get) {
 	
 	
 	Module._copy = function (path_type, from_path, to_path) {
-		Dr.log('[_copy]', arguments);
+		Dr.debug(5, '[_copy]', arguments);
 		if (Module.getPathType(to_path) === path_type) {
 			Dr.log('[_copy] exist, skipped');
 			return;
@@ -127,7 +127,7 @@ Dr.Implement('Directory', function (global, module_get) {
 	};
 	
 	Module.prototype.init_content = function () {
-		//Dr.log('init_content', this.path);
+		Dr.debug(5, 'init_content', this.path);
 		var content = Module.getDirContent(this.path);
 		for (var index in content) {
 			var name = content[index];
@@ -201,7 +201,7 @@ Dr.Implement('Directory', function (global, module_get) {
 		}
 		
 		var callback = function (path, name, type)  {
-			Dr.log(path, name, type);
+			Dr.debug(1, path, name, type);
 			var from_path = Path.join(path, name);
 			if (to_path_root) {
 				to_path_list[from_path] = Path.join(to_path_list[path], name);
@@ -213,6 +213,33 @@ Dr.Implement('Directory', function (global, module_get) {
 		};
 		
 		this.walk(callback, is_call_before_walk);
+	};
+	
+	Module.modify = function (operation, type, path, to_path) {
+		var type = type || Module.getPathType(path);
+		
+		switch (operation) {
+			case 'copy':
+			case 'delete':
+			case 'move':
+				break;
+			default:
+				Dr.log('[modify] Error operation', operation);
+				return;
+				break;
+		}
+		
+		if (type == 'File') {
+			Module['_' + operation](type, path, to_path);
+			return;
+		}
+		if (type == 'Directory') {
+			Module.create(path).modify(operation, to_path);
+			if (operation == 'delete' || operation == 'move') Module._delete('Directory', path);
+			return;
+		}
+		Dr.log('[modify] Error type', type);
+		return;
 	};
 	
 	Module.create = function (path) {

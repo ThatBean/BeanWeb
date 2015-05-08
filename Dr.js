@@ -1,9 +1,14 @@
 // Js Dr Bean Dr.Eames
 var DrAuthor = 'Bean/Dr.Eames';
 var DrVersion = '0.11';
-var DrEnvironment = 'default';
+var DrEnvironment = 'unknown';
 
-var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.version >= DrVersion) ? Dr : (function (undefined) {
+// Prevent unnecessary re-define
+var Dr = (
+	typeof(Dr) == 'function' 
+	&& Dr.author == DrAuthor 
+	&& Dr.version >= DrVersion
+) ? Dr : (function (undefined) {
 	
 	// Check Environment
 	console.log('[Dr] Check Environment...');
@@ -163,7 +168,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.version >= DrV
 				return;
 			}
 			
-			Dr.log('[load] try load module', module_name);
+			Dr.debug(5, '[load] try load module', module_name);
 			
 			//loop for all required
 			var require_name_list = module_data.require;
@@ -197,10 +202,10 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.version >= DrV
 			var left_module_name_list;
 			
 			while(left_to_load != 0) {
-				Dr.log('[loadAll] start', left_to_load, last_left_to_load, left_module_name_list);
+				Dr.debug(5, '[loadAll] start', left_to_load, last_left_to_load, left_module_name_list);
 				
 				if (last_left_to_load == left_to_load) {
-					alert('[loadAll] Still has ' + left_to_load + ' left ot load, infinite loop load?');
+					Dr.log('[loadAll] Still has ' + left_to_load + ' left ot load, infinite loop load?');
 					break;
 				}
 				
@@ -213,7 +218,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.version >= DrV
 					if (module_data.status.load == false) {
 						this.load(module_name);
 						if (module_data.status.load == true) {
-							Dr.log('[loadAll] loaded', module_name);
+							Dr.debug(10, '[loadAll] loaded', module_name);
 						}
 						else {
 							left_to_load += 1;
@@ -396,8 +401,15 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.version >= DrV
 	
 	Dr.log = function () {
 		var arg_list = Dr.getArgumentArray(arguments);
-		Dr.assertList(arg_list);
+		Dr.logList(arg_list);
 	}
+	Dr.debug = function (debug_level) {
+		if (!Dr.debugLogLevel || Dr.debugLogLevel > debug_level) return;
+		var arg_list = Dr.getArgumentArray(arguments);
+		arg_list.shift();
+		Dr.logList(arg_list);
+	}
+	Dr.debugLogLevel = 0;
 	
 	Dr.assert = function () {
 		var arg_list = Dr.getArgumentArray(arguments);
@@ -435,14 +447,38 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.version >= DrV
 	Dr.Declare('LogProto', 'class');
 	Dr.Implement('LogProto', function (global, module_get) {
 		var Module = function () {
+			this._is_show_debug = false;
+			this._show_debug_level = 1;	//0 = normal log
+			
 			this._is_record_history = true;
 			this._log_history = [];
 		}
 		Module.prototype.log = function () {
 			var arg_list = Dr.getArgumentArray(arguments);
+			//add time tag
 			arg_list.unshift('[' + Dr.now().toFixed(4) + 'sec]');
+			//show in log
 			Dr.logList(arg_list);
+			//check if record
 			if (this._is_record_history) this._log_history.push(arg_list);
+		}
+		Module.prototype.debug = function (debug_level) {
+			var arg_list = Dr.getArgumentArray(arguments);
+			//remove debug_level
+			arg_list.shift();
+			//add debug tag
+			if (debug_level && debug_level > 0) arg_list.unshift('{' + debug_level + '}');
+			//add time tag
+			arg_list.unshift('[' + Dr.now().toFixed(4) + 'sec]');
+			//check if show in log
+			if (!debug_level || (this._is_show_debug && debug_level >= this._show_debug_level)) Dr.logList(arg_list);
+			//check if record
+			if (this._is_record_history) this._log_history.push(arg_list);
+		}
+		Module.prototype.setDebug = function (debug_level) {
+			var debug_level = debug_level || 0;
+			this._is_show_debug = (debug_level > 0);
+			this._show_debug_level = debug_level;	//0 = normal log
 		}
 		Module.prototype.getHistory = function () {
 			return this._log_history;
@@ -506,7 +542,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.version >= DrV
 		}
 		
 		Module.prototype.emit = function (event_key) {
-			Dr.log("[emit] Get", event_key)
+			Dr.debug(5, "[emit] Get", event_key)
 			
 			var args = Dr.getArgumentArray(arguments, 1);
 			args.unshift(event_key);
@@ -548,7 +584,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.version >= DrV
 			//Dr.log('Dr.Update', delta_sec);
 			
 			if (this._is_active) Dr.onNextProperUpdate(this._update_func);
-			else Dr.log('[UpdateLoop] Stopped');
+			else Dr.debug(10, '[UpdateLoop] Stopped');
 		}
 		
 		
@@ -576,7 +612,7 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.version >= DrV
 		Module.prototype.toggle = function (key, value) {
 			if (value == undefined) this[key] = !this[key];
 			else this[key] = value;
-			Dr.log('[Toggle]', key, value, this[key]);
+			Dr.debug(5, '[Toggle]', key, value, this[key]);
 		}
 		
 		return Module;
@@ -588,8 +624,12 @@ var Dr = (typeof(Dr) == 'function' && Dr.author == DrAuthor && Dr.version >= DrV
 	
 	Dr.UpdateLoop = Dr.GetNew('UpdateLoopProto');
 	
+	/* currently no need
 	Dr.Log = Dr.GetNew('LogProto');
 	Dr.log = function () { Dr.Log.log.apply(Dr.Log, Dr.getArgumentArray(arguments)); }
+	Dr.debug = function (debug_level) { Dr.Log.debug.apply(Dr.Log, Dr.getArgumentArray(arguments)); }
+	Dr.setDebug = function (debug_level) { Dr.Log.setDebug.apply(Dr.Log, Dr.getArgumentArray(arguments)); }
+	*/
 	
 	Dr.Toggle = Dr.GetNew('ToggleProto');
 	Dr.toggle = function () { Dr.Toggle.toggle.apply(Dr.Toggle, Dr.getArgumentArray(arguments)); }
@@ -650,7 +690,7 @@ switch (Dr.environment) {
 		Dr.getLocalPath = function (relative_path) {
 			return Path.resolve(Dr.node_start_script_path, relative_path);
 		}
-		Dr.log('node_start_script_path:', Dr.node_start_script_path);
+		Dr.debug(10, 'node_start_script_path:', Dr.node_start_script_path);
 		
 		Dr.require = require;
 		Dr.startREPL = function () {

@@ -1,5 +1,7 @@
 require('./Dr.js');
 
+//Dr.debugLogLevel = 1;
+
 var global_args = process.argv;
 
 var node_exe = global_args[0];
@@ -60,6 +62,7 @@ Dr.loadLocalScript('./Dr.node.js', function () {
 		
 		Dr.LoadAll();
 		
+		Dr.log('[Dr] version file config_file:', config_file);
 		var version_config = Dr.loadJsonFile(config_file);
 		
 		var VersionCenter = Dr.Get('VersionCenter');
@@ -101,6 +104,7 @@ function defineVersionCenterModule () {
 				Dr.log('[VersionCenter] target_dir not valid directory! target_dir:', target_dir, Directory.getPathType(target_dir));
 			}
 			
+			Dr.debug(5, '[VersionCenter] target_dir:', target_dir);
 			this.target_dir = target_dir;
 			this.verisoned_list = [];
 			
@@ -111,12 +115,12 @@ function defineVersionCenterModule () {
 				//console.log('Get', ' - ', path, ' - ', name, ' - ', type);
 				
 				if (type != 'Directory' && type != 'File') {
-					Dr.log('[VersionCenter] Skipped unknown type', path, name, type);
+					Dr.log('[VersionCenter] Skipped unknown type', type, path, name);
 					return;
 				}
 				
 				if (name[0] == '.') {
-					Dr.log('[VersionCenter] Skipped hidden file', path, name, type);
+					Dr.log('[VersionCenter] Skipped hidden file', type, path, name);
 					return 'continue';
 				}
 				
@@ -127,6 +131,7 @@ function defineVersionCenterModule () {
 					_this.verisoned_list.push({
 						path: path,
 						type: type,
+						version: result.version_suffix,
 						name_versioned: result.name_versioned,
 						name_unversioned: result.name_unversioned,
 					})
@@ -151,10 +156,62 @@ function defineVersionCenterModule () {
 				return;
 			}
 			
+			Dr.log('[VersionCenter] target_version:', target_version);
 			this.target_version = target_version;
 			
 			Dr.log(this.verisoned_list);
 			
+			var delete_list = [];
+			var rename_list = [];
+			
+			//sort versioned list
+			for (var index in this.verisoned_list) {
+				var versioned_info = this.verisoned_list[index];
+				if (versioned_info.version == target_version) {
+					rename_list.push([
+						versioned_info.type, 
+						versioned_info.path, 
+						versioned_info.name_versioned,
+						versioned_info.name_unversioned
+					]);
+					delete_list.push([
+						versioned_info.type, 
+						versioned_info.path, 
+						versioned_info.name_unversioned
+					]);
+				}
+				else {
+					delete_list.push([
+						versioned_info.type, 
+						versioned_info.path, 
+						versioned_info.name_versioned
+					]);
+				}
+			}
+			
+			Dr.log('delete_list', delete_list);
+			Dr.log('rename_list', rename_list);
+			
+			//delete first
+			for (var index in delete_list) {
+				var type = delete_list[index][0];
+				var path = delete_list[index][1];
+				var name = delete_list[index][2];
+				
+				Directory.modify('delete', type, Path.join(path, name));
+			}
+			
+			//then rename
+			for (var index in rename_list) {
+				var type = rename_list[index][0];
+				var path = rename_list[index][1];
+				var name = rename_list[index][2];
+				var name_to = rename_list[index][3];
+				
+				Directory.modify('move', type, Path.join(path, name), Path.join(path, name_to));
+			}
+			
+			//callback
 			if (callback) callback();
 		}
 		

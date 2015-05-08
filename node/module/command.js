@@ -57,13 +57,13 @@ Dr.Implement('Command', function (global, module_get) {
 
 		///on exit
 		sub_process.on('exit', function(code, signal) {
-			console.warn('[Exit] code:', code, ' signal:', signal);
+			Dr.debug(10, '[Exit] code:', code, ' signal:', signal);
 			if (options.callback) options.callback(code, signal);
 		});
 
 		///on exit
 		sub_process.on('error', function(error) {
-			console.warn('[Error] error:', error);
+			Dr.log('[Error] error:', error);
 			if (error.stack) Dr.log(error.stack);
 			if (options.callback) options.callback(-1, error);
 		});

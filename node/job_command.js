@@ -71,7 +71,7 @@ function defineCommandJobModule () {
 			var _this = this;
 			this.job_config.callback = function (code, signal) {
 				var status = (code == 0 ? Module.status.End : Module.status.Error);
-				Dr.log('[CommandJob][callback] id:', _this.id, 'status:', status, code, signal);
+				Dr.debug(5, '[CommandJob][callback] id:', _this.id, 'status:', status, code, signal);
 				if (_this.job_config.sync) _this.callback(status, _this.id, code, signal);
 			}
 		}
@@ -116,7 +116,7 @@ function startJobCenter (job_config_list) {
 }
 
 function loadJobConfig (config_file) {
-	Dr.log('[loadJobConfig] config_file:', config_file);
+	Dr.debug(5, '[loadJobConfig] config_file:', config_file);
 	var config_src = Dr.loadJsonFile(config_file);
 	
 	var global_config = {

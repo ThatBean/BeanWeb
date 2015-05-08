@@ -44,7 +44,7 @@ Dr.loadLocalScript('./Dr.node.js', function () {
 							callback: function (code, signal) {
 								//Dr.log(arguments);
 								//if (data) Dr.log(data.toString());
-								console.warn('[Exit] code:', code, ' signal:', signal);
+								Dr.log('[Exit] code:', code, ' signal:', signal);
 								is_running = false
 								if (last_log.search('file') != -1 || last_log.search('change') != -1) {
 									last_change_log = last_log;

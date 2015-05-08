@@ -51,8 +51,8 @@ Dr.Implement('Request', function (global, module_get) {
 	};
 	
 	Module.prototype.onRespond = function (request, response) {
-		Dr.log('STATUS: ' + respond.statusCode);
-		Dr.log('HEADERS: ' + JSON.stringify(respond.headers));
+		Dr.debug(5, 'STATUS: ' + respond.statusCode);
+		Dr.debug(5, 'HEADERS: ' + JSON.stringify(respond.headers));
 		
 		var buffer = '';
 		var _this = this;

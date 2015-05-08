@@ -3,7 +3,7 @@ if (typeof(Dr) === 'undefined' || Dr.environment !== 'browser') {
 }
 else {
 	// Required Non-Standard-JavaScript Methods
-	console.log('[Dr] Adding browser methods...');
+	Dr.log('[Dr] Adding browser methods...');
 
 	var _key_code_to_def = {
 		'8': 'K_BACKSPACE',
@@ -186,7 +186,7 @@ else {
 		return document.getElementsByTagName("body")[0];
 	};
 	Dr.loadScript = function (script_src, callback) {
-		Dr.log('Loading Script:', script_src);
+		Dr.debug(10, 'Loading Script:', script_src);
 		var script_element = document.createElement('script');
 		script_element.type = 'text/javascript';
 		script_element.async = true;
@@ -199,7 +199,7 @@ else {
 	};
 	Dr.loadScriptByList = function (script_src_list, callback) {
 		var loop_load_script = function () {
-			Dr.log("[loadScriptByList]", script_src_list);
+			Dr.debug(10, '[loadScriptByList]', script_src_list);
 			if (script_src_list.length <= 0) callback();
 			else Dr.loadScript(script_src_list.shift(), loop_load_script);
 		}
@@ -406,7 +406,7 @@ else {
 		};
 	};
 
-	console.log('[Dr] Finished adding browser methods...');
+	Dr.log('[Dr] Finished adding browser methods...');
 
 
 
