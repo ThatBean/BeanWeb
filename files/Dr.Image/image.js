@@ -62,7 +62,7 @@ Dr.Implement('ImageData', function (global, module_get) {
 	
 	Module.prototype.drawImageDataClip = function (context, x, y, clip_x, clip_y, clip_width, clip_height) {
 		//context.putImageData(imgData,x,y,dirtyX,dirtyY,dirtyWidth,dirtyHeight);
-		context.putImageData(this._data, x, y, clip_x, clip_y, clip_width, clip_height);
+		context.putImageData(this._data, clip_x ? x - clip_x : x, clip_y ? y - clip_y : y, clip_x, clip_y, clip_width, clip_height);
 	}
 	
 	return Module;
