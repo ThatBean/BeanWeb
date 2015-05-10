@@ -60,7 +60,7 @@
 		
 		window.onload = function () {
 			set_body_padding();
-			scale_canvas();
+			//scale_canvas();
 		}
 	</script>
 </head>
@@ -90,11 +90,6 @@
 		</div>
 		
 		<div>
-			<button onclick="Dr.Switch.Switch('Log')">Switch Log</button>
-			<button onclick="Dr.Switch.Switch('Render')">Switch Render</button>
-			<button onclick="Dr.Switch.Switch('Skeleton')">Switch Skeleton</button>
-			<br />
-			<br />
 			<button onclick="Dr.Event.emit('KEY_UP', null, 'K_LEFT')">[Left]</button>
 			<button onclick="Dr.Event.emit('KEY_UP', null, 'K_RIGHT')">[Right]</button>
 			<button onclick="Dr.Event.emit('KEY_UP', null, 'K_UP')">[ Up ]</button>
