@@ -48,21 +48,21 @@ Dr.Implement('ImageData', function (global, module_get) {
 	}
 	
 	Module.prototype.drawImage = function (context, x, y) {
-		context.drawImage(this.data, x, y);
+		context.drawImage(this._data, x, y);
 	}
 	
 	Module.prototype.drawImageData = function (context, x, y) {
-		context.putImageData(this.data, x, y);
+		context.putImageData(this._data, x, y);
 	}
 	
 	Module.prototype.drawImageClip = function (context, x, y, clip_x, clip_y, clip_width, clip_height) {
 		//context.drawImage(img,sx,sy,swidth,sheight,x,y,width,height);
-		context.drawImage(this.data, clip_x, clip_y, clip_width, clip_height, x, y, clip_width, clip_height);
+		context.drawImage(this._data, clip_x, clip_y, clip_width, clip_height, x, y, clip_width, clip_height);
 	}
 	
 	Module.prototype.drawImageDataClip = function (context, x, y, clip_x, clip_y, clip_width, clip_height) {
 		//context.putImageData(imgData,x,y,dirtyX,dirtyY,dirtyWidth,dirtyHeight);
-		context.putImageData(this.data, x, y, clip_x, clip_y, clip_width, clip_height);
+		context.putImageData(this._data, x, y, clip_x, clip_y, clip_width, clip_height);
 	}
 	
 	return Module;

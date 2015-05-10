@@ -152,7 +152,7 @@ Dr.Implement('ImageCache', function (global, module_get) {
 			}
 		}
 		else {
-			if (font_data.font_size && font_data.font_size)
+			//if (font_data.font_size && font_data.font_size)
 		}
 		
 		
@@ -246,7 +246,7 @@ Dr.Implement('BitmapFont', function (global, module_get) {
 			}
 		}
 		else {
-			if (font_data.font_size && font_data.font_size)
+			//if (font_data.font_size && font_data.font_size)
 		}
 		
 		
