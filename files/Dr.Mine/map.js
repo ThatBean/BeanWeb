@@ -42,58 +42,104 @@ Dr.Implement('Mine_Type', function (global, module_get) {
 		L: 'Locked',
 	}
 	
+	// ( [/] )
 	Module.getTLBR = function (x, y) {
 		return x + y > 1;	// true = top
 	}
-	
+	// ( [\] )
 	Module.getTRBL = function (x, y) {
 		return x < y;	// true = top
 	}
 	
+	Module.condensedMap = {
+		HEX: [
+			[
+				[Module.getTLBR, [-1, 0], [0, 0]],
+				[false, [0, 0]],
+				[false, [0, 0]],
+				[Module.getTRBL, [1, 0], [0, 0]]
+				[false, [1, 0]],
+				[false, [1, 0]],
+			], 
+			[
+				[Module.getTRBL, [0, 0], [-1, 0]],
+				[false, [0, 0]],
+				[false, [0, 0]],
+				[Module.getTLBR, [0, 0], [1, 0]]
+				[false, [1, 0]],
+				[false, [1, 0]],
+			], 
+		],
+		TRI: [
+			[
+				[Module.getTRBL, [0, 0], [-1, 1]],
+				[Module.getTLBR, [0, 0], [0, 1]]
+			], 
+			[
+				[Module.getTLBR, [-1, 2], [0, 3]],
+				[Module.getTRBL, [0, 2], [0, 3]]
+			], 
+		],
+	}
 	
 	//the x and y will be normalized first(based on smallest triangle)
-	Module.getBlockFromPosition = function (type, x, y) {
-			switch (type) {
+	Module.getBlockFromPosition = function (block_type, x, y) {
+		var x_integer = Math.floor(x);
+		var y_integer = Math.floor(y);
+		var x_decimal = x - x_integer;
+		var y_decimal = y - y_integer;
+		switch (block_type) {
 			case Module.type.BOX:
-				var row = Math.floor(x);
-				var col = Math.floor(y);
+				var row = x_integer;
+				var col = y_integer;
 				return [row, col];
 				break;
 			case Module.type.HEX:
-				var decimal = x - Math.floor(x);
-				if (decimal >= 0.25 && decimal <= 0.75) {
-					var row = Math.floor(x);
-					var col = Math.floor(y);
-					return [row, col];
+				var row = (x_integer - x_integer % 6) / 3;
+				var col = (y_integer - y_integer % 2) / 2;
+				
+				var map = Module.condensedMap.HEX[y_integer % 2][x_integer % 6];
+				var location_mod;
+				
+				if (map[0]) {
+					location_mod = map[0](x_decimal, y_decimal) ? map[1] : map[2];
 				}
 				else {
-					
+					location_mod = map[1][0];
 				}
 				
-				//shift col down when the row is even
-				var shift_col = ((row % 2 == 0) ? 0 : 1;
-				var row = Math.floor(x);
-				var col = Math.floor(y);
+				row += location_mod[0];
+				col += location_mod[1];
+				
 				return [row, col];
-				return ;
 				break;
 			case Module.type.TRI:
-				//shift col right when the col is (4n +1) or (4n + 2)
-				var shift_col = ((col % 4 == 0 || col % 4 == 3) ? 0 : 1;
-				if (col % 2 == 0) {
-					return ;
+				var row = (x_integer - x_integer % 2);
+				var col = (y_integer - y_integer % 2);
+				
+				var map = Module.condensedMap.HEX[y_integer % 2][x_integer % 2];
+				var location_mod;
+				
+				if (map[0]) {
+					location_mod = map[0](x_decimal, y_decimal) ? map[1] : map[2];
 				}
 				else {
-					return ;
+					location_mod = map[1][0];
+				}
+				
+				row += location_mod[0];
+				col += location_mod[1];
+				
+				return [row, col];
 				break;
 			default:
-				Dr.log('[Mine_Map] error type:', type);
+				Dr.log('[Mine_Map] error block_type:', block_type);
 				break;
 		}
 	}
 	
-	Module.getChainList = function (type, row, col) {
-		switch (type) {
+	Module.getChainList = function (block_type, row, col) {
+		switch (block_type) {
 			case Module.type.BOX:
 				return [
 					[row - 1, col - 1],
@@ -168,7 +214,7 @@ Dr.Implement('Mine_Type', function (global, module_get) {
 				}
 				break;
 			default:
-				Dr.log('[Mine_Map] error type:', type);
+				Dr.log('[Mine_Map] error block_type:', block_type);
 				break;
 		}
 	}
@@ -189,7 +235,27 @@ Dr.Implement('Mine_Block', function (global, module_get) {
 	Module.type = Mine_Type.type;
 	
 	Module.prototype.init = function (map, block_type, x, y, is_mine, special_type) {
+		this._map = map;
+		this._block_type = block_type;
+		this._x = x;
+		this._y = y;
+		this._is_mine = is_mine;
+		this._special_type = special_type;
 		
+		this.initChainList();
+	}
+	
+	Module.prototype.initChainList = function () {
+		this._chain_list = [];
+		
+		var chain_list = Module.getChainList(block_type, row, col);
+		for (index in chain_list) {
+			var row = chain_list[index][0];
+			var col = chain_list[index][1];
+			if (this._map.checkLocationValid(row, col)) {
+				this._chain_list.push([row, col]);
+			}
+		}
 	}
 	
 	Module.prototype.flip = function () {
@@ -219,7 +285,7 @@ Dr.Implement('Mine_Map', function (global, module_get) {
 	
 	Module.type = Mine_Type.type;
 	
-	Module.prototype.init = function (type, width, height, mine_count, special_count_list) {
+	Module.prototype.init = function (type, row, col, mine_block_count, empty_block_count, lock_block_count) {
 		
 		switch (type) {
 			case Module.type.BOX:
@@ -227,31 +293,64 @@ Dr.Implement('Mine_Map', function (global, module_get) {
 			case Module.type.HEX:
 				break;
 			case Module.type.TRI:
-				height = height * 2;
+				col = col * 2;
 				break;
 			default:
 				Dr.log('[Mine_Map] error type:', type);
+				return;
 				break;
+		}
+		
+		if (row * col < (mine_block_count + empty_block_count + lock_block_count)) {
+			Dr.log('[Mine_Map] error count:', row * col, (mine_block_count + empty_block_count + lock_block_count), 'input:', row, col, mine_block_count, empty_block_count, lock_block_count);
+			return;
 		}
 		
 		//all directly accessible(public)
 		this.type = type;
-		this.data = this._editable ? data : null;
 		
-		this.width = data.width;
-		this.height = data.height;
 		
 		//should not access(private)
-		this._source = source;
-		this._data = data;
+		this._type = type;
+		this._row_count = row;
+		this._col_count = col;
+		
+		this._mine_block_count = mine_block_count;
+		this._empty_block_count = empty_block_count;
+		this._lock_block_count = lock_block_count;
+		
+		this.initMapData();
 	}
 	
-	Module.prototype.drawImage = function (context, x, y) {
-		context.drawImage(this._data, x, y);
+	Module.prototype.checkLocationValid = function (row, col) {
+		return row >= 0 
+			&& col >= 0 
+			&& row < this._row_count 
+			&& col < this._col_count;
 	}
 	
-	Module.prototype.drawImageData = function (context, x, y) {
-		context.putImageData(this._data, x, y);
+	Module.prototype.initMapData = function () {
+		this._map_data = [];
+		
+		var block_count = this._row_count * this._col_count;
+		
+		var block_id_pool = [];
+		for (var i = 0; i < block_count; i++) block_id_pool[i] = i;
+		
+		var get_id_list = function (block_id_pool, id_count) {
+			var id_list = [];
+			var block_index_list = Dr.getRandomIntMulti(0, block_id_pool.length - 1, id_count);
+			for (var i = id_count - 1; i >= 0; i--) {
+				var id_pack = block_id_pool.splice(block_index_list[i], 1);
+				id_list.unshift(id_pack[0]);
+			}
+			return id_list;
+		}
+		
+		var mine_block_id_list = get_id_list(block_id_pool, this._mine_block_count);
+		var empty_block_id_list = get_id_list(block_id_pool, this._empty_block_count);
+		var lock_block_id_list = get_id_list(block_id_pool, this._lock_block_count);
+		
 	}
 	
 	Module.prototype.drawImageClip = function (context, x, y, clip_x, clip_y, clip_width, clip_height) {

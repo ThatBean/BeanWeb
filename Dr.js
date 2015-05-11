@@ -292,14 +292,15 @@ var Dr = (
 	Dr.getRandomIntMulti = function (range_01, range_02, count) { //the result will be from small to big
 		var from = Math.min(range_01, range_02);
 		var to = Math.max(range_01, range_02);
-		var count = Math.min(count, (to - from));
+		var count = Math.min(count, (to - from + 1));
 		var res = [];
 		for (var i = 0; i < count; i++) {
 			var new_rand = get_random_int(from, to - i);
 			for (var j = 0; j < res.length; j++) {
-				if (res[j] <= new_rand) { new_rand++; }
-				else { res.splice(j, 0, new_rand); break; }
+				if (res[j] <= new_rand) new_rand++;
+				else break;
 			}
+			res.splice(j, 0, new_rand);
 		}
 		return res;
 	};
