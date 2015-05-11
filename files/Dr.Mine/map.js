@@ -1,11 +1,11 @@
 /*
-	[BOX]
+	[BOX] (Block W x H: 1 x 1)
 	
 		1	1	1	1
 		2	2	2	2
 		3	3	3	3
 
-	[HEX]
+	[HEX] (Block W x H: 4 x 2 | Condensed Block W x H: 3 x 2 | Repeat W x H: 6 x 2 - 2 Block)
 	
 		1		1		1
 			1		1
@@ -14,7 +14,7 @@
 		3		3		3
 			3		3
 		
-	[TRI]
+	[TRI] (Block W x H: 2 x 1 | Condensed Block W x H: 1 x 1 | Repeat W x H: 2 x 2 - 4 Block)
 	
 		1		1		1		1
 			2		2		2
@@ -42,7 +42,16 @@ Dr.Implement('Mine_Type', function (global, module_get) {
 		L: 'Locked',
 	}
 	
-	//the x and y will be normalized first
+	Module.getTLBR = function (x, y) {
+		return x + y > 1;	// true = top
+	}
+	
+	Module.getTRBL = function (x, y) {
+		return x < y;	// true = top
+	}
+	
+	
+	//the x and y will be normalized first(based on smallest triangle)
 	Module.getBlockFromPosition = function (type, x, y) {
 			switch (type) {
 			case Module.type.BOX:
