@@ -285,6 +285,7 @@ var Dr = (
 		return res;
 	}
 	Dr.getRandomInt = function (range_01, range_02) {
+		var range_02 = range_02 || 0;
 		var from = Math.min(range_01, range_02);
 		var to = Math.max(range_01, range_02);
 		return get_random_int(from, to);
