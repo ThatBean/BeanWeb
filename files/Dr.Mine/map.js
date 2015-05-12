@@ -38,8 +38,8 @@ Dr.Implement('Mine_Type', function (global, module_get) {
 		HEX: 'HEX',
 		TRI: 'TRI',
 		
-		E: 'Empty',
-		L: 'Locked',
+		EmptyBlock: 'E',
+		LockBlock: 'L',
 	}
 	
 	// ( [/] )
@@ -234,11 +234,11 @@ Dr.Implement('Mine_Block', function (global, module_get) {
 	var Mine_Type = Dr.Get('Mine_Type');
 	Module.type = Mine_Type.type;
 	
-	Module.prototype.init = function (map, block_type, x, y, is_mine, special_type) {
+	Module.prototype.init = function (map, block_type, row, col, is_mine, special_type) {
 		this._map = map;
 		this._block_type = block_type;
-		this._x = x;
-		this._y = y;
+		this._row = row;
+		this._col = col;
 		this._is_mine = is_mine;
 		this._special_type = special_type;
 		
@@ -285,18 +285,17 @@ Dr.Implement('Mine_Map', function (global, module_get) {
 	
 	Module.type = Mine_Type.type;
 	
-	Module.prototype.init = function (type, row, col, mine_block_count, empty_block_count, lock_block_count) {
+	Module.prototype.init = function (block_type, row, col, mine_block_count, empty_block_count, lock_block_count) {
 		
-		switch (type) {
+		switch (block_type) {
 			case Module.type.BOX:
-				break;
 			case Module.type.HEX:
 				break;
 			case Module.type.TRI:
 				col = col * 2;
 				break;
 			default:
-				Dr.log('[Mine_Map] error type:', type);
+				Dr.log('[Mine_Map] error block_type:', block_type);
 				return;
 				break;
 		}
@@ -307,11 +306,10 @@ Dr.Implement('Mine_Map', function (global, module_get) {
 		}
 		
 		//all directly accessible(public)
-		this.type = type;
-		
+		this.block_type = block_type;
 		
 		//should not access(private)
-		this._type = type;
+		this._block_type = block_type;
 		this._row_count = row;
 		this._col_count = col;
 		
@@ -319,7 +317,13 @@ Dr.Implement('Mine_Map', function (global, module_get) {
 		this._empty_block_count = empty_block_count;
 		this._lock_block_count = lock_block_count;
 		
+		this._map_mine_data = [];
+		this._map_visual_data = [];
+		this._map_block = [];
+		
 		this.initMapData();
+		
+		this.initBlock();
 	}
 	
 	Module.prototype.checkLocationValid = function (row, col) {
@@ -330,8 +334,6 @@ Dr.Implement('Mine_Map', function (global, module_get) {
 	}
 	
 	Module.prototype.initMapData = function () {
-		this._map_data = [];
-		
 		var block_count = this._row_count * this._col_count;
 		
 		var block_id_pool = [];
@@ -351,16 +353,52 @@ Dr.Implement('Mine_Map', function (global, module_get) {
 		var empty_block_id_list = get_id_list(block_id_pool, this._empty_block_count);
 		var lock_block_id_list = get_id_list(block_id_pool, this._lock_block_count);
 		
+		this._map_mine_data = [];
+		this._map_visual_data = [];
+		
+		for (var i = 0; i < this._row_count; i++) {
+			var row_mine_data = [];
+			var row_visual_data = [];
+			for (var j = 0; j < this._col_count; j++) {
+				row_mine_data[j] = 0;
+				row_visual_data[j] = '';
+			}
+			this._map_mine_data[i] = row_mine_data;
+			this._map_visual_data[i] = row_visual_data;
+		}
+		
+		var apply_data = function (map_data, id_list, apply_symbol) {
+			for (var index in id_list) {
+				var id = id_list[index];
+				var row = Math.floor(id / this._row_count);
+				var col = id % this._row_count;
+				map_data[row][col] = apply_symbol;
+			}
+		}
+		
+		apply_data(this._map_mine_data, mine_block_id_list, 1);
+		apply_data(this._map_visual_data, empty_block_id_list, Module.type.EmptyBlock);
+		apply_data(this._map_visual_data, lock_block_id_list, Module.type.LockBlock);
 	}
 	
-	Module.prototype.drawImageClip = function (context, x, y, clip_x, clip_y, clip_width, clip_height) {
-		//context.drawImage(img,sx,sy,swidth,sheight,x,y,width,height);
-		context.drawImage(this._data, clip_x, clip_y, clip_width, clip_height, x, y, clip_width, clip_height);
-	}
-	
-	Module.prototype.drawImageDataClip = function (context, x, y, clip_x, clip_y, clip_width, clip_height) {
-		//context.putImageData(imgData,x,y,dirtyX,dirtyY,dirtyWidth,dirtyHeight);
-		context.putImageData(this._data, clip_x ? x - clip_x : x, clip_y ? y - clip_y : y, clip_x, clip_y, clip_width, clip_height);
+	Module.prototype.initBlock = function () {
+		this._map_block = [];
+		
+		for (var i = 0; i < this._row_count; i++) {
+			var row_block = [];
+			for (var j = 0; j < this._col_count; j++) {
+				var block = new Mine_Block;
+				block.init(
+					this, 
+					this._block_type, 
+					i, j, 
+					this._map_mine_data[i][j], 
+					this._map_visual_data[i][j]
+				);
+				row_block[j] = block;
+			}
+			this._map_block[i] = row_block;
+		}
 	}
 	
 	return Module;
