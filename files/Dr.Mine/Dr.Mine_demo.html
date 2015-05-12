@@ -1,0 +1,119 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
+	
+	<title>Dr.Mine Demo Page</title>
+	
+	<style>
+		#page-header td, #page-footer td { text-align: left; padding: 0.1em; border-left: 1em solid #222; border-right: 1em solid #222; }
+		canvas { background-color: #ddd; margin: 0; padding: 0; border: 0; }
+	</style>
+	
+    <link href="../../favicon.png" rel="shortcut icon">
+	<link href="../../bean_common.css" rel="stylesheet" type="text/css">
+	<!-- load page utility script -->
+	<script src="../../Dr.js"></script>
+	<script type="text/javascript">
+		Dr.loadLocalScript('../../Dr.browser.js', function () {
+			Dr.loadScriptByList([
+				'map.js',
+				'mine_sample_code.js'
+			], function () {
+				Dr.log("All script loaded");
+			})
+		})
+	</script>
+	
+	
+	<script type="text/javascript"> 
+		function set_body_padding () {
+			var body = Dr.getBody();
+			
+			var page_header = document.getElementById("page-header");
+			var padding_header = (page_header ? page_header.offsetHeight : 0) + "px";
+			var page_footer = document.getElementById("page-footer");
+			var padding_footer = (page_footer ? page_footer.offsetHeight : 0) + "px";
+			
+			body.style.paddingTop = padding_header;
+			body.style.paddingBottom = padding_footer;
+			console.log("set_body_padding", padding_header, padding_footer);
+			//add watch
+			body.onresize = set_body_padding;
+		}
+		
+		function scale_canvas() {
+			var devicePixelRatio = window.devicePixelRatio || 1;
+			var canvas = document.getElementById('Dr.Canvas');
+			var body = Dr.getBody();
+			var minSize = Math.floor(body.offsetWidth * 0.9 / 10) * 10;
+			
+			var width = Math.min(minSize, canvas.width || (parseInt(canvas.style.width)));
+			var height = Math.min(minSize, canvas.height || (parseInt(canvas.style.height)));
+			
+			canvas.width = devicePixelRatio * width;
+			canvas.height = devicePixelRatio * height;
+			canvas.style.width = width + 'px';
+			canvas.style.height = height + 'px';
+		}
+		
+		window.onload = function () {
+			set_body_padding();
+			scale_canvas();
+		}
+	</script>
+</head>
+<body>
+	<div id="page-header" class="fix-top">
+		<p class="text-center">The Demo Html of Dr.Mine</p>
+	</div>
+	
+	<div id="page-footer" class="fix-bottom">
+		<table class="align-center">
+			<tr>
+				<td class="font-small text-center">
+					<a href="mailto:Bean@ThatBean.com">Bean@ThatBean.com</a> | 
+					<a href="https://github.com/ThatBean">Bean in Git</a> | 
+					<a href="http://steamcommunity.com/id/dreames">Dr.Eames in Steam</a> | 
+					<a href="http://thatbean.com">thatbean.com</a>
+					<br /> 
+					&clubs;&infin; Copywrong 2015 by <b class="font-big">Bean/Dr.Eames</b>
+				</td>
+			</tr>
+		</table>
+	</div>
+	
+	<div id="page-content" class="align-center text-center">
+		<div>
+		<p>This page is for <b>Dr.Mine develop</b> use</p>
+		</div>
+		
+		<div>
+			<button onclick="Dr.Event.emit('KEY_UP', null, 'K_LEFT')">[Left]</button>
+			<button onclick="Dr.Event.emit('KEY_UP', null, 'K_RIGHT')">[Right]</button>
+			<button onclick="Dr.Event.emit('KEY_UP', null, 'K_UP')">[ Up ]</button>
+			<button onclick="Dr.Event.emit('KEY_UP', null, 'K_DOWN')">[Down]</button>
+			<br />
+			<br />
+			<button onclick="Dr.Switch.Switch('Model_Type', 1)">Model 1</button>
+			<button onclick="Dr.Switch.Switch('Model_Type', 2)">Model 2</button>
+			<button onclick="Dr.Switch.Switch('Model_Type', 3)">Model 3</button>
+			<button onclick="Dr.Switch.Switch('Model_Type', 4)">Model 4</button>
+		</div>
+		
+		<br />
+		
+		<div>
+			<canvas id="Dr.Canvas" class="pixelated" width="400" height="600"></canvas>
+		</div>
+		
+		<p id="FPS">
+			FPS here
+		</p>
+		<p id="Log">
+			Log here
+		</p>
+	</div>
+<br />
+</body>
+</html>
