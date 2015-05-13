@@ -50,6 +50,7 @@
 		}
 		
 		function requestGitPull (operation) {
+			GitPullLog.innerHTML = 'Requesting Git Pull [' + operation.toString() + ']...';
 			Dr.createHttpRequest(
 				'http://thatbean.com:888', 
 				operation, 
