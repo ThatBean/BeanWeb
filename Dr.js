@@ -513,7 +513,7 @@ var Dr = (
 			var callback_list = this._get_callback_list(event_key);
 			
 			for (var i in callback_list) {
-				if (callback_list[i] = callback) {
+				if (callback_list[i] == callback) {
 					Dr.log('callback already exist');
 					return;
 				}
@@ -527,7 +527,7 @@ var Dr = (
 		Module.prototype.removeEventListener = function (event_key, org_callback) {
 			var callback_list = this._get_callback_list(event_key);
 			for (var i in callback_list) {
-				if (callback_list[i] = org_callback) {
+				if (callback_list[i] == org_callback) {
 					callback_list.splice(i, 1);
 					return org_callback;
 				}

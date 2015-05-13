@@ -397,7 +397,13 @@ else {
 		}
 		
 		if (position_visible) {
-			if (event.pageX || event.pageY) {
+			if (event.targetTouches && event.targetTouches[0].pageX) {
+				position_document = {
+					x: event.targetTouches[0].pageX,
+					y: event.targetTouches[0].pageY,
+				}
+			}
+			else if (event.pageX || event.pageY) {
 				position_document = {
 					x: event.pageX,
 					y: event.pageY,
