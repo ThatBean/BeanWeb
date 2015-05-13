@@ -372,12 +372,21 @@ else {
 	};
 	Dr.getActionFromEvent = function (event, listener_element) {
 		var action_type = _event_to_action_mapper[event.type];
+		var position_visible;	//position relative to visible (inner window or device screen)
+		var position_document;	//position relative to document
+		var position_target;	//position relative to target element
+		var position_listener;	//position relative to listener element
 		
-		var position_visible;
 		if (event.targetTouches) {
-			position_visible = {
-				x: event.targetTouches[0].clientX,
-				y: event.targetTouches[0].clientY,
+			if (event.targetTouches[0]) {
+				position_visible = {
+					x: event.targetTouches[0].clientX,
+					y: event.targetTouches[0].clientY,
+				}
+			}
+			else {
+				//when touchend, no targetTouches exist
+				position_visible = null;
 			}
 		}
 		else {
@@ -387,39 +396,39 @@ else {
 			}
 		}
 		
-		var position_document;
-		if (event.pageX || event.pageY) {
-			position_document = {
-				x: event.pageX,
-				y: event.pageY,
+		if (position_visible) {
+			if (event.pageX || event.pageY) {
+				position_document = {
+					x: event.pageX,
+					y: event.pageY,
+				};
+			}
+			else {
+				var body = Dr.getBody();
+				position_document = {
+					x: position_visible.x + body.scrollLeft + (Dr.document.documentElement ? Dr.document.documentElement.scrollLeft : 0),
+					y: position_visible.y + body.scrollTop + (Dr.document.documentElement ? Dr.document.documentElement.scrollTop : 0),
+				};
+			}
+			
+			position_target = {
+				x: position_document.x - event.target.offsetLeft,
+				y: position_document.y - event.target.offsetTop,
 			};
+			
+			position_listener = listener_element ? {
+				x: position_document.x - listener_element.offsetLeft,
+				y: position_document.y - listener_element.offsetTop,
+			} : null;
 		}
-		else {
-			var body = Dr.getBody();
-			position_document = {
-				x: position_visible.x + body.scrollLeft + Dr.document.documentElement.scrollLeft,
-				y: position_visible.y + body.scrollTop + Dr.document.documentElement.scrollTop,
-			};
-		}
-		
-		var target_element = event.target;
-		var position_target = {
-			x: position_document.x - target_element.offsetLeft,
-			y: position_document.y - target_element.offsetTop,
-		};
-		
-		var position_listener = listener_element ? {
-			x: position_document.x - listener_element.offsetLeft,
-			y: position_document.y - listener_element.offsetTop,
-		} : null;
 		
 		return {
 			event: event,
 			action_type: action_type,
-			position_visible: position_visible,	//position relative to visible (inner window or device screen)
-			position_document: position_document, //position relative to document
-			position_target: position_target, //position relative to target element
-			position_listener: position_listener, //position relative to listener element
+			position_visible: position_visible,
+			position_document: position_document,
+			position_target: position_target,
+			position_listener: position_listener,
 		}
 	};
 

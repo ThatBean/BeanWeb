@@ -48,7 +48,7 @@ function init() {
 	image_data_canvas.init('local', test_canvas_data, ImageData.type.CANVAS_ELEMENT);
 	image_data_canvas_image_data.init('local', test_canvas_image_data, ImageData.type.CANVAS_IMAGE_DATA);
 	
-	var loop_count = 10000;
+	var loop_count = 1000;
 	
 	var log_list = ['Testing draw speed of <draw>', 'loop_count:', loop_count];
 	tag_log.Log(log_list.join(' '));
@@ -153,10 +153,22 @@ function init() {
 	
 	test_canvas.init(main_canvas);
 	
-	test_canvas.getEventCenter().addEventListener('action_move', function (event_key, action) {
+	var on_event_callback =  function (event_key, action) {
 		var rad = 1;
-		test_canvas.getContext().fillRect(action.position_listener.x - rad, action.position_listener.y - rad, rad * 2, rad * 2);
-	})
+		if (action.position_listener) {
+			if (Dr.devicePixelRatio >  1) action.event.preventDefault();
+			
+			test_canvas.getContext().fillRect(action.position_listener.x - rad, action.position_listener.y - rad, rad * 2, rad * 2);
+			tag_log.Log([event_key, action.position_listener.x.toFixed(4), action.position_listener.y.toFixed(4)].join(' '));
+		}
+		else {
+			tag_log.Log([event_key].join(' '));
+		}
+	};
+	
+	test_canvas.getEventCenter().addEventListener('action_move', on_event_callback);
+	test_canvas.getEventCenter().addEventListener('action_start', on_event_callback);
+	test_canvas.getEventCenter().addEventListener('action_end', on_event_callback);
 	
 	Dr.test_canvas = test_canvas;
 }
