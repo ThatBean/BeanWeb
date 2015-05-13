@@ -151,7 +151,7 @@ Dr.Implement('Mine_Map', function (global, module_get) {
 			return this._map_block[row][col];
 		}
 		else {
-			Dr.log('[getBlockFromLocation] checkLocationValid', row, col);
+			Dr.debug(5, '[getBlockFromLocation] checkLocationValid', row, col);
 		}
 	}
 	

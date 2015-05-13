@@ -431,7 +431,7 @@ Dr.Implement('OverlayCursor', function (global, module_get) {
 		this.element_map.ELEMENT_MENU.getElementsByTagName('button')[0].addEventListener('click', _action_menu_close, false);
 		this.element_map.ELEMENT_MENU.getElementsByTagName('button')[1].addEventListener('click', _action_menu_exit, false);
 		
-		Dr.Event.subscribe('WINDOW_RESIZE', _calculate_position);
+		Dr.Event.addEventListener('WINDOW_RESIZE', _calculate_position);
 	}
 	
 	

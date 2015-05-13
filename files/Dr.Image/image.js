@@ -1,3 +1,63 @@
+Dr.Declare('Canvas', 'class');
+Dr.Require('Canvas', 'ImageData');
+Dr.Implement('Canvas', function (global, module_get) {
+	
+	var Module = function () {
+		//
+	}
+	
+	var ImageData = Dr.Get('ImageData');
+	
+	Module.event = {
+		DRAW: 'DRAW',
+		UPDATE: 'UPDATE',
+	}
+	
+	Module.prototype.init = function (canvas) {
+		this._canvas = canvas;
+		this._context = canvas.getContext('2d');
+		
+		this._width = canvas.width;
+		this._height = canvas.height;
+		
+		this._event_center = Dr.GetNew('EventProto');
+		
+		var _this = this;
+		Dr.applyActionListener(canvas, function (action) {
+			_this.onAction(action);
+		});
+	}
+	
+	
+	Module.prototype.onAction = function (action) {
+		this._event_center.emit(action.action_type, action);
+		//Dr.log('[Canvas][onAction] get', action.action_type, action);
+	}
+	
+	Module.prototype.update = function (delta_time) {
+		this._event_center.emit(Module.event.UPDATE);
+	}
+	
+	Module.prototype.getCanvas = function () {
+		return this._canvas;
+	}
+	
+	Module.prototype.getContext = function () {
+		return this._context;
+	}
+	
+	Module.prototype.drawImageData = function (image_data, x, y) {
+		this._event_center.emit(Module.event.DRAW);
+	}
+	
+	Module.prototype.getEventCenter = function () {
+		return this._event_center;
+	}
+	
+	return Module;
+});
+
+
 
 Dr.Declare('ImageData', 'class');
 Dr.Implement('ImageData', function (global, module_get) {
@@ -7,9 +67,9 @@ Dr.Implement('ImageData', function (global, module_get) {
 	}
 	
 	Module.type = {
-		IMAGE_ELEMENT: 'IMAGE_ELEMENT',
-		CANVAS_ELEMENT: 'CANVAS_ELEMENT',
-		CANVAS_IMAGE_DATA: 'CANVAS_IMAGE_DATA',
+		IMAGE_ELEMENT: 'IMAGE_ELEMENT',	//fast, but not editable
+		CANVAS_ELEMENT: 'CANVAS_ELEMENT',	//fast, with vector graph edit API
+		CANVAS_IMAGE_DATA: 'CANVAS_IMAGE_DATA',	//slow, but with pixel manipulation
 	}
 	
 	Module.prototype.init = function (source, data, type) {

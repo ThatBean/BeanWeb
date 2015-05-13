@@ -144,6 +144,21 @@ function init() {
 	Dr.image_data_image = image_data_image;
 	Dr.image_data_canvas = image_data_canvas;
 	Dr.image_data_canvas_image_data = image_data_canvas_image_data;
+	
+	
+	
+	var Canvas = Dr.Get('Canvas');
+	
+	var test_canvas = new Canvas;
+	
+	test_canvas.init(main_canvas);
+	
+	test_canvas.getEventCenter().addEventListener('action_move', function (event_key, action) {
+		var rad = 1;
+		test_canvas.getContext().fillRect(action.position_listener.x - rad, action.position_listener.y - rad, rad * 2, rad * 2);
+	})
+	
+	Dr.test_canvas = test_canvas;
 }
 
 Dr.afterWindowLoaded(init);

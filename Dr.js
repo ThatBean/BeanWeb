@@ -503,7 +503,7 @@ var Dr = (
 			return this._event_data[event_key];
 		}
 		
-		Module.prototype.subscribe = function (event_key, callback) {
+		Module.prototype.addEventListener = function (event_key, callback) {
 			if (!callback && typeof(callback) != 'function') {
 				Dr.log('callback error', callback);
 				return;
@@ -524,7 +524,7 @@ var Dr = (
 			return event_key;
 		}
 		
-		Module.prototype.unsubscribe = function (event_key, org_callback) {
+		Module.prototype.removeEventListener = function (event_key, org_callback) {
 			var callback_list = this._get_callback_list(event_key);
 			for (var i in callback_list) {
 				if (callback_list[i] = org_callback) {
@@ -535,11 +535,11 @@ var Dr = (
 			return null;
 		}
 		
-		Module.prototype.unsubscribeKey = function (event_key) {
+		Module.prototype.removeEventKey = function (event_key) {
 			this._event_data[event_key] = null;
 		}
 		
-		Module.prototype.unsubscribeAll = function () {
+		Module.prototype.removeAll = function () {
 			this._event_data = [];
 		}
 		

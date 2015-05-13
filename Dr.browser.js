@@ -97,7 +97,7 @@ else {
 		'123': 'K_F12',
 	};
 
-	var _event_to_action_type = {
+	var _event_to_action_mapper = {
 		'touchstart': 'action_start',
 		'touchmove': 'action_move',
 		'touchend': 'action_end',
@@ -145,7 +145,7 @@ else {
 
 	Dr.afterWindowLoaded = function (callback) {
 		if (Dr.WINDOW_LOADED) { callback('WINDOW_LOADED'); }
-		else { Dr.Event.subscribe('WINDOW_LOADED', callback); }
+		else { Dr.Event.addEventListener('WINDOW_LOADED', callback); }
 	};
 
 	//client related (the visible area, view port)
@@ -183,7 +183,7 @@ else {
 	//document related
 	Dr.getBody = function (document) {
 		var document = document || Dr.document;
-		return document.getElementsByTagName("body")[0];
+		return document.body || document.getElementsByTagName("body")[0];
 	};
 	Dr.loadScript = function (script_src, callback) {
 		Dr.debug(10, 'Loading Script:', script_src);
@@ -239,16 +239,16 @@ else {
 		xml_http.send(message);
 		return xml_http;
 	};
-	Dr.createDownload = function (filename, file_src) {
+	Dr.createDownloadLink = function (file_name, file_src) {
 		var tag = document.createElement('a');
 		tag.setAttribute('href', file_src);
-		tag.setAttribute('download', filename);
+		tag.setAttribute('download', file_name);
 		tag.click();
 	};
-	Dr.createTextDownload = function (filename, text) {
+	Dr.createDownloadLocalText = function (file_name, text) {
 		var tag = document.createElement('a');
 		tag.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-		tag.setAttribute('download', filename);
+		tag.setAttribute('download', file_name);
 		tag.click();
 	};
 	Dr.createOffscreenCanvas = function (width, height){
@@ -360,8 +360,18 @@ else {
 	Dr.getKeyDefination = function (key_code) {
 		return _key_code_to_def[key_code] || 'K_UNDEFINED';
 	};
-	Dr.getActionFromEvent = function (event) {
-		var action_type = _event_to_action_type[event.type];
+	
+	//simple event wrapper, merged touch and click
+	Dr.applyActionListener = function (listener_element, callback) {
+		for (var event_type in _event_to_action_mapper) {
+			listener_element.addEventListener(event_type, function (event) {
+				var action = Dr.getActionFromEvent(event, listener_element);
+				callback(action);
+			});
+		}
+	};
+	Dr.getActionFromEvent = function (event, listener_element) {
+		var action_type = _event_to_action_mapper[event.type];
 		
 		var position_visible;
 		if (event.targetTouches) {
@@ -392,18 +402,25 @@ else {
 			};
 		}
 		
+		var target_element = event.target;
+		var position_target = {
+			x: position_document.x - target_element.offsetLeft,
+			y: position_document.y - target_element.offsetTop,
+		};
+		
+		var position_listener = listener_element ? {
+			x: position_document.x - listener_element.offsetLeft,
+			y: position_document.y - listener_element.offsetTop,
+		} : null;
+		
 		return {
 			event: event,
 			action_type: action_type,
 			position_visible: position_visible,	//position relative to visible (inner window or device screen)
 			position_document: position_document, //position relative to document
+			position_target: position_target, //position relative to target element
+			position_listener: position_listener, //position relative to listener element
 		}
-	};
-	Dr.getPositonInElementFromAction = function (action, element) {
-		return {
-			x: action.position_document.x - element.offsetLeft,
-			y: action.position_document.y - element.offsetTop,
-		};
 	};
 
 	Dr.log('[Dr] Finished adding browser methods...');

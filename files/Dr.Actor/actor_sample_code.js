@@ -94,8 +94,8 @@ function init() {
 		}
 	};
 	
-	Dr.Event.subscribe('KEY_UP', adjust_func);
-	Dr.Event.subscribe('KEY_DOWN', adjust_func);
+	Dr.Event.addEventListener('KEY_UP', adjust_func);
+	Dr.Event.addEventListener('KEY_DOWN', adjust_func);
 	
 	Dr.UpdateLoop.add(drawingLoop);
 }
