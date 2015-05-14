@@ -16,10 +16,14 @@ function init() {
 	var TagLog = Dr.Get("TagLog");
 	var tag_log = new TagLog(function (log_text) {
 		document.getElementById("Log").innerHTML = log_text;
-	})
+	}, true);
 	tag_log.Log("init log " + Dr.now()); 
 	tag_log.listMax = 50; 
 	
+	Dr.UpdateLoop.add(function (delta_time) { 
+		tag_log.Output(); 
+		return true;
+	})
 	
 	var main_canvas = document.getElementById('Dr.Canvas');
 	var main_context = main_canvas.getContext('2d');
@@ -154,11 +158,17 @@ function init() {
 	test_canvas.init(main_canvas);
 	
 	var on_event_callback =  function (event_key, action) {
-		var rad = 1;
+		var rad = 2;
 		if (action.position_listener) {
-			if (Dr.devicePixelRatio >  1) action.event.preventDefault();
+			//if (Dr.devicePixelRatio >  1) 
+				action.event.preventDefault();
 			
-			test_canvas.getContext().fillRect(action.position_listener.x - rad, action.position_listener.y - rad, rad * 2, rad * 2);
+			Dr.UpdateLoop.add(function (delta_time) { 
+				test_canvas.getContext().fillRect(action.position_listener.x - rad, action.position_listener.y - rad, rad * 2, rad * 2);
+				return false;	//once
+			})
+			
+			
 			tag_log.Log([event_key, action.position_listener.x.toFixed(4), action.position_listener.y.toFixed(4)].join(' '));
 		}
 		else {

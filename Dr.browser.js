@@ -449,10 +449,12 @@ else {
 	//the log is updated to 'logTag'
 	Dr.Declare('TagLog', 'class');
 	Dr.Implement('TagLog', function (global, module_get) {
-		var Module = function(output_func) {
+		var Module = function(output_func, is_hold_output) {
 			//record putput func, so you don't need to set it next time
-			if (output_func) this.output_func = output_func;
-			
+			if (output_func) {
+				this.output_func = output_func;
+				this.is_hold_output = is_hold_output;
+			}
 			this.List = [];		//store history logs
 			this.listMax = 10;			//max history to maintain
 			this.lastTime = Dr.now();	//init time
@@ -469,11 +471,20 @@ else {
 			//record tag, so you don't need to set it next time
 			if (logTagId) this.logTag = Dr.document.getElementById(logTagId);
 			//update tag object html
+			if (!this.is_hold_output) {
+				this.Output();
+			}
+		}
+		
+		
+		Module.prototype.Output = function () {
+			//update tag object html
 			if (this.output_func) {
 				var log_text = this.List.join(this.logSeperator);
 				this.output_func(log_text);
 			}
 		}
+		
 		return Module;
 	});
 

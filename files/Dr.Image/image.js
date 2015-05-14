@@ -26,6 +26,8 @@ Dr.Implement('Canvas', function (global, module_get) {
 		Dr.applyActionListener(canvas, function (action) {
 			_this.onAction(action);
 		});
+		
+		//canvas.style.cursor = 'default';	//prevent selection
 	}
 	
 	
