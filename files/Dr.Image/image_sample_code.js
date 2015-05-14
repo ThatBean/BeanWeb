@@ -129,15 +129,23 @@ function init() {
 		i += delta_time * 120;
 		//i += 1;
 		
-		var x = i % main_canvas.width;
+		function draw_func (looped_time) {
+			
+			var x = (i + looped_time) % main_canvas.width;
+			
+			var y1 = i % main_canvas.height;
+			var y2 = (i + 100) % main_canvas.height;
+			var y3 = (i + 200) % main_canvas.height;
+			
+			if (Dr.Toggle.Draw_Image) image_data_image.draw(main_context, x, y1);
+			if (Dr.Toggle.Draw_Canvas) image_data_canvas.draw(main_context, x, y2);
+			if (Dr.Toggle.Draw_CanvasImageData) image_data_canvas_image_data.draw(main_context, x, y3);
+			
+		}
 		
-		var y1 = i % main_canvas.height;
-		var y2 = (i + 100) % main_canvas.height;
-		var y3 = (i + 200) % main_canvas.height;
+		var loop_count = Dr.Toggle.Draw_Count || 1;
 		
-		image_data_image.draw(main_context, x, y1);
-		image_data_canvas.draw(main_context, x, y2);
-		image_data_canvas_image_data.draw(main_context, x, y3);
+		Dr.loop(loop_count, draw_func);
 		
 		return true;
 	})
