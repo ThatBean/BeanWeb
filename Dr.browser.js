@@ -459,9 +459,11 @@ else {
 			this.listMax = 10;			//max history to maintain
 			this.lastTime = Dr.now();	//init time
 			this.logSeperator = '<br />';	//usually '<br />' or '\n'
+			this.is_changed = false;
 		}
 		
 		Module.prototype.Log = function (newLog, logTagId) {
+			this.is_changed = true;
 			//generate this log
 			var now = Dr.now();
 			this.List.unshift('[+' + (now - this.lastTime).toFixed(4) + 'sec]' + newLog);	//add to head of the array
@@ -479,9 +481,11 @@ else {
 		
 		Module.prototype.Output = function () {
 			//update tag object html
-			if (this.output_func) {
+			if (this.is_changed && this.output_func) {
 				var log_text = this.List.join(this.logSeperator);
 				this.output_func(log_text);
+				this.is_changed = false;
+				//Dr.log('[TagLog] Output called');
 			}
 		}
 		

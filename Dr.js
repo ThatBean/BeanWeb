@@ -562,43 +562,53 @@ var Dr = (
 	Dr.Declare('UpdateLoopProto', 'class');
 	Dr.Implement('UpdateLoopProto', function (global, module_get) {
 		var Module = function () {
-			this._update_list = [];	//non-constant, will be refreshed on every update
 			this._last_update_clock = Dr.clock();
 			this._is_active = false;
+			this.clear();	
 			//prepare a update closure
 			var _this = this;
-			this._update_func = function () {
-				_this.update();
-			}
+			this._update_func = function () { _this.update(); };
 		}
 		
+		Module.prototype.start = function () {
+			this._is_active = true;
+			Dr.onNextProperUpdate(this._update_func);
+		}
+		Module.prototype.stop = function () { 
+			this._is_active = false; 
+		}
+		Module.prototype.clear = function () { 
+			this._update_list = []; //index non-constant, will be refreshed on every update
+			this._update_map = {};	//key constant, will be refreshed on every update
+		}
+		Module.prototype.add = function (update_func, key) { 
+			if (key) this._update_map[key] = update_func;
+			else this._update_list.push(update_func); 
+		}
 		Module.prototype.update = function () {
-			var current_update_clock = Dr.clock()
+			var current_update_clock = Dr.clock();
 			var delta_sec = (current_update_clock - this._last_update_clock) / Dr.clock_per_sec;
-			this._last_update_clock = current_update_clock
+			this._last_update_clock = current_update_clock;
 			
 			var next_update_list = [];
 			for (index in this._update_list) {
-				var is_keep_update = this._update_list[index](delta_sec);
-				if (is_keep_update) next_update_list.push(this._update_list[index]);
+				var is_keep_for_next_update = this._update_list[index](delta_sec);
+				if (is_keep_for_next_update) next_update_list.push(this._update_list[index]);
 			}
 			this._update_list = next_update_list;
+			
+			var next_update_map = {};
+			for (key in this._update_map) {
+				var is_keep_for_next_update = this._update_map[key](delta_sec);
+				if (is_keep_for_next_update) next_update_map[key] = this._update_map[key];
+			}
+			this._update_map = next_update_map;
 			//Dr.log('Dr.Update', delta_sec);
 			
 			if (this._is_active) Dr.onNextProperUpdate(this._update_func);
 			else Dr.debug(10, '[UpdateLoop] Stopped');
 		}
 		
-		
-		Module.prototype.start = function () {
-			if (this._is_active) return;
-			this._is_active = true;
-			this._update_func();
-		}
-		
-		Module.prototype.stop = function () { this._is_active = false; }
-		Module.prototype.clear = function () { this._update_list = []; }
-		Module.prototype.add = function (update_func) { this._update_list.push(update_func); }
 		
 		return Module;
 	});

@@ -166,7 +166,7 @@ function init() {
 			Dr.UpdateLoop.add(function (delta_time) { 
 				test_canvas.getContext().fillRect(action.position_listener.x - rad, action.position_listener.y - rad, rad * 2, rad * 2);
 				return false;	//once
-			})
+			}, 'test_canvas_draw_touch_position')
 			
 			
 			tag_log.Log([event_key, action.position_listener.x.toFixed(4), action.position_listener.y.toFixed(4)].join(' '));
