@@ -189,6 +189,7 @@ function init() {
 	test_canvas.getEventCenter().addEventListener('action_end', on_event_callback);
 	
 	Dr.test_canvas = test_canvas;
+	
 }
 
 Dr.afterWindowLoaded(init);
