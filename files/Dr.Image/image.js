@@ -13,21 +13,19 @@ Dr.Implement('Canvas', function (global, module_get) {
 		UPDATE: 'UPDATE',
 	}
 	
-	Module.prototype.init = function (canvas) {
+	Module.prototype.init = function (canvas, event_center) {
 		this._canvas = canvas;
 		this._context = canvas.getContext('2d');
 		
 		this._width = canvas.width;
 		this._height = canvas.height;
+		//canvas.style.cursor = 'default';	//prevent selection
 		
-		this._event_center = Dr.GetNew('EventProto');
+		//event
+		this._event_center = event_center || Dr.GetNew('EventProto');
 		
 		var _this = this;
-		Dr.applyActionListener(canvas, function (action) {
-			_this.onAction(action);
-		});
-		
-		//canvas.style.cursor = 'default';	//prevent selection
+		Dr.applyActionListener(canvas, function (action) { _this.onAction(action); });
 	}
 	
 	
@@ -194,6 +192,8 @@ Dr.Implement('ImageData', function (global, module_get) {
 		}
 		
 		canvas_element.getContext('2d').putImageData(target_canvas_image_data, 0, 0);
+		
+		//Dr.target_canvas_image_data = target_canvas_image_data;
 		
 		this.init(this._source, canvas_element, Module.type.CANVAS_ELEMENT);
 	}
