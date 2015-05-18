@@ -21,6 +21,13 @@ Dr.Implement('Canvas', function (global, module_get) {
 		this._height = canvas.height;
 		//canvas.style.cursor = 'default';	//prevent selection
 		
+		
+		// TODO: 2d
+		this._origin = {
+			x: 0,
+			y: 0,
+		};
+		
 		//event
 		this._event_center = event_center || Dr.GetNew('EventProto');
 		
@@ -198,5 +205,43 @@ Dr.Implement('ImageData', function (global, module_get) {
 		this.init(this._source, canvas_element, Module.type.CANVAS_ELEMENT);
 	}
 	
+	
 	return Module;
 });
+
+
+// TODO:
+/*
+
+
+	Module.seperate = function (combined_image_data, combined_info) {
+		
+		return image_data_list;
+	}
+	
+	Module.combine = function (image_data_list) {
+		
+		//should be JSON string convertible
+		var combined_info = {
+			type: 'combined_image',
+			size: [w, h],
+			image_count: count,
+			content: [
+				{
+					name: '',
+					size: [w, h],
+					location: [x, y],
+					//rotate_left: false,
+					//scale_9: [x1, y1, x2, y2],
+				}
+			],
+		};
+		
+		return {
+			combined_image_data: combined_image_data,
+			combined_info: combined_info,
+		}
+	}
+	
+
+*/
