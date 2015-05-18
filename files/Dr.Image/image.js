@@ -14,19 +14,14 @@ Dr.Implement('Canvas', function (global, module_get) {
 	}
 	
 	Module.prototype.init = function (canvas, event_center) {
-		this._canvas = canvas;
-		this._context = canvas.getContext('2d');
+		this._main_canvas = canvas;
+		this._main_context = canvas.getContext('2d');
 		
 		this._width = canvas.width;
 		this._height = canvas.height;
 		//canvas.style.cursor = 'default';	//prevent selection
 		
-		
-		// TODO: 2d
-		this._origin = {
-			x: 0,
-			y: 0,
-		};
+		this._buffer_list = [];
 		
 		//event
 		this._event_center = event_center || Dr.GetNew('EventProto');
@@ -41,16 +36,19 @@ Dr.Implement('Canvas', function (global, module_get) {
 		//Dr.log('[Canvas][onAction] get', action.action_type, action);
 	}
 	
-	Module.prototype.update = function (delta_time) {
+	Module.prototype.update = function (delta_time, buffer_index) {
 		this._event_center.emit(Module.event.UPDATE);
+		
+		var buffer_index = buffer_index || 0;
+		this.applyBuffer(buffer_index);
 	}
 	
-	Module.prototype.getCanvas = function () {
-		return this._canvas;
+	Module.prototype.getMainCanvas = function () {
+		return this._main_canvas;
 	}
 	
-	Module.prototype.getContext = function () {
-		return this._context;
+	Module.prototype.getMainContext = function () {
+		return this._main_context;
 	}
 	
 	Module.prototype.drawImageData = function (image_data, x, y) {
@@ -59,6 +57,68 @@ Dr.Implement('Canvas', function (global, module_get) {
 	
 	Module.prototype.getEventCenter = function () {
 		return this._event_center;
+	}
+	
+	
+	Module.prototype.createBuffer = function (buffer_index, buffer_canvas/* ... will pass to configBuffer */) {
+		var buffer_index = buffer_index || this._buffer_list.length;
+		
+		this._buffer_list[buffer_index] = {
+			index: buffer_index,
+			canvas: buffer_canvas || Dr.document.createElement('canvas'),
+		};
+		
+		//apply init config
+		var args = Dr.getArgumentArray(arguments, 2);
+		args[0] = buffer_index;
+		this.configBuffer.apply(this, args);
+		
+		return this._buffer_list[buffer_index];
+	}
+	
+	
+	Module.prototype.configBuffer = function (buffer_index, buffer_width, buffer_height, x, y, clip_x, clip_y, clip_width, clip_height) {
+		Dr.assert(this._buffer_list[buffer_index], '[configBuffer] error buffer_index not found:', buffer_index);
+		
+		var buffer = this._buffer_list[buffer_index];
+		
+		//keep buffer if we can
+		if (buffer.canvas.width != buffer_width) buffer.canvas.width = (buffer_width != undefined ? buffer_width : this._width);
+		if (buffer.canvas.height != buffer_height) buffer.canvas.height = (buffer_height != undefined ? buffer_height : this._height);
+		
+		this._buffer_list[buffer_index] = {
+			index: buffer_index,
+			
+			canvas: buffer.canvas,
+			context: buffer.canvas.getContext('2d'),
+			
+			// how this buffer apply to main canvas
+			x: (x != undefined ? x : (buffer.x || 0)),
+			y: (y != undefined ? y : (buffer.y || 0)),
+			clip_x: (clip_x != undefined ? clip_x : (buffer.clip_x || 0)),
+			clip_y: (clip_y != undefined ? clip_y : (buffer.clip_y || 0)),
+			clip_width: (clip_width != undefined ? clip_width : (buffer.clip_width || this._width)),
+			clip_height: (clip_height != undefined ? clip_height : (buffer.clip_height || this._height)),
+		};
+	}
+	
+	Module.prototype.getBuffer = function (buffer_index) {
+		return this._buffer_list[buffer_index];
+	}
+	
+	Module.prototype.applyBuffer = function (buffer_index) {
+		Dr.assert(this._buffer_list[buffer_index], '[applyBuffer] error buffer_index not found:', buffer_index);
+		
+		var buffer = this._buffer_list[buffer_index];
+		
+		//context.drawImage(img,sx,sy,swidth,sheight,x,y,width,height);
+		this._main_context.drawImage(
+			buffer.canvas, 
+			buffer.clip_x, buffer.clip_y, 
+			buffer.clip_width, buffer.clip_height, 
+			buffer.x, buffer.y, 
+			buffer.clip_width, buffer.clip_height
+		);
 	}
 	
 	return Module;

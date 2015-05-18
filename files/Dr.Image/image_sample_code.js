@@ -172,7 +172,7 @@ function init() {
 				action.event.preventDefault();
 			
 			Dr.UpdateLoop.add(function (delta_time) { 
-				test_canvas.getContext().fillRect(action.position_listener.x - rad, action.position_listener.y - rad, rad * 2, rad * 2);
+				test_canvas.getMainContext().fillRect(action.position_listener.x - rad, action.position_listener.y - rad, rad * 2, rad * 2);
 				return false;	//once
 			}, 'test_canvas_draw_touch_position')
 			
