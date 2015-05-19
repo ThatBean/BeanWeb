@@ -31,6 +31,58 @@
 	<script type="text/javascript">
 		Dr.loadLocalScript('../../Dr.browser.js', function () {
 			Dr.log("All script loaded");
+			
+				Dr.CodeRun = {};
+			
+				var run_code_text = function (code_text) {
+					try {
+						eval(code_text);
+					}
+					catch (error) {
+						Dr.CodeRun.log('[Dr.CodeRun] Script Error! error:', error);
+						if (error.stack) Dr.CodeRun.log(error.stack);
+					}
+				}
+				
+				var init_code_run = function () {
+					Dr.CodeRun.Button_Run = document.getElementById('CodeRun_Button_Run');
+					Dr.CodeRun.Button_Clear = document.getElementById('CodeRun_Button_Clear');
+					Dr.CodeRun.P_Log = document.getElementById('CodeRun_P_Log');
+					Dr.CodeRun.Div_Root = document.getElementById('CodeRun_Div_Root');
+					Dr.CodeRun.Textarea_Code = document.getElementById('CodeRun_Textarea_Code');
+					
+					var TagLog = Dr.Get("TagLog");
+					Dr.CodeRun.tag_log = new TagLog(function (log_text) { CodeRun_P_Log.innerHTML = log_text; }, true);
+					Dr.CodeRun.tag_log.Log("init log " + Dr.now()); 
+					Dr.CodeRun.tag_log.listMax = 50; 
+					Dr.UpdateLoop.add(function (delta_time) { Dr.CodeRun.tag_log.Output(); return true; });
+					
+					Dr.CodeRun.log = function () {
+						var args = Dr.getArgumentArray(arguments);
+						Dr.CodeRun.tag_log.Log(args.join(' '));
+						Dr.log.apply(Dr, args);
+					};
+					
+					Dr.CodeRun.Button_Run.onclick = function (event) {
+						//Dr.CodeRun.log('[Button_Run]', arguments);
+						var code_text = Dr.CodeRun.Textarea_Code.value;
+						run_code_text(code_text);
+					}
+					Dr.CodeRun.Button_Clear.onclick = function (event) {
+						//Dr.CodeRun.log('[Button_Clear]', arguments);
+						Dr.CodeRun.Textarea_Code.value = '';
+					}
+					
+					var text_resize_func = function (event_key, event) {
+						Dr.CodeRun.Textarea_Code.style.width = Dr.CodeRun.Div_Root.offsetWidth;
+						Dr.CodeRun.Textarea_Code.rows = 10;
+					};
+					
+					Dr.Event.addEventListener('WINDOW_RESIZE', text_resize_func);
+					text_resize_func();
+				}
+				
+				Dr.afterWindowLoaded(init_code_run);
 		})
 	</script>
 	<!-- -->
@@ -224,6 +276,24 @@
 		<button onclick="requestGitPull('status');">Git Pull Status</button>
 		<br />
 		<pre id="GitPullLog" class="text-left align-center">Git Pull Log here</pre>
+		
+		<hr />
+		
+		<div id="CodeRun" class="align-center width-75">
+			<button id="CodeRun_Button_Run">Run</button>
+			<button id="CodeRun_Button_Clear">Clear</button>
+			<br />
+			<br />
+			<textarea id="CodeRun_Textarea_Code">Dr.CodeRun.log('Check Below'); Dr.CodeRun.Div_Root.innerHTML = 'Check Below Below';</textarea>
+			<br />
+			<p id="CodeRun_P_Log" class="text-left font-small">Log here</p>
+			<br />
+			<div id="CodeRun_Div_Root">Root div element</div>
+			
+			<script type="text/javascript">
+				//
+			</script>
+		</div>
 	</div>
 <br />
 </body>

@@ -59,7 +59,7 @@ Dr.Implement('Canvas', function (global, module_get) {
 		return this._event_center;
 	}
 	
-	
+	//simple buffer canvas list, could be a separated class
 	Module.prototype.createBuffer = function (buffer_index, buffer_canvas/* ... will pass to configBuffer */) {
 		var buffer_index = buffer_index || this._buffer_list.length;
 		
