@@ -47,6 +47,8 @@
 				var init_code_run = function () {
 					Dr.CodeRun.Button_Run = document.getElementById('CodeRun_Button_Run');
 					Dr.CodeRun.Button_Clear = document.getElementById('CodeRun_Button_Clear');
+					Dr.CodeRun.Button_Save = document.getElementById('CodeRun_Button_Save');
+					Dr.CodeRun.Button_Load = document.getElementById('CodeRun_Button_Load');
 					Dr.CodeRun.P_Log = document.getElementById('CodeRun_P_Log');
 					Dr.CodeRun.Div_Root = document.getElementById('CodeRun_Div_Root');
 					Dr.CodeRun.Textarea_Code = document.getElementById('CodeRun_Textarea_Code');
@@ -73,8 +75,18 @@
 						Dr.CodeRun.Textarea_Code.value = '';
 					}
 					
+					var saved_text = '';
+					Dr.CodeRun.Button_Save.onclick = function (event) {
+						saved_text = Dr.CodeRun.Textarea_Code.value;
+						Dr.CodeRun.log('[Save]');
+					}
+					Dr.CodeRun.Button_Load.onclick = function (event) {
+						Dr.CodeRun.Textarea_Code.value = saved_text;
+						Dr.CodeRun.log('[Load]');
+					}
+					
 					var text_resize_func = function (event_key, event) {
-						Dr.CodeRun.Textarea_Code.style.width = Dr.CodeRun.Div_Root.offsetWidth;
+						Dr.CodeRun.Textarea_Code.style.width = (Dr.CodeRun.Div_Root.offsetWidth - 0) + 'px';
 						Dr.CodeRun.Textarea_Code.rows = 10;
 					};
 					
@@ -82,8 +94,8 @@
 					text_resize_func();
 					
 					Dr.CodeRun.Textarea_Code.innerHTML = '' 
-						+ 'Dr.CodeRun.log("Check Below");' + '\n' 
-						+ 'Dr.CodeRun.Div_Root.innerHTML = "Check Below Below";' + '\n'
+						+ 'Dr.CodeRun.log("Check [Dr.CodeRun.log] here");' + '\n' 
+						+ 'Dr.CodeRun.Div_Root.innerHTML = "Check [Dr.CodeRun.Div_Root] here";' + '\n'
 						+ 'Dr.CodeRun.P_Log.style.backgroundColor = "#EFE";' + '\n'
 						+ 'Dr.CodeRun.Div_Root.style.backgroundColor = "#FEE";' + '\n'
 						+ 'Dr.CodeRun.Textarea_Code.style.backgroundColor = "#EEF";' + '\n'
@@ -287,9 +299,11 @@
 		
 		<hr />
 		
-		<div id="CodeRun" class="align-center" style="padding: 5px;">
+		<div id="CodeRun" class="align-center" style="margin: 5px; width: 99%;">
 			<button id="CodeRun_Button_Run">Run</button>
 			<button id="CodeRun_Button_Clear">Clear</button>
+			<button id="CodeRun_Button_Save">Save</button>
+			<button id="CodeRun_Button_Load">Load</button>
 			<br />
 			<br />
 			<textarea id="CodeRun_Textarea_Code"></textarea>
