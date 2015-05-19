@@ -80,6 +80,14 @@
 					
 					Dr.Event.addEventListener('WINDOW_RESIZE', text_resize_func);
 					text_resize_func();
+					
+					Dr.CodeRun.Textarea_Code.innerHTML = '' 
+						+ 'Dr.CodeRun.log("Check Below");' + '\n' 
+						+ 'Dr.CodeRun.Div_Root.innerHTML = "Check Below Below";' + '\n'
+						+ 'Dr.CodeRun.P_Log.style.backgroundColor = "#EFE";' + '\n'
+						+ 'Dr.CodeRun.Div_Root.style.backgroundColor = "#FEE";' + '\n'
+						+ 'Dr.CodeRun.Textarea_Code.style.backgroundColor = "#EEF";' + '\n'
+						;
 				}
 				
 				Dr.afterWindowLoaded(init_code_run);
@@ -279,15 +287,14 @@
 		
 		<hr />
 		
-		<div id="CodeRun" class="align-center width-75">
+		<div id="CodeRun" class="align-center" style="padding: 5px;">
 			<button id="CodeRun_Button_Run">Run</button>
 			<button id="CodeRun_Button_Clear">Clear</button>
 			<br />
 			<br />
-			<textarea id="CodeRun_Textarea_Code">Dr.CodeRun.log('Check Below'); Dr.CodeRun.Div_Root.innerHTML = 'Check Below Below';</textarea>
+			<textarea id="CodeRun_Textarea_Code"></textarea>
 			<br />
 			<p id="CodeRun_P_Log" class="text-left font-small">Log here</p>
-			<br />
 			<div id="CodeRun_Div_Root">Root div element</div>
 			
 			<script type="text/javascript">

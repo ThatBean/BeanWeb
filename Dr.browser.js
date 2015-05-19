@@ -134,9 +134,16 @@ else {
 		Dr.Event.emit("PASTE", event, content);
 	};
 
-	Dr.window.addEventListener(("onorientationchange" in window ? "orientationchange" : "resize"), function (event) {
+	Dr.window.addEventListener("resize", function (event) {
 		Dr.Event.emit('WINDOW_RESIZE', event);
 	});
+	
+	if ("onorientationchange" in window) {
+		Dr.window.addEventListener("orientationchange", function (event) {
+			Dr.Event.emit('WINDOW_ROTATION', event);
+			Dr.Event.emit('WINDOW_RESIZE', event);
+		});
+	}
 
 	Dr.window.addEventListener('load', function (event) {
 		Dr.WINDOW_LOADED = true;
