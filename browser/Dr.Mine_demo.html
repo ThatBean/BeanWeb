@@ -3,24 +3,25 @@
 <head>
 	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
 	
-	<title>Dr.Actor Demo Page</title>
+	<title>Dr.Mine Demo Page</title>
 	
 	<style>
 		#page-header td, #page-footer td { text-align: left; padding: 0.1em; border-left: 1em solid #222; border-right: 1em solid #222; }
 		canvas { background-color: #ddd; margin: 0; padding: 0; border: 0; }
 	</style>
 	
-    <link href="../../favicon.png" rel="shortcut icon">
-	<link href="../../bean_common.css" rel="stylesheet" type="text/css">
+    <link href="../favicon.png" rel="shortcut icon">
+	<link href="../bean_common.css" rel="stylesheet" type="text/css">
 	<!-- load page utility script -->
-	<script src="../../Dr.js"></script>
+	<script src="Dr.js"></script>
 	<script type="text/javascript">
-		Dr.loadLocalScript('../../Dr.browser.js', function () {
+		Dr.loadLocalScript('Dr.browser.js', function () {
 			Dr.loadScriptByList([
-				'actor.js',
-				'advice.js',
-				'state.js',
-				'actor_sample_code.js'
+				'mine_game/type.js',
+				'mine_game/block.js',
+				'mine_game/map.js',
+				'mine_game/visual.js',
+				'mine_game/mine_sample_code.js'
 			], function () {
 				Dr.log("All script loaded");
 			})
@@ -67,7 +68,7 @@
 </head>
 <body>
 	<div id="page-header" class="fix-top">
-		<p class="text-center">The Demo Html of Dr.Actor</p>
+		<p class="text-center">The Demo Html of Dr.Mine</p>
 	</div>
 	
 	<div id="page-footer" class="fix-bottom">
@@ -87,15 +88,10 @@
 	
 	<div id="page-content" class="align-center text-center">
 		<div>
-		<p>This page is for <b>Dr.Actor develop</b> use</p>
+		<p>This page is for <b>Dr.Mine develop</b> use</p>
 		</div>
 		
 		<div>
-			<button onclick="Dr.Switch.Switch('Log')">Switch Log</button>
-			<button onclick="Dr.Switch.Switch('Render')">Switch Render</button>
-			<button onclick="Dr.Switch.Switch('Skeleton')">Switch Skeleton</button>
-			<br />
-			<br />
 			<button onclick="Dr.Event.emit('KEY_UP', null, 'K_LEFT')">[Left]</button>
 			<button onclick="Dr.Event.emit('KEY_UP', null, 'K_RIGHT')">[Right]</button>
 			<button onclick="Dr.Event.emit('KEY_UP', null, 'K_UP')">[ Up ]</button>
@@ -111,7 +107,7 @@
 		<br />
 		
 		<div>
-			<canvas id="Dr.Canvas" class="pixelated" width="400" height="400"></canvas>
+			<canvas id="Dr.Canvas" class="pixelated" width="400" height="600"></canvas>
 		</div>
 		
 		<p id="FPS">

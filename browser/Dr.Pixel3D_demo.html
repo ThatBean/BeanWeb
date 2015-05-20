@@ -3,29 +3,30 @@
 <head>
 	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
 	
-	<title>Dr.Mine Demo Page</title>
+	<title>Dr.Pixel3D Demo Page</title>
 	
 	<style>
 		#page-header td, #page-footer td { text-align: left; padding: 0.1em; border-left: 1em solid #222; border-right: 1em solid #222; }
 		canvas { background-color: #ddd; margin: 0; padding: 0; border: 0; }
 	</style>
 	
-    <link href="../../favicon.png" rel="shortcut icon">
-	<link href="../../bean_common.css" rel="stylesheet" type="text/css">
+    <link href="../favicon.png" rel="shortcut icon">
+	<link href="../bean_common.css" rel="stylesheet" type="text/css">
 	<!-- load page utility script -->
-	<script src="../../Dr.js"></script>
+	<script src="Dr.js"></script>
 	<script type="text/javascript">
-		Dr.loadLocalScript('../../Dr.browser.js', function () {
+		Dr.loadLocalScript('Dr.browser.js', function () {
 			Dr.loadScriptByList([
-				'type.js',
-				'block.js',
-				'map.js',
-				'visual.js',
-				'mine_sample_code.js'
+				'pixel3d/math.js',
+				'pixel3d/data.js',
+				'pixel3d/engine.js',
+				'pixel3d/animation.js',
+				'pixel3d/pixel3d_sample_code.js'
 			], function () {
 				Dr.log("All script loaded");
 			})
 		})
+		
 	</script>
 	
 	
@@ -45,30 +46,28 @@
 			body.onresize = set_body_padding;
 		}
 		
-		function scale_canvas() {
-			var devicePixelRatio = window.devicePixelRatio || 1;
+		function pixelate_canvas() {
 			var canvas = document.getElementById('Dr.Canvas');
 			var body = Dr.getBody();
 			var minSize = Math.floor(body.offsetWidth * 0.9 / 10) * 10;
+			canvas.style.width = Math.min(minSize, Dr.devicePixelRatio * 4 * (parseInt(canvas.style.width))) + 'px';
+			canvas.style.height = Math.min(minSize, Dr.devicePixelRatio * 4 * (parseInt(canvas.style.height))) + 'px';
 			
-			var width = Math.min(minSize, canvas.width || (parseInt(canvas.style.width)));
-			var height = Math.min(minSize, canvas.height || (parseInt(canvas.style.height)));
-			
-			canvas.width = devicePixelRatio * width;
-			canvas.height = devicePixelRatio * height;
-			canvas.style.width = width + 'px';
-			canvas.style.height = height + 'px';
+			var context = canvas.getContext('2d');
+			if (context.imageSmoothingEnabled) context.imageSmoothingEnabled = false;
+			if (context.mozImageSmoothingEnabled) context.mozImageSmoothingEnabled = false;
+			if (context.webkitImageSmoothingEnabled) context.webkitImageSmoothingEnabled = false;
 		}
 		
 		window.onload = function () {
 			set_body_padding();
-			scale_canvas();
+			pixelate_canvas();
 		}
 	</script>
 </head>
 <body>
 	<div id="page-header" class="fix-top">
-		<p class="text-center">The Demo Html of Dr.Mine</p>
+		<p class="text-center">The Demo Html of Dr.Pixel3D</p>
 	</div>
 	
 	<div id="page-footer" class="fix-bottom">
@@ -88,26 +87,48 @@
 	
 	<div id="page-content" class="align-center text-center">
 		<div>
-		<p>This page is for <b>Dr.Mine develop</b> use</p>
+		<p>This page is for <b>Dr.Pixel3D develop</b> use</p>
 		</div>
 		
 		<div>
+			<button onclick="Dr.toggle('Log')">Switch Log</button>
+			<button onclick="Dr.toggle('Render')">Switch Render</button>
+			<button onclick="Dr.toggle('Skeleton')">Switch Skeleton</button>
+			<br />
+			<br />
+			<button onclick="Dr.toggle('Model')">Switch Model</button>
+			<button onclick="Dr.toggle('Zoom')">Switch Zoom</button>
+			<button onclick="Dr.toggle('Rotate')">Switch Rotate</button>
+			<br />
+			<br />
 			<button onclick="Dr.Event.emit('KEY_UP', null, 'K_LEFT')">[Left]</button>
 			<button onclick="Dr.Event.emit('KEY_UP', null, 'K_RIGHT')">[Right]</button>
 			<button onclick="Dr.Event.emit('KEY_UP', null, 'K_UP')">[ Up ]</button>
 			<button onclick="Dr.Event.emit('KEY_UP', null, 'K_DOWN')">[Down]</button>
 			<br />
 			<br />
-			<button onclick="Dr.Switch.Switch('Model_Type', 1)">Model 1</button>
-			<button onclick="Dr.Switch.Switch('Model_Type', 2)">Model 2</button>
-			<button onclick="Dr.Switch.Switch('Model_Type', 3)">Model 3</button>
-			<button onclick="Dr.Switch.Switch('Model_Type', 4)">Model 4</button>
+			<button onclick="Dr.toggle('Model_Type', 1)">Model 1</button>
+			<button onclick="Dr.toggle('Model_Type', 2)">Model 2</button>
+			<button onclick="Dr.toggle('Model_Type', 3)">Model 3</button>
+			<button onclick="Dr.toggle('Model_Type', 4)">Model 4</button>
+			<br />
+			<br />
+			<button onclick="Dr.toggle('PixelRotation')">PixelRotation</button>
+			<button onclick="Dr.toggle('PixelRotationX')">PixelRotationX</button>
+			<button onclick="Dr.toggle('PixelRotationY')">PixelRotationY</button>
+			<button onclick="Dr.toggle('PixelRotationZ')">PixelRotationZ</button>
+			<br />
+			<br />
+			<button onclick="Dr.toggle('PixelRotationSpeed', 0.05)">PixelRotationSpeed1</button>
+			<button onclick="Dr.toggle('PixelRotationSpeed', 0.1)">PixelRotationSpeed2</button>
+			<button onclick="Dr.toggle('PixelRotationSpeed', 0.5)">PixelRotationSpeed3</button>
+			<button onclick="Dr.toggle('PixelRotationSpeed', 1)">PixelRotationSpeed4</button>
 		</div>
 		
 		<br />
 		
 		<div>
-			<canvas id="Dr.Canvas" class="pixelated" width="400" height="600"></canvas>
+			<canvas id="Dr.Canvas" class="pixelated" width="100" height="100"></canvas>
 		</div>
 		
 		<p id="FPS">

@@ -1,0 +1,154 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
+	
+	<title>Dr.Image Demo Page</title>
+	
+	<style>
+		#page-header td, #page-footer td { text-align: left; padding: 0.1em; border-left: 1em solid #222; border-right: 1em solid #222; }
+		canvas { background-color: #ddd; margin: 0; padding: 0; border: 0; }
+	</style>
+	
+    <link href="../favicon.png" rel="shortcut icon">
+	<link href="../bean_common.css" rel="stylesheet" type="text/css">
+	<!-- load page utility script -->
+	<script src="Dr.js"></script>
+	<script type="text/javascript">
+		Dr.loadLocalScript('Dr.browser.js', function () {
+			Dr.loadScriptByList([
+				'image/image.js',
+				'image/resource_loader.js',
+				'image/bitmapfont.js',
+				'image/image_sample_code.js'
+			], function () {
+				Dr.log("All script loaded");
+			})
+		})
+	</script>
+	
+	
+	<script type="text/javascript"> 
+		function set_body_padding () {
+			var body = Dr.getBody();
+			
+			var page_header = document.getElementById("page-header");
+			var padding_header = (page_header ? page_header.offsetHeight : 0) + "px";
+			var page_footer = document.getElementById("page-footer");
+			var padding_footer = (page_footer ? page_footer.offsetHeight : 0) + "px";
+			
+			body.style.paddingTop = padding_header;
+			body.style.paddingBottom = padding_footer;
+			console.log("set_body_padding", padding_header, padding_footer);
+			//add watch
+			body.onresize = set_body_padding;
+		}
+		
+		function scale_canvas() {
+			var devicePixelRatio = window.devicePixelRatio || 1;
+			var canvas = document.getElementById('Dr.Canvas');
+			var body = Dr.getBody();
+			var minSize = Math.floor(body.offsetWidth * 0.9 / 10) * 10;
+			
+			var width = Math.min(minSize, canvas.width || (parseInt(canvas.style.width)));
+			var height = Math.min(minSize, canvas.height || (parseInt(canvas.style.height)));
+			
+			canvas.width = devicePixelRatio * width;
+			canvas.height = devicePixelRatio * height;
+			canvas.style.width = width + 'px';
+			canvas.style.height = height + 'px';
+		}
+		
+		function prepare_test_image_data () {
+			var test_canvas_data = document.getElementById('test_canvas_data');
+			var font_size = test_canvas_data.height;
+			var ctx = test_canvas_data.getContext('2d');
+			test_canvas_data.width = test_canvas_data.width;
+			ctx.font = "bold " + font_size + "px monaco, consolas, monospace";
+			ctx.textAlign = "left";
+			ctx.textBaseline = "middle";
+			ctx.fillStyle = "#500";
+			ctx.fillText("TestCanvasData", 0, test_canvas_data.height * 0.5);
+			
+			var test_image_data = document.getElementById('test_image_data');
+			test_image_data.src = test_canvas_data.toDataURL();
+			
+			test_canvas_data.width = test_canvas_data.width;
+			ctx.font = "bold " + font_size + "px monaco, consolas, monospace";
+			ctx.textAlign = "left";
+			ctx.textBaseline = "middle";
+			ctx.fillStyle = "#050";
+			ctx.fillText("TestCanvasData", 0, test_canvas_data.height * 0.5);
+		}
+		
+		window.onload = function () {
+			set_body_padding();
+			//scale_canvas();
+			prepare_test_image_data();
+		}
+	</script>
+</head>
+<body>
+	<div id="page-header" class="fix-top">
+		<p class="text-center">The Demo Html of Dr.Image</p>
+	</div>
+	
+	<div id="page-footer" class="fix-bottom">
+		<table class="align-center">
+			<tr>
+				<td class="font-small text-center">
+					<a href="mailto:Bean@ThatBean.com">Bean@ThatBean.com</a> | 
+					<a href="https://github.com/ThatBean">Bean in Git</a> | 
+					<a href="http://steamcommunity.com/id/dreames">Dr.Eames in Steam</a> | 
+					<a href="http://thatbean.com">thatbean.com</a>
+					<br /> 
+					&clubs;&infin; Copywrong 2015 by <b class="font-big">Bean/Dr.Eames</b>
+				</td>
+			</tr>
+		</table>
+	</div>
+	
+	<div id="page-content" class="align-center text-center">
+		<div>
+		<p>This page is for <b>Dr.Image develop</b> use</p>
+		</div>
+		
+		<div>
+			<button onclick="Dr.Event.emit('KEY_UP', null, 'K_LEFT')">[Left]</button>
+			<button onclick="Dr.Event.emit('KEY_UP', null, 'K_RIGHT')">[Right]</button>
+			<button onclick="Dr.Event.emit('KEY_UP', null, 'K_UP')">[ Up ]</button>
+			<button onclick="Dr.Event.emit('KEY_UP', null, 'K_DOWN')">[Down]</button>
+			<br />
+			<br />
+			<button onclick="Dr.toggle('Draw_Image')">Draw_Image</button>
+			<button onclick="Dr.toggle('Draw_Canvas')">Draw_Canvas</button>
+			<button onclick="Dr.toggle('Draw_CanvasImageData')">Draw_CanvasImageData</button>
+			<br />
+			<br />
+			<button onclick="Dr.toggle('Draw_Count', 10)">Draw_Count 10</button>
+			<button onclick="Dr.toggle('Draw_Count', 100)">Draw_Count 100</button>
+			<button onclick="Dr.toggle('Draw_Count', 500)">Draw_Count 500</button>
+			<button onclick="Dr.toggle('Draw_Count', 1000)">Draw_Count 1000</button>
+			<button onclick="Dr.toggle('Draw_Count', 5000)">Draw_Count 5000</button>
+			<button onclick="Dr.toggle('Draw_Count', 10000)">Draw_Count 10000</button>
+		</div>
+		
+		<br />
+		<p id="FPS">
+			FPS here
+		</p>
+		<div>
+			<canvas id="Dr.Canvas" class="pixelated" width="300" height="600"></canvas>
+		</div>
+		
+		<img id="test_image_data" />
+		<canvas id="test_canvas_data" class="pixelated" width="300" height="50"></canvas>
+		
+		<p id="Log">
+			Log here
+		</p>
+		
+	</div>
+<br />
+</body>
+</html>
