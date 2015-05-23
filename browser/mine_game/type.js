@@ -143,28 +143,29 @@ Dr.Implement('Mine_Type', function (global, module_get) {
 		switch (block_type) {
 			case Module.type.BOX:
 				return [
-					[row - 1, col - 1],
-					[row - 1, col    ],
-					[row - 1, col + 1],
+					//row		col		is_connected by edge (false = by vertex)
+					[row - 1, col - 1, false],
+					[row - 1, col    , true],
+					[row - 1, col + 1, false],
 					
-					[row    , col - 1],
-					[row    , col + 1],
+					[row    , col - 1, true],
+					[row    , col + 1, true],
 					
-					[row + 1, col - 1],
-					[row + 1, col    ],
-					[row + 1, col + 1],
+					[row + 1, col - 1, false],
+					[row + 1, col    , true],
+					[row + 1, col + 1, false],
 				];
 				break;
 			case Module.type.HEX:
 				//shift col down when the row is even
 				var shift_col = ((row % 2 == 0) ? 0 : 1);
 				return [
-					[row - 1, col - 1 + shift_col],
-					[row - 1, col     + shift_col],
-					[row    , col + 1],
-					[row    , col - 1],
-					[row + 1, col - 1 + shift_col],
-					[row + 1, col     + shift_col],
+					[row - 1, col - 1 + shift_col, true],
+					[row - 1, col     + shift_col, true],
+					[row    , col + 1, true],
+					[row    , col - 1, true],
+					[row + 1, col - 1 + shift_col, true],
+					[row + 1, col     + shift_col, true],
 				];
 				
 				break;
@@ -173,44 +174,44 @@ Dr.Implement('Mine_Type', function (global, module_get) {
 				var shift_col = ((row % 4 == 0 || row % 4 == 3) ? 0 : 1);
 				if (row % 2 == 0) {
 					return [
-						[row - 2, col - 1 + shift_col],
-						[row - 2, col     + shift_col],
+						[row - 2, col - 1 + shift_col, false],
+						[row - 2, col     + shift_col, false],
 						
-						[row - 1, col - 1],
-						[row - 1, col    ],
-						[row - 1, col + 1],
+						[row - 1, col - 1, false],
+						[row - 1, col    , true],
+						[row - 1, col + 1, false],
 						
-						[row    , col - 1],
-						[row    , col + 1],
+						[row    , col - 1, false],
+						[row    , col + 1, false],
 						
-						[row + 1, col - 1 + shift_col],
-						[row + 1, col     + shift_col],
+						[row + 1, col - 1 + shift_col, true],
+						[row + 1, col     + shift_col, true],
 						
-						[row + 2, col - 1 + shift_col],
-						[row + 2, col     + shift_col],
+						[row + 2, col - 1 + shift_col, false],
+						[row + 2, col     + shift_col, false],
 						
-						[row + 3, col    ],
+						[row + 3, col    , false],
 					];
 				}
 				else {
 					return [
-						[row - 3, col    ],
+						[row - 3, col    , false],
 						
-						[row - 2, col - 1 + shift_col],
-						[row - 2, col     + shift_col],
+						[row - 2, col - 1 + shift_col, false],
+						[row - 2, col     + shift_col, false],
 						
-						[row - 1, col - 1 + shift_col],
-						[row - 1, col     + shift_col],
+						[row - 1, col - 1 + shift_col, true],
+						[row - 1, col     + shift_col, true],
 						
-						[row    , col - 1],
-						[row    , col + 1],
+						[row    , col - 1, false],
+						[row    , col + 1, false],
 						
-						[row + 1, col - 1],
-						[row + 1, col    ],
-						[row + 1, col + 1],
+						[row + 1, col - 1, false],
+						[row + 1, col    , true],
+						[row + 1, col + 1, false],
 						
-						[row + 2, col - 1 + shift_col],
-						[row + 2, col     + shift_col],
+						[row + 2, col - 1 + shift_col, false],
+						[row + 2, col     + shift_col, false],
 					];
 				}
 				break;

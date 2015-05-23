@@ -139,6 +139,22 @@ Dr.Implement('ImageData', function (global, module_get) {
 		CANVAS_IMAGE_DATA: 'CANVAS_IMAGE_DATA',	//slow, but with pixel manipulation
 	}
 	
+	Module.prototype.create = function (type, width, height) {
+		switch (type) {
+			case Module.type.CANVAS_ELEMENT:
+				var canvas_element = Dr.document.createElement('canvas');
+				canvas_element.width = width;
+				canvas_element.height = height;
+				this.init('create', canvas_element, Module.type.CANVAS_ELEMENT);
+				break;
+			case Module.type.IMAGE_ELEMENT:
+			case Module.type.CANVAS_IMAGE_DATA:
+			default:
+				Dr.log('[ImageData][create] error type:', type);
+				break;
+		}
+	}
+	
 	Module.prototype.init = function (source, data, type) {
 		
 		switch (type) {
@@ -207,7 +223,6 @@ Dr.Implement('ImageData', function (global, module_get) {
 				this.init(this._source, canvas_element, Module.type.CANVAS_ELEMENT);
 				break;
 			case Module.type.CANVAS_ELEMENT:
-				return;
 				break;
 			default:
 				Dr.log('[ImageData][toCanvas] error type:', this.type, this._source);
@@ -215,7 +230,34 @@ Dr.Implement('ImageData', function (global, module_get) {
 		}
 	}
 	
-	//canvas only
+	Module.prototype.toCanvasImageData = function () {
+		switch (this.type) {
+			case Module.type.IMAGE_ELEMENT:
+				var canvas_element = Dr.document.createElement('canvas');
+				canvas_element.width = this.width;
+				canvas_element.height = this.height;
+				var canvas_context = canvas_element.getContext('2d');
+				this.draw(canvas_context, 0, 0);
+				var canvas_image_data = canvas_context.getImageData(0, 0, canvas_element.width, canvas_element.height);
+				this.init(this._source, canvas_image_data, Module.type.CANVAS_IMAGE_DATA);
+				break;
+			case Module.type.CANVAS_ELEMENT:
+				var canvas_element = this._data;
+				var canvas_context = canvas_element.getContext('2d');
+				var canvas_image_data = canvas_context.getImageData(0, 0, canvas_element.width, canvas_element.height);
+				this.init(this._source, canvas_image_data, Module.type.CANVAS_IMAGE_DATA);
+				break;
+			case Module.type.CANVAS_IMAGE_DATA:
+				break;
+			default:
+				Dr.log('[ImageData][toCanvasImageData] error type:', this.type, this._source);
+				break;
+		}
+	}
+	
+	
+	//CANVAS_ELEMENT only
+	//CANVAS_ELEMENT only
 	Module.prototype.scale = function (scale_x, scale_y) {
 		this.toCanvas();
 		
@@ -264,6 +306,56 @@ Dr.Implement('ImageData', function (global, module_get) {
 		
 		this.init(this._source, canvas_element, Module.type.CANVAS_ELEMENT);
 	}
+	
+	
+	
+	
+	//CANVAS_IMAGE_DATA only
+	//CANVAS_IMAGE_DATA only
+	Module.prototype.drawPixel = function (x, y, color) {
+		this.toCanvasImageData();
+		
+		var index = Math.round(x) + Math.round(y) * this.width;
+		var index4 = index * 4;
+		var data = this._data.data;
+		
+		data[index4] = color.r * 255;
+		data[index4 + 1] = color.g * 255;
+		data[index4 + 2] = color.b * 255;
+		data[index4 + 3] = color.a * 255;
+	};
+	
+	Module.prototype.drawPixelLine = function (point0, point1, color) {
+		this.toCanvasImageData();
+		
+		var x0 = Math.round(point0.x);
+		var y0 = Math.round(point0.y);
+		//var z0 = point0.z;
+		
+		var x1 = Math.round(point1.x);
+		var y1 = Math.round(point1.y);
+		//var z1 = point1.z;
+		
+		var dx = Math.abs(x1 - x0);
+		var dy = Math.abs(y1 - y0);
+		//var dz = Math.abs(z1 - z0) / Math.sqrt(dx*dx + dy*dy);
+		
+		var sx = (x0 < x1) ? 1 : -1;
+		var sy = (y0 < y1) ? 1 : -1;
+		//var sz = (z0 < z1) ? dz : -dz;
+		
+		var err = dx - dy;
+		
+		while(true) {
+			this.drawPixel(x0, y0, color);
+			//this.drawPoint4(x0, y0, z0, color);
+			if((x0 == x1) && (y0 == y1)) break;
+			var e2 = 2 * err;
+			if(e2 > -dy) { err -= dy; x0 += sx; }
+			if(e2 < dx) { err += dx; y0 += sy; }
+			//z0 += sz;
+		}
+	};
 	
 	
 	return Module;
