@@ -190,6 +190,10 @@ function init() {
 	
 	Dr.test_canvas = test_canvas;
 	
+	
+	
+	// Dr.image_data_canvas.drawPixelLine({x:1,y:3}, {x:150,y:45}, {r:200,g:30,b:0,a:100});
+	// Dr.image_data_canvas.draw(Dr.main_context, 10, 10);
 }
 
 Dr.afterWindowLoaded(init);
