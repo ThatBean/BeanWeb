@@ -83,19 +83,19 @@ function init() {
 	
 	
 	var timer = Dr.now();
-	for (var i = 0; i < loop_count; i++) image_data_image.drawClip(main_context, 0, 200, 50, 20, 400, 50);
+	for (var i = 0; i < loop_count; i++) image_data_image.drawClip(main_context, 0, 200, 50, 20, test_canvas_data.width, test_canvas_data.height);
 	log_list = ['[End] image_data_image drawClip', 'time:', (Dr.now() - timer).toFixed(6), 'Hz:', (1 / (Dr.now() - timer)).toFixed(6)];
 	tag_log.Log(log_list.join(' '));
 	Dr.log(log_list.join(' '));
 	
 	var timer = Dr.now();
-	for (var i = 0; i < loop_count; i++) image_data_canvas.drawClip(main_context, 0, 250, 50, 20, 400, 50);
+	for (var i = 0; i < loop_count; i++) image_data_canvas.drawClip(main_context, 0, 250, 50, 20, test_canvas_data.width, test_canvas_data.height);
 	log_list = ['[End] image_data_canvas drawClip', 'time:', (Dr.now() - timer).toFixed(6), 'Hz:', (1 / (Dr.now() - timer)).toFixed(6)];
 	tag_log.Log(log_list.join(' '));
 	Dr.log(log_list.join(' '));
 	
 	var timer = Dr.now();
-	for (var i = 0; i < loop_count; i++) image_data_canvas_image_data.drawClip(main_context, 0, 300, 50, 20, 400, 50);
+	for (var i = 0; i < loop_count; i++) image_data_canvas_image_data.drawClip(main_context, 0, 300, 50, 20, test_canvas_data.width, test_canvas_data.height);
 	log_list = ['[End] image_data_canvas_image_data drawClip', 'time:', (Dr.now() - timer).toFixed(6), 'Hz:', (1 / (Dr.now() - timer)).toFixed(6)];
 	tag_log.Log(log_list.join(' '));
 	Dr.log(log_list.join(' '));
@@ -107,19 +107,19 @@ function init() {
 	
 	
 	var timer = Dr.now();
-	for (var i = 0; i < loop_count; i++) image_data_image.drawClip(main_context, 0, 400, 10, 20, 40, 20);
+	for (var i = 0; i < loop_count; i++) image_data_image.drawClip(main_context, 0, 400, 10, 20, test_canvas_data.width * 0.5, test_canvas_data.height * 0.3);
 	log_list = ['[End] image_data_image drawClip', 'time:', (Dr.now() - timer).toFixed(6), 'Hz:', (1 / (Dr.now() - timer)).toFixed(6)];
 	tag_log.Log(log_list.join(' '));
 	Dr.log(log_list.join(' '));
 	
 	var timer = Dr.now();
-	for (var i = 0; i < loop_count; i++) image_data_canvas.drawClip(main_context, 0, 450, 10, 20, 40, 20);
+	for (var i = 0; i < loop_count; i++) image_data_canvas.drawClip(main_context, 0, 450, 10, 20, test_canvas_data.width * 0.5, test_canvas_data.height * 0.3);
 	log_list = ['[End] image_data_canvas drawClip', 'time:', (Dr.now() - timer).toFixed(6), 'Hz:', (1 / (Dr.now() - timer)).toFixed(6)];
 	tag_log.Log(log_list.join(' '));
 	Dr.log(log_list.join(' '));
 	
 	var timer = Dr.now();
-	for (var i = 0; i < loop_count; i++) image_data_canvas_image_data.drawClip(main_context, 0, 500, 10, 20, 40, 20);
+	for (var i = 0; i < loop_count; i++) image_data_canvas_image_data.drawClip(main_context, 0, 500, 10, 20, test_canvas_data.width * 0.5, test_canvas_data.height * 0.3);
 	log_list = ['[End] image_data_canvas_image_data drawClip', 'time:', (Dr.now() - timer).toFixed(6), 'Hz:', (1 / (Dr.now() - timer)).toFixed(6)];
 	tag_log.Log(log_list.join(' '));
 	Dr.log(log_list.join(' '));
