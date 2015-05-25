@@ -43,6 +43,33 @@ Dr.Implement('Mine_Type', function (global, module_get) {
 		LockBlock: 'L',
 	}
 	
+	Module.fragSizeBlock = {
+		BOX: [1, 1],
+		HEX: [4, 2],
+		TRI: [2, 1],
+	}
+	
+	Module.fragSizeCondensedBlock = {
+		BOX: [1, 1],
+		HEX: [3, 2],
+		TRI: [1, 1],
+	}
+	
+	Module.sizeAdjustment = {
+		BOX: {
+			row: [1, 0],	//scale, add
+			col: [1, 0],
+		},
+		HEX: {
+			row: [1, 1 / 3],	//scale, add
+			col: [1, 1 / 2],
+		},
+		TRI: {
+			row: [1, 1 / 2],	//scale, add
+			col: [0.5, 0],
+		},
+	}
+	
 	// ( [/] )
 	Module.getTLBR = function (x, y) {
 		return x + y > 1;	// true = top
@@ -52,7 +79,7 @@ Dr.Implement('Mine_Type', function (global, module_get) {
 		return x < y;	// true = top
 	}
 	
-	Module.condensedMap = {
+	Module.mapCondensedBlock = {
 		HEX: [
 			[
 				[Module.getTLBR, [-1, 0], [0, 0]],
@@ -83,7 +110,7 @@ Dr.Implement('Mine_Type', function (global, module_get) {
 		],
 	}
 	
-	//the x and y will be normalized first(based on smallest triangle)
+	//the x and y will be normalized first(based on fragment(smallest triangle))
 	Module.getBlockFromPosition = function (block_type, x, y) {
 		var x_integer = Math.floor(x);
 		var y_integer = Math.floor(y);
@@ -99,7 +126,7 @@ Dr.Implement('Mine_Type', function (global, module_get) {
 				var row = (x_integer - x_integer % 6) / 3;
 				var col = (y_integer - y_integer % 2) / 2;
 				
-				var map = Module.condensedMap.HEX[y_integer % 2][x_integer % 6];
+				var map = Module.mapCondensedBlock.HEX[y_integer % 2][x_integer % 6];
 				var location_mod;
 				
 				if (map[0]) {
@@ -118,7 +145,7 @@ Dr.Implement('Mine_Type', function (global, module_get) {
 				var row = (x_integer - x_integer % 2);
 				var col = (y_integer - y_integer % 2);
 				
-				var map = Module.condensedMap.HEX[y_integer % 2][x_integer % 2];
+				var map = Module.mapCondensedBlock.HEX[y_integer % 2][x_integer % 2];
 				var location_mod;
 				
 				if (map[0]) {

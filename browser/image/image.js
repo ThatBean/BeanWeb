@@ -1,6 +1,6 @@
-Dr.Declare('Canvas', 'class');
-Dr.Require('Canvas', 'ImageData');
-Dr.Implement('Canvas', function (global, module_get) {
+Dr.Declare('CanvasExt', 'class');
+Dr.Require('CanvasExt', 'ImageData');
+Dr.Implement('CanvasExt', function (global, module_get) {
 	
 	var Module = function () {
 		//
@@ -33,7 +33,7 @@ Dr.Implement('Canvas', function (global, module_get) {
 	
 	Module.prototype.onAction = function (action) {
 		this._event_center.emit(action.action_type, action);
-		//Dr.log('[Canvas][onAction] get', action.action_type, action);
+		//Dr.log('[CanvasExt][onAction] get', action.action_type, action);
 	}
 	
 	Module.prototype.update = function (delta_time, buffer_index) {

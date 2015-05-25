@@ -159,9 +159,9 @@ function init() {
 	
 	
 	
-	var Canvas = Dr.Get('Canvas');
+	var CanvasExt = Dr.Get('CanvasExt');
 	
-	var test_canvas = new Canvas;
+	var test_canvas = new CanvasExt;
 	
 	test_canvas.init(main_canvas);
 	

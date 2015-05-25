@@ -12,7 +12,10 @@ Dr.Implement('Mine_Map', function (global, module_get) {
 	
 	Module.type = Mine_Type.type;
 	
-	Module.prototype.init = function (block_type, row, col, mine_block_count, empty_block_count, lock_block_count) {
+	Module.prototype.init = function (
+		block_type, row, col, 
+		mine_block_count, empty_block_count, lock_block_count
+	) {
 		
 		switch (block_type) {
 			case Module.type.BOX:
@@ -32,6 +35,9 @@ Dr.Implement('Mine_Map', function (global, module_get) {
 		
 		//all directly accessible(public)
 		this.block_type = block_type;
+		this.row_count = row;
+		this.col_count = col;
+		
 		
 		//should not access(private)
 		this._block_type = block_type;
