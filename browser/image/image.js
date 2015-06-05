@@ -312,17 +312,32 @@ Dr.Implement('ImageData', function (global, module_get) {
 	
 	//CANVAS_IMAGE_DATA only
 	//CANVAS_IMAGE_DATA only
-	Module.prototype.drawPixel = function (x, y, color) {
+	Module.prototype.getPixelColor = function (x, y) {
 		this.toCanvasImageData();
 		
-		var index = Math.round(x) + Math.round(y) * this.width;
+		var index = x + y * this.width;
 		var index4 = index * 4;
 		var data = this._data.data;
 		
-		data[index4] = color.r * 255;
-		data[index4 + 1] = color.g * 255;
-		data[index4 + 2] = color.b * 255;
-		data[index4 + 3] = color.a * 255;
+		return {
+			r: data[index4],
+			g: data[index4 + 1],
+			b: data[index4 + 2],
+			a: data[index4 + 3],
+		}
+	};
+	
+	Module.prototype.drawPixel = function (x, y, color) {
+		this.toCanvasImageData();
+		
+		var index = x + y * this.width;
+		var index4 = index * 4;
+		var data = this._data.data;
+		
+		data[index4] = color.r;
+		data[index4 + 1] = color.g;
+		data[index4 + 2] = color.b;
+		data[index4 + 3] = color.a;
 	};
 	
 	Module.prototype.drawPixelLine = function (point0, point1, color) {
@@ -357,6 +372,37 @@ Dr.Implement('ImageData', function (global, module_get) {
 		}
 	};
 	
+	
+	Module.prototype.floodFill = function (point, color) {
+		this.toCanvasImageData();
+		
+		var x = Math.round(point.x);
+		var y = Math.round(point.y);
+		
+		var from_color = this.getPixelColor(x, y);
+		var to_color = color;
+		
+		
+		var data = this._data.data;
+		
+		var todo_list = [];
+		var is_flood_up = true;
+		
+		
+		
+		
+		
+		
+		while(true) {
+			this.drawPixel(x0, y0, color);
+			//this.drawPoint4(x0, y0, z0, color);
+			if((x0 == x1) && (y0 == y1)) break;
+			var e2 = 2 * err;
+			if(e2 > -dy) { err -= dy; x0 += sx; }
+			if(e2 < dx) { err += dx; y0 += sy; }
+			//z0 += sz;
+		}
+	};
 	
 	return Module;
 });
