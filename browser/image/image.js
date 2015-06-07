@@ -373,34 +373,97 @@ Dr.Implement('ImageData', function (global, module_get) {
 	};
 	
 	
-	Module.prototype.floodFill = function (point, color) {
+	Module.prototype.floodFill = function (start_point, fill_color) {
 		this.toCanvasImageData();
 		
-		var x = Math.round(point.x);
-		var y = Math.round(point.y);
+		start_point.x = Math.round(start_point.x);
+		start_point.y = Math.round(start_point.y);
 		
-		var from_color = this.getPixelColor(x, y);
-		var to_color = color;
-		
-		
+		var width = this.width;
+		var height = this.height;
 		var data = this._data.data;
-		
-		var todo_list = [];
-		var is_flood_up = true;
-		
+		var from_color = this.getPixelColor(start_point.x, start_point.y);
+		var to_color = fill_color;
 		
 		
+		var mark_point_array = [];
 		
+		var put_color = function (x, y, color) {
+			var index = (y * width + x) * 4;
+			data[index] = color.r;
+			data[index + 1] = color.g;
+			data[index + 2] = color.b;
+			data[index + 3] = color.a;
+		}
 		
+		var check_color = function (x, y, color) {
+			var index = (y * width + x) * 4;
+			return data[index] == color.r
+				&& data[index + 1] == color.g
+				&& data[index + 2] == color.b
+				&& data[index + 3] == color.a;
+		}
 		
-		while(true) {
-			this.drawPixel(x0, y0, color);
-			//this.drawPoint4(x0, y0, z0, color);
-			if((x0 == x1) && (y0 == y1)) break;
-			var e2 = 2 * err;
-			if(e2 > -dy) { err -= dy; x0 += sx; }
-			if(e2 < dx) { err += dx; y0 += sy; }
-			//z0 += sz;
+		var push_mark_point = function (x, y) {
+			if (check_color(x, y, from_color)) {
+				mark_point_array.push({x:x, y:y});
+				return true;
+			}
+			return false;
+		}
+		
+		var combo_push = function (x_left, x_right, check_y) {
+			var check_x = x_left + 1;
+			var is_combo = false;
+			while(check_x < x_right) {
+				if (check_color(check_x, check_y, from_color)) {
+					if (!is_combo) {
+						is_combo = true;
+						push_mark_point(check_x, check_y);
+					}
+				}
+				else {
+					is_combo = false;
+				}
+				check_x++;
+			}
+		}
+		
+		//check initial point
+		if (!check_color(start_point.x, start_point.y, to_color)) push_mark_point(start_point.x, start_point.y);
+		else return;
+		
+		//stack loop
+		while(mark_point_array.length) {	//loop marked points
+			var init_point = mark_point_array.pop();
+			
+			var x_left = init_point.x - 1;
+			var x_right = init_point.x + 1;
+			
+			var current_y = init_point.y;
+			
+			if (check_color(init_point.x, init_point.y, from_color)) {
+				//paint current point
+				put_color(init_point.x, init_point.y, to_color);
+				
+				//left expand
+				while(x_left >= 0 && check_color(x_left, current_y, from_color)) {
+					put_color(x_left, current_y, to_color);
+					x_left--;
+				}
+				
+				//right expand
+				while(x_right < width && check_color(x_right, current_y, from_color)) {
+					put_color(x_right, current_y, to_color);
+					x_right++;
+				}
+				
+				//up check
+				if (current_y - 1 >= 0) combo_push(x_left, x_right, current_y - 1);
+				
+				//down check
+				if (current_y + 1 < height) combo_push(x_left, x_right, current_y + 1);
+			}
 		}
 	};
 	
