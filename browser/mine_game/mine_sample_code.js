@@ -131,6 +131,7 @@ function init() {
 	Dr.image_data_canvas.draw(Dr.main_context, 0, 0);
 	
 	Dr.image_data_canvas.floodFill({x:65,y:30}, {r:20,g:50,b:100,a:255})
+	Dr.image_data_canvas.floodFill({x:200,y:200}, {r:200,g:50,b:100,a:255})
 	
 	Dr.image_data_canvas.draw(Dr.main_context, 0, 0);
 }

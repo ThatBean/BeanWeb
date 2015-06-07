@@ -385,7 +385,6 @@ Dr.Implement('ImageData', function (global, module_get) {
 		var from_color = this.getPixelColor(start_point.x, start_point.y);
 		var to_color = fill_color;
 		
-		
 		var mark_point_array = [];
 		
 		var put_color = function (x, y, color) {
@@ -404,14 +403,6 @@ Dr.Implement('ImageData', function (global, module_get) {
 				&& data[index + 3] == color.a;
 		}
 		
-		var push_mark_point = function (x, y) {
-			if (check_color(x, y, from_color)) {
-				mark_point_array.push({x:x, y:y});
-				return true;
-			}
-			return false;
-		}
-		
 		var combo_push = function (x_left, x_right, check_y) {
 			var check_x = x_left + 1;
 			var is_combo = false;
@@ -419,7 +410,7 @@ Dr.Implement('ImageData', function (global, module_get) {
 				if (check_color(check_x, check_y, from_color)) {
 					if (!is_combo) {
 						is_combo = true;
-						push_mark_point(check_x, check_y);
+						mark_point_array.push({x:check_x, y:check_y});
 					}
 				}
 				else {
@@ -430,7 +421,7 @@ Dr.Implement('ImageData', function (global, module_get) {
 		}
 		
 		//check initial point
-		if (!check_color(start_point.x, start_point.y, to_color)) push_mark_point(start_point.x, start_point.y);
+		if (!check_color(start_point.x, start_point.y, to_color)) mark_point_array.push(start_point);
 		else return;
 		
 		//stack loop
@@ -451,7 +442,6 @@ Dr.Implement('ImageData', function (global, module_get) {
 					put_color(x_left, current_y, to_color);
 					x_left--;
 				}
-				
 				//right expand
 				while(x_right < width && check_color(x_right, current_y, from_color)) {
 					put_color(x_right, current_y, to_color);
@@ -460,7 +450,6 @@ Dr.Implement('ImageData', function (global, module_get) {
 				
 				//up check
 				if (current_y - 1 >= 0) combo_push(x_left, x_right, current_y - 1);
-				
 				//down check
 				if (current_y + 1 < height) combo_push(x_left, x_right, current_y + 1);
 			}
