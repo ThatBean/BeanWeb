@@ -146,7 +146,7 @@
 		function requestGitPull (operation) {
 			GitPullLog.innerHTML = 'Requesting Git Pull [' + operation.toString() + ']...';
 			Dr.createHttpRequest(
-				'http://thatbean.com:888', 
+				'http://' + window.location.hostname + ':888', 
 				operation, 
 				function (xml_http, text) {
 					var GitPullLog = document.getElementById("GitPullLog");
