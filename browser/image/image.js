@@ -17,6 +17,15 @@ Dr.Implement('CanvasExt', function (global, module_get) {
 		this._main_canvas = canvas;
 		this._main_context = canvas.getContext('2d');
 		
+		if (Dr.devicePixelRatio != 1) {
+			Dr.log('Get Dr.devicePixelRatio:', Dr.devicePixelRatio);
+		}
+		
+		if (canvas.width != parseInt(canvas.style.width) || canvas.height != parseInt(canvas.style.height)) {
+			Dr.log('Get canvas pixel style mismatch:', 'pixel:', canvas.width, canvas.height, 'style:', canvas.style.width, canvas.style.height);
+		}
+		
+		
 		this._width = canvas.width;
 		this._height = canvas.height;
 		//canvas.style.cursor = 'default';	//prevent selection
