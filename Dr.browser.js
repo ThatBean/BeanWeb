@@ -5,7 +5,7 @@ else {
 	// Required Non-Standard-JavaScript Methods
 	Dr.log('[Dr] Adding browser methods...');
 
-	var _key_code_to_def = {
+	Dr.eventKeyCodeMap = {
 		'8': 'K_BACKSPACE',
 		'9': 'K_TAB',
 		
@@ -21,8 +21,8 @@ else {
 		'27': 'K_ESC',
 		
 		'32': 'K_SPACE',
-		'33': 'K_PRIOR',
-		'34': 'K_NEXT',
+		'33': 'K_PAGE_UP',
+		'34': 'K_PAGE_DOWN',
 		'35': 'K_END',
 		'36': 'K_HOME',
 		'37': 'K_LEFT',
@@ -35,69 +35,14 @@ else {
 		'45': 'K_INSERT',
 		'46': 'K_DELETE',
 		'47': 'K_HELP',
-		'48': 'K_0',
-		'49': 'K_1',
-		'50': 'K_2',
-		'51': 'K_3',
-		'52': 'K_4',
-		'53': 'K_5',
-		'54': 'K_6',
-		'55': 'K_7',
-		'56': 'K_8',
-		'57': 'K_9',
-		'65': 'K_A',
-		'66': 'K_B',
-		'67': 'K_C',
-		'68': 'K_D',
-		'69': 'K_E',
-		'70': 'K_F',
-		'71': 'K_G',
-		'72': 'K_H',
-		'73': 'K_I',
-		'74': 'K_J',
-		'75': 'K_K',
-		'76': 'K_L',
-		'77': 'K_M',
-		'78': 'K_N',
-		'79': 'K_O',
-		'80': 'K_P',
-		'81': 'K_Q',
-		'82': 'K_R',
-		'83': 'K_S',
-		'84': 'K_T',
-		'85': 'K_U',
-		'86': 'K_V',
-		'87': 'K_W',
-		'88': 'K_X',
-		'89': 'K_Y',
-		'90': 'K_Z',
-		
-		'96': 'K_KP_0',
-		'97': 'K_KP_1',
-		'98': 'K_KP_2',
-		'99': 'K_KP_3',
-		'100': 'K_KP_4',
-		'101': 'K_KP_5',
-		'102': 'K_KP_6',
-		'103': 'K_KP_7',
-		'104': 'K_KP_8',
-		'105': 'K_KP_9',
-		
-		'112': 'K_F1',
-		'113': 'K_F2',
-		'114': 'K_F3',
-		'115': 'K_F4',
-		'116': 'K_F5',
-		'117': 'K_F6',
-		'118': 'K_F7',
-		'119': 'K_F8',
-		'120': 'K_F9',
-		'121': 'K_F10',
-		'122': 'K_F11',
-		'123': 'K_F12',
 	};
-
-	var _event_to_action_mapper = {
+	
+	for (var i = 0; i <= 9; i++) Dr.eventKeyCodeMap[48 + i] = 'K_' + i;
+	for (var i = 0; i <= (('Z').charCodeAt(0) - ('A').charCodeAt(0)); i++) Dr.eventKeyCodeMap[65 + i] = 'K_' + String.fromCharCode(('A').charCodeAt(0) + i);
+	for (var i = 0; i <= 9; i++) Dr.eventKeyCodeMap[96 + i] = 'K_KP_' + i;
+	for (var i = 1; i <= 12; i++) Dr.eventKeyCodeMap[112 - 1 + i] = 'K_F' + i;
+	
+	Dr.eventActionMap = {
 		'touchstart': 'action_start',
 		'touchmove': 'action_move',
 		'touchend': 'action_end',
@@ -124,20 +69,15 @@ else {
 	Dr.document.onpaste = function (event) {
 		//get content
 		var content;
-		if (event.clipboardData) { 
-			content = (event.originalEvent || event).clipboardData.getData('text/plain');
-		}
-		else if (window.clipboardData) {
-			content = window.clipboardData.getData('Text');
-		}
+		if (event.clipboardData) content = (event.originalEvent || event).clipboardData.getData('text/plain');
+		else if (window.clipboardData) content = window.clipboardData.getData('Text');
 		//pass on
 		Dr.Event.emit("PASTE", event, content);
 	};
-
+	
 	Dr.window.addEventListener("resize", function (event) {
 		Dr.Event.emit('WINDOW_RESIZE', event);
 	});
-	
 	if ("onorientationchange" in window) {
 		Dr.window.addEventListener("orientationchange", function (event) {
 			Dr.Event.emit('WINDOW_ROTATION', event);
@@ -198,9 +138,7 @@ else {
 		script_element.type = 'text/javascript';
 		script_element.async = true;
 		script_element.src = script_src;
-		script_element.onload = function () {
-			callback(script_element);
-		};
+		script_element.onload = function () { callback(script_element); };
 		var exist_script_element = document.getElementsByTagName('script')[0];
 		exist_script_element.parentNode.insertBefore(script_element, exist_script_element);
 	};
@@ -214,16 +152,12 @@ else {
 		loop_load_script();
 	};
 	Dr.loadText = function (src, callback) {
-		Dr.createHttpRequest(src, null, function (xml_http, response_text) {
-			callback(response_text);
-		});
+		Dr.createHttpRequest(src, null, function (xml_http, response_text) { callback(response_text); });
 	};
 	Dr.loadImage = function (image_src, callback) {
 		var image_element = new Image();
 		image_element.src = image_src;
-		image_element.onload = function () {
-			callback(image_element);
-		};
+		image_element.onload = function () { callback(image_element); };
 		return image_element;
 	};
 	Dr.createHttpRequest = function (url, message, finish_callback, state_change_callback) {
@@ -338,47 +272,33 @@ else {
 	Dr.onNextScreenUpdate = function (callback) {
 		return requestAnimationFrame(callback);
 	};
-	Dr.setDelayCallback = function (callback, delay, is_once) { 
-		var set_func;
-		var clear_func;
-		if (is_once) {
-			set_func = setInterval;
-			clear_func = clearInterval;
-		}
-		else {
-			set_func = setTimeout;
-			clear_func = clearTimeout;
-		}
-		var delay_callback_id = set_func(callback, delay);
-		return function () {clear_func(delay_callback_id)}
+	Dr.createDelayCallback = function (callback, delay, is_repeat) { 
+		var set_func = is_repeat ? setInterval : setTimeout;
+		var clear_func = is_repeat ? clearInterval : clearTimeout;
+		var delay_callback_id = set_func(callback, delay / 1000);
+		return function () { clear_func(delay_callback_id); };	//can be called to remove callback
 	};
 	Dr.clearDelayCallback = function (delay_callback_clear_func) {
-		if (delay_callback_clear_func) {
-			delay_callback_clear_func();
-		}
-		else {
-			clearTimeout();
-			clearInterval();
-		}
+		if (delay_callback_clear_func) { delay_callback_clear_func(); }
+		else { clearTimeout(); clearInterval(); }	//clear all
 	};
 
 
 	//event related
 	Dr.getKeyDefination = function (key_code) {
-		return _key_code_to_def[key_code] || 'K_UNDEFINED';
+		return Dr.eventKeyCodeMap[key_code] || 'K_UNDEFINED';
 	};
 	
 	//simple event wrapper, merged touch and click
 	Dr.applyActionListener = function (listener_element, callback) {
-		for (var event_type in _event_to_action_mapper) {
+		for (var event_type in Dr.eventActionMap) {
 			listener_element.addEventListener(event_type, function (event) {
-				var action = Dr.getActionFromEvent(event, listener_element);
-				callback(action);
+				callback(Dr.getActionFromEvent(event, listener_element));
 			});
 		}
 	};
 	Dr.getActionFromEvent = function (event, listener_element) {
-		var action_type = _event_to_action_mapper[event.type];
+		var action_type = Dr.eventActionMap[event.type];
 		var position_visible;	//position relative to visible (inner window or device screen)
 		var position_document;	//position relative to document
 		var position_target;	//position relative to target element

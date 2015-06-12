@@ -159,7 +159,17 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 	}
 	
 	Module.prototype.generateImageData = function () {
-		
+		for (var image_type in this.configImageGenerate) {
+			var config = this.configImageGenerate[image_type]
+			
+			
+			
+			
+			
+			
+			
+			
+		}
 		
 	}
 	

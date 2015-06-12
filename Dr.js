@@ -45,7 +45,7 @@ var Dr = (
 	
 	Dr.global = this.global || this;	//normally window, or {} for a sandbox?
 	
-	console.log('[Dr] Init base method...');
+	console.log('[Dr] Init Base Method...');
 	
 	Dr.getArgumentArray = function (src_args, omit_arg) {
 		return Array.prototype.slice.call(src_args, omit_arg || 0);
@@ -73,7 +73,7 @@ var Dr = (
 		}
 	})();
 	
-	console.log('[Dr] Init module manager...');
+	console.log('[Dr] Init Module Manager...');
 	
 	Dr.ModuleManagerProto = (function () {
 		var Module = function () {
@@ -95,7 +95,6 @@ var Dr = (
 			};
 		};
 		Module.prototype._module_get = function (module_name) { 
-			//Dr.log('_module_get', module_name, this._module_data_pool);
 			if (module_name 
 				&& this._module_data_pool[module_name] 
 				&& this._module_data_pool[module_name].status.load == true)
@@ -105,8 +104,7 @@ var Dr = (
 		};
 		Module.prototype._module_set = function (module_name, module) {
 			if (!this._module_data_pool[module_name]) {
-				alert('[_module_set] module not declared', module_name, module);
-				debugger;
+				Dr.assert(false, '[_module_set] module not declared', module_name, module);
 				return;
 			}
 			this._module_data_pool[module_name].module = module; 
@@ -115,12 +113,12 @@ var Dr = (
 		
 		Module.prototype.declare =  function (module_name, module_type) {
 			if (!module_name) {
-				alert('[declare] error declare nameless module');
+				Dr.assert(false, '[declare] error declare nameless module');
 				return;
 			};
 			if (this._module_data_pool[module_name]) {
 				if (module_type != this._module_data_pool[module_name].type) {
-					alert('[declare] re-declare type mismatch');
+					Dr.assert(false, '[declare] re-declare failed, type mismatch');
 					return;
 				}
 				else {
@@ -131,11 +129,8 @@ var Dr = (
 			this._module_data_pool[module_name].status.declare = true;
 		};
 		Module.prototype.implement =  function (module_name, module_implement_func) {
-			if (!this._module_data_pool[module_name] 
-				|| !this._module_data_pool[module_name].status.declare) {
-				alert('[implement] module not declared', module_name, module_implement_func);
-				
-				debugger;
+			if (!this._module_data_pool[module_name] || !this._module_data_pool[module_name].status.declare) {
+				Dr.assert(false, '[implement] module not declared', module_name, module_implement_func);
 				return;
 			}
 			
@@ -143,88 +138,69 @@ var Dr = (
 			this._module_data_pool[module_name].status.implement = true;
 		};
 		Module.prototype.require =  function (module_name, required_module_name) {
-			if (!this._module_data_pool[module_name] 
-				|| !this._module_data_pool[module_name].status.declare) {
-				alert('[load] module not declared', module_name, required_module_name);
-				
-				debugger;
+			if (!this._module_data_pool[module_name] || !this._module_data_pool[module_name].status.declare) {
+				Dr.assert(false, '[require] module not declared', module_name, required_module_name);
 				return;
 			}
 			
 			this._module_data_pool[module_name].require.push(required_module_name);
 		};
 		Module.prototype.load =  function (module_name) {
-			if (!this._module_data_pool[module_name] 
-				|| !this._module_data_pool[module_name].status.declare) {
-				alert('[load] module not declared', module_name);
-				
-				debugger;
+			if (!this._module_data_pool[module_name] || !this._module_data_pool[module_name].status.declare) {
+				Dr.assert(false, '[load] module not declared', module_name);
 				return;
 			}
+			
 			
 			var module_data = this._module_data_pool[module_name];
 			
-			if (module_data.status.load) {
+			if (typeof(module_data.implement_func) != 'function') {
+				Dr.assert(false, '[load] missing module implement func', module_data.implement_func, 'for loading module', module_name);
 				return;
 			}
 			
-			Dr.debug(5, '[load] try load module', module_name);
+			if (module_data.status.load) return this._module_get(module_name);
 			
 			//loop for all required
 			var require_name_list = module_data.require;
-			var all_requirment_meet = true;
 			for (var i in require_name_list) {
 				if (!this._module_get(require_name_list[i])) {
 					Dr.log('[load] missing required module', i, require_name_list[i], 'for loading module', module_name);
-					all_requirment_meet = false;
+					return;
 				}
 			}
 			
-			if (typeof(module_data.implement_func) != 'function') {
-				Dr.log('[load] missing module implement func', module_data.implement_func, 'for loading module', module_name);
-				all_requirment_meet = false;
-			}
-			
-			if (all_requirment_meet) {
-				var _this = this;	//for module get closure
-				var module = module_data.implement_func(Dr.global, function (module_name) {
-					return _this._module_get(module_name);
-				});
-				this._module_set(module_name, module);
-				Dr.log('[load] loaded', module_name);
-			}
-			else
-				return;
+			var _this = this;	//for module get closure
+			var module = module_data.implement_func(Dr.global, function (module_name) { return _this._module_get(module_name); });
+			this._module_set(module_name, module);
+			Dr.log('[load] loaded', module_name);
+			return this._module_get(module_name);
 		};
 		Module.prototype.loadAll = function () {
 			var left_to_load = 'init';
-			var last_left_to_load;
-			var left_module_name_list;
+			var last_left_to_load = 'init';
 			
 			while(left_to_load != 0) {
-				Dr.debug(5, '[loadAll] start', left_to_load, last_left_to_load, left_module_name_list);
-				
-				if (last_left_to_load == left_to_load) {
-					Dr.log('[loadAll] Still has ' + left_to_load + ' left ot load, infinite loop load?');
-					break;
-				}
+				Dr.debug(10, '[loadAll] start loop', left_to_load, last_left_to_load);
 				
 				last_left_to_load = left_to_load;
 				left_to_load = 0;
-				left_module_name_list = [];
+				var left_module_name_list = [];
 				
 				for (var module_name in this._module_data_pool) {
 					var module_data = this._module_data_pool[module_name];
 					if (module_data.status.load == false) {
 						this.load(module_name);
-						if (module_data.status.load == true) {
-							Dr.debug(10, '[loadAll] loaded', module_name);
-						}
-						else {
+						if (module_data.status.load == false) {	//not the time
 							left_to_load += 1;
 							left_module_name_list.push(module_name);
 						}
 					}
+				}
+				
+				if (last_left_to_load == left_to_load) {
+					Dr.assert(false, '[loadAll] ' + left_to_load + ' left ot load, infinite loop load?');
+					return;
 				}
 			}
 		};
@@ -242,7 +218,7 @@ var Dr = (
 	Dr.Implement = function (module_name, module_implement_func) { Dr.ModuleManager.implement(module_name, module_implement_func); }
 	Dr.LoadAll = function () { Dr.ModuleManager.loadAll(); }
 	Dr.Get = function (module_name) { return Dr.ModuleManager.get(module_name); }
-	Dr.GetNew = function () {
+	Dr.GetNew = function (/* module_name, args for new */) {
 		var arg_list = Dr.getArgumentArray(arguments);
 		var module_name = arg_list.shift();
 		var module = Dr.ModuleManager.get(module_name);
@@ -260,13 +236,13 @@ var Dr = (
 	
 	
 	// Check Function & add Fall-back(polyfill)
-	console.log('[Dr] Checking Function & add Fall-back...');
+	console.log('[Dr] Checking Function & Add Fall-back...');
 	
 	// Add Date.now fall-back
 	Date.now = Date.now || function() { return new Date().getTime(); };
 	
-	//JavaScript only
-	console.log('[Dr] Adding JavaScript only Functions...');
+	//JavaScript
+	console.log('[Dr] Adding Pure JavaScript Functions...');
 	
 	//time related
 	Dr.getUTCTimeStamp = function () { return Math.floor(Date.now() / 1000); };
@@ -274,9 +250,7 @@ var Dr = (
 	Dr.startClock = Date.now();
 	Dr.clock = function () { return (Date.now() - Dr.startClock); }; //return running time in milliseconds
 	Dr.clock_per_sec = 1000;
-	Dr.now = function () {
-		return (Date.now() - Dr.startClock) / Dr.clock_per_sec;	//return running time in seconds
-	};
+	Dr.now = function () { return (Date.now() - Dr.startClock) / Dr.clock_per_sec; };	//return running time in seconds
 	
 	//math related
 	var get_random_int = function (from, to) { //this will not auto swap, meaning <from> should be smaller than <to>
@@ -314,7 +288,7 @@ var Dr = (
 	
 	
 	//extend
-	console.log('[Dr] add extend function...');
+	console.log('[Dr] Adding Extend Function...');
 	
 	Dr.loop = function (loop_time, loop_func) {
 		var looped_time = 0;
@@ -364,15 +338,11 @@ var Dr = (
 		var temp_object = {};
 		for (var i in array_list) {
 			var array = array_list[i];
-			for (var j in array) {
-				temp_object[array[j]] = true;
-			};
+			for (var j in array) temp_object[array[j]] = true;
 		};
 		var res_array = array_list[0];
 		res_array.length = 0;
-		for (var key in temp_object) {
-			res_array.push(key);
-		};
+		for (var key in temp_object) res_array.push(key);
 		return res_array;
 	};
 	
@@ -457,24 +427,16 @@ var Dr = (
 		}
 		Module.prototype.log = function () {
 			var arg_list = Dr.getArgumentArray(arguments);
-			//add time tag
 			arg_list.unshift('[' + Dr.now().toFixed(4) + 'sec]');
-			//show in log
 			Dr.logList(arg_list);
-			//check if record
 			if (this._is_record_history) this._log_history.push(arg_list);
 		}
 		Module.prototype.debug = function (debug_level) {
 			var arg_list = Dr.getArgumentArray(arguments);
-			//remove debug_level
 			arg_list.shift();
-			//add debug tag
 			if (debug_level && debug_level > 0) arg_list.unshift('{' + debug_level + '}');
-			//add time tag
 			arg_list.unshift('[' + Dr.now().toFixed(4) + 'sec]');
-			//check if show in log
 			if (!debug_level || (this._is_show_debug && debug_level >= this._show_debug_level)) Dr.logList(arg_list);
-			//check if record
 			if (this._is_record_history) this._log_history.push(arg_list);
 		}
 		Module.prototype.setDebug = function (debug_level) {
@@ -679,40 +641,41 @@ var Dr = (
 		}
 	})();
 	
+	console.log('[Dr] Adding Environment Specific Functions...');
+	
+	switch (Dr.environment) {
+		case 'browser':
+		case 'cordova':
+			//Dr.loadLocalScript('./Dr.browser.js');
+			break;
+		case 'node':
+			//Dr.loadLocalScript('./Dr.node.js');
+			global.Dr = Dr;
+			module.exports = Dr;
+			
+			Dr.node_exe = process.argv[0];
+			Dr.require = require;
+			
+			var Path = require('path');
+			Dr.node_start_script_path = Path.resolve(process.cwd(), Path.dirname(process.argv[1]));
+			Dr.getLocalPath = function (relative_path) {
+				return Path.resolve(Dr.node_start_script_path, relative_path);
+			}
+			Dr.startREPL = function () {
+				var Repl = require("repl");
+				Repl.start({
+					prompt: 'Dr.node> ',
+					input: process.stdin,
+					output: process.stdout,
+					useGlobal: true,
+				});
+			}
+			
+			Dr.debug(10, 'node_start_script_path:', Dr.node_start_script_path);
+			break;
+	}
+	
 	console.log('[Dr] Finished Initialize.');
 	
 	return Dr;
 })();
-
-switch (Dr.environment) {
-	case 'browser':
-	case 'cordova':
-		//Dr.loadLocalScript('./Dr.browser.js');
-		break;
-	case 'node':
-		//Dr.loadLocalScript('./Dr.node.js');
-		global.Dr = Dr;
-		module.exports = Dr;
-		
-		//Dr.log('process.argv', process.argv);
-		Dr.node_exe = process.argv[0];
-		
-		var Path = require('path');
-		Dr.node_start_script_path = Path.resolve(process.cwd(), Path.dirname(process.argv[1]));
-		Dr.getLocalPath = function (relative_path) {
-			return Path.resolve(Dr.node_start_script_path, relative_path);
-		}
-		Dr.debug(10, 'node_start_script_path:', Dr.node_start_script_path);
-		
-		Dr.require = require;
-		Dr.startREPL = function () {
-			var Repl = require("repl");
-			Repl.start({
-				prompt: 'Dr.node> ',
-				input: process.stdin,
-				output: process.stdout,
-				useGlobal: true,
-			});
-		}
-		break;
-}
