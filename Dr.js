@@ -1,34 +1,34 @@
 // Js Dr Bean Dr.Eames
-var DrAuthor = 'Bean/Dr.Eames';
-var DrVersion = '0.11';
-var DrEnvironment = 'unknown';
+var dr_author = 'Bean/Dr.Eames';
+var dr_version = '0.12';
+var dr_environment = 'unknown';
 
 // Prevent unnecessary re-define
 var Dr = (
 	typeof(Dr) == 'function' 
-	&& Dr.author == DrAuthor 
-	&& Dr.version >= DrVersion
+	&& Dr.author == dr_author 
+	&& Dr.version >= dr_version
 ) ? Dr : (function (undefined) {
 	
 	// Check Environment
 	console.log('[Dr] Check Environment...');
 	
 	if (typeof(window) !== 'undefined' && typeof(document) !== 'undefined') {
-		DrEnvironment = 'browser';
-		console.log('detected', DrEnvironment);
+		dr_environment = 'browser';
+		console.log('detected', dr_environment);
 	}
 	
 	if (typeof(process) !== 'undefined' && typeof(process.versions) !== 'undefined' && process.versions.node) {
-		DrEnvironment = 'node';
-		console.log('detected', DrEnvironment, process.versions.node);
+		dr_environment = 'node';
+		console.log('detected', dr_environment, process.versions.node);
 	}
 	
 	if (typeof(cordova) !== 'undefined') {
-		DrEnvironment = 'cordova';
-		console.log('detected', DrEnvironment);
+		dr_environment = 'cordova';
+		console.log('detected', dr_environment);
 	}
 	
-	console.log('[Dr] Environment is', DrEnvironment);
+	console.log('[Dr] Environment is', dr_environment);
 	
 	// Dr Initialize
 	console.log('[Dr] Initializing...');
@@ -39,9 +39,9 @@ var Dr = (
 		Dr.log('[Dr] Environment ' + Dr.environment);
 	}
 	
-	Dr.author = DrAuthor;
-	Dr.version = DrVersion;
-	Dr.environment = DrEnvironment;
+	Dr.author = dr_author;
+	Dr.version = dr_version;
+	Dr.environment = dr_environment;
 	
 	Dr.global = this.global || this;	//normally window, or {} for a sandbox?
 	
@@ -231,10 +231,6 @@ var Dr = (
 	
 	
 	
-	
-	
-	
-	
 	// Check Function & add Fall-back(polyfill)
 	console.log('[Dr] Checking Function & Add Fall-back...');
 	
@@ -249,8 +245,8 @@ var Dr = (
 	Dr.startTimestamp = Dr.getUTCTimeStamp();
 	Dr.startClock = Date.now();
 	Dr.clock = function () { return (Date.now() - Dr.startClock); }; //return running time in milliseconds
-	Dr.clock_per_sec = 1000;
-	Dr.now = function () { return (Date.now() - Dr.startClock) / Dr.clock_per_sec; };	//return running time in seconds
+	Dr.clockPerSec = 1000;
+	Dr.now = function () { return (Date.now() - Dr.startClock) / Dr.clockPerSec; };	//return running time in seconds
 	
 	//math related
 	var get_random_int = function (from, to) { //this will not auto swap, meaning <from> should be smaller than <to>
@@ -375,13 +371,13 @@ var Dr = (
 		var arg_list = Dr.getArgumentArray(arguments);
 		Dr.logList(arg_list);
 	}
+	Dr.debugLogLevel = 0;
 	Dr.debug = function (debug_level) {
 		if (!Dr.debugLogLevel || Dr.debugLogLevel > debug_level) return;
 		var arg_list = Dr.getArgumentArray(arguments);
 		arg_list.shift();
 		Dr.logList(arg_list);
 	}
-	Dr.debugLogLevel = 0;
 	
 	Dr.assert = function () {
 		var arg_list = Dr.getArgumentArray(arguments);
@@ -421,7 +417,6 @@ var Dr = (
 		var Module = function () {
 			this._is_show_debug = false;
 			this._show_debug_level = 1;	//0 = normal log
-			
 			this._is_record_history = true;
 			this._log_history = [];
 		}
@@ -433,7 +428,7 @@ var Dr = (
 		}
 		Module.prototype.debug = function (debug_level) {
 			var arg_list = Dr.getArgumentArray(arguments);
-			arg_list.shift();
+			arg_list.shift();	//drop debug level
 			if (debug_level && debug_level > 0) arg_list.unshift('{' + debug_level + '}');
 			arg_list.unshift('[' + Dr.now().toFixed(4) + 'sec]');
 			if (!debug_level || (this._is_show_debug && debug_level >= this._show_debug_level)) Dr.logList(arg_list);
@@ -467,7 +462,7 @@ var Dr = (
 		
 		Module.prototype.addEventListener = function (event_key, callback) {
 			if (!callback && typeof(callback) != 'function') {
-				Dr.log('callback error', callback);
+				Dr.assert(false, 'callback error', callback);
 				return;
 			}
 			
@@ -476,7 +471,7 @@ var Dr = (
 			
 			for (var i in callback_list) {
 				if (callback_list[i] == callback) {
-					Dr.log('callback already exist');
+					Dr.assert(false, 'callback already exist');
 					return;
 				}
 			}
@@ -549,7 +544,7 @@ var Dr = (
 		}
 		Module.prototype.update = function () {
 			var current_update_clock = Dr.clock();
-			var delta_sec = (current_update_clock - this._last_update_clock) / Dr.clock_per_sec;
+			var delta_sec = (current_update_clock - this._last_update_clock) / Dr.clockPerSec;
 			this._last_update_clock = current_update_clock;
 			
 			var next_update_list = [];
@@ -653,13 +648,13 @@ var Dr = (
 			global.Dr = Dr;
 			module.exports = Dr;
 			
-			Dr.node_exe = process.argv[0];
+			Dr.nodeExePath = process.argv[0];
 			Dr.require = require;
 			
 			var Path = require('path');
-			Dr.node_start_script_path = Path.resolve(process.cwd(), Path.dirname(process.argv[1]));
+			Dr.nodeStartScriptPath = Path.resolve(process.cwd(), Path.dirname(process.argv[1]));
 			Dr.getLocalPath = function (relative_path) {
-				return Path.resolve(Dr.node_start_script_path, relative_path);
+				return Path.resolve(Dr.nodeStartScriptPath, relative_path);
 			}
 			Dr.startREPL = function () {
 				var Repl = require("repl");
@@ -671,7 +666,7 @@ var Dr = (
 				});
 			}
 			
-			Dr.debug(10, 'node_start_script_path:', Dr.node_start_script_path);
+			Dr.debug(10, 'nodeStartScriptPath:', Dr.nodeStartScriptPath);
 			break;
 	}
 	

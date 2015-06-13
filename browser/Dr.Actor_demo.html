@@ -23,46 +23,11 @@
 				'actor/actor_sample_code.js'
 			], function () {
 				Dr.log("All script loaded");
+				
+				Dr.setPageHeaderFooterPadding();
+				Dr.fitCanvas(document.getElementById('Dr.Canvas'));
 			})
 		})
-	</script>
-	
-	
-	<script type="text/javascript"> 
-		function set_body_padding () {
-			var body = Dr.getBody();
-			
-			var page_header = document.getElementById("page-header");
-			var padding_header = (page_header ? page_header.offsetHeight : 0) + "px";
-			var page_footer = document.getElementById("page-footer");
-			var padding_footer = (page_footer ? page_footer.offsetHeight : 0) + "px";
-			
-			body.style.paddingTop = padding_header;
-			body.style.paddingBottom = padding_footer;
-			console.log("set_body_padding", padding_header, padding_footer);
-			//add watch
-			body.onresize = set_body_padding;
-		}
-		
-		function scale_canvas() {
-			var devicePixelRatio = window.devicePixelRatio || 1;
-			var canvas = document.getElementById('Dr.Canvas');
-			var body = Dr.getBody();
-			var minSize = Math.floor(body.offsetWidth * 0.9 / 10) * 10;
-			
-			var width = Math.min(minSize, canvas.width || (parseInt(canvas.style.width)));
-			var height = Math.min(minSize, canvas.height || (parseInt(canvas.style.height)));
-			
-			canvas.width = devicePixelRatio * width;
-			canvas.height = devicePixelRatio * height;
-			canvas.style.width = width + 'px';
-			canvas.style.height = height + 'px';
-		}
-		
-		window.onload = function () {
-			set_body_padding();
-			scale_canvas();
-		}
 	</script>
 </head>
 <body>
@@ -86,9 +51,7 @@
 	</div>
 	
 	<div id="page-content" class="align-center text-center">
-		<div>
-		<p>This page is for <b>Dr.Actor develop</b> use</p>
-		</div>
+		<div><p>This page is for <b>Dr.Actor develop</b> use</p></div>
 		
 		<div>
 			<button onclick="Dr.Switch.Switch('Log')">Switch Log</button>
@@ -110,16 +73,9 @@
 		
 		<br />
 		
-		<div>
-			<canvas id="Dr.Canvas" class="pixelated" width="400" height="400"></canvas>
-		</div>
-		
-		<p id="FPS">
-			FPS here
-		</p>
-		<p id="Log">
-			Log here
-		</p>
+		<div><canvas id="Dr.Canvas" class="pixelated" width="400" height="400"></canvas></div>
+		<p id="FPS">FPS here</p>
+		<p id="Log">Log here</p>
 	</div>
 <br />
 </body>

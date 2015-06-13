@@ -23,42 +23,15 @@
 				'image/image_sample_code.js'
 			], function () {
 				Dr.log("All script loaded");
+				
+				Dr.setPageHeaderFooterPadding();
+				Dr.fitCanvas(document.getElementById('Dr.Canvas'), 1);
 			})
 		})
 	</script>
 	
 	
 	<script type="text/javascript"> 
-		function set_body_padding () {
-			var body = Dr.getBody();
-			
-			var page_header = document.getElementById("page-header");
-			var padding_header = (page_header ? page_header.offsetHeight : 0) + "px";
-			var page_footer = document.getElementById("page-footer");
-			var padding_footer = (page_footer ? page_footer.offsetHeight : 0) + "px";
-			
-			body.style.paddingTop = padding_header;
-			body.style.paddingBottom = padding_footer;
-			console.log("set_body_padding", padding_header, padding_footer);
-			//add watch
-			body.onresize = set_body_padding;
-		}
-		
-		function scale_canvas() {
-			var devicePixelRatio = window.devicePixelRatio || 1;
-			var canvas = document.getElementById('Dr.Canvas');
-			var body = Dr.getBody();
-			var minSize = Math.floor(body.offsetWidth * 0.9 / 10) * 10;
-			
-			var width = Math.min(minSize, canvas.width || (parseInt(canvas.style.width)));
-			var height = Math.min(minSize, canvas.height || (parseInt(canvas.style.height)));
-			
-			canvas.width = devicePixelRatio * width;
-			canvas.height = devicePixelRatio * height;
-			canvas.style.width = width + 'px';
-			canvas.style.height = height + 'px';
-		}
-		
 		function prepare_test_image_data () {
 			var test_canvas_data = document.getElementById('test_canvas_data');
 			var font_size = test_canvas_data.height;
@@ -82,8 +55,6 @@
 		}
 		
 		window.onload = function () {
-			set_body_padding();
-			//scale_canvas();
 			prepare_test_image_data();
 		}
 	</script>
@@ -109,9 +80,7 @@
 	</div>
 	
 	<div id="page-content" class="align-center text-center">
-		<div>
-		<p>This page is for <b>Dr.Image develop</b> use</p>
-		</div>
+		<div><p>This page is for <b>Dr.Image develop</b> use</p></div>
 		
 		<div>
 			<button onclick="Dr.Event.emit('KEY_UP', null, 'K_LEFT')">[Left]</button>
@@ -134,20 +103,11 @@
 		</div>
 		
 		<br />
-		<p id="FPS">
-			FPS here
-		</p>
-		<div>
-			<canvas id="Dr.Canvas" class="pixelated" width="300" height="600"></canvas>
-		</div>
-		
+		<p id="FPS">FPS here</p>
+		<div><canvas id="Dr.Canvas" class="pixelated" width="300" height="600"></canvas></div>
 		<img id="test_image_data" />
 		<canvas id="test_canvas_data" class="pixelated" width="300" height="50"></canvas>
-		
-		<p id="Log">
-			Log here
-		</p>
-		
+		<p id="Log">Log here</p>
 	</div>
 <br />
 </body>

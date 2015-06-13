@@ -14,39 +14,18 @@
     <link href="favicon.png" rel="shortcut icon">
 	<link href="bean_common.css" rel="stylesheet" type="text/css">
 	
-	<!--
-	<script src="./Dr.js"></script>
-	
-	<script type="text/javascript">
-		Dr.loadLocalScript('./Dr.browser.js', function () {
-			Dr.log("All script loaded");
-		})
-	</script>
-	-->
-	
-	<script type="text/javascript">
-		var site_url = "thatbean.com";
-		
-		if(top != window){
-			top.location.href = site_url;
-		}
-		
-		window["PATHS_PASSPORT"] = site_url;
-	</script>
-	
 	<script type="text/javascript"> 
 		function switch_to_url (target_url) {
 			window.location.href = target_url;
 		}
 		
 		function set_body_padding () {
-			var body = document.getElementsByTagName("body")[0];
-			
 			var page_header = document.getElementById("page-header");
-			var padding_header = (page_header ? page_header.offsetHeight : 0) + "px";
 			var page_footer = document.getElementById("page-footer");
+			var padding_header = (page_header ? page_header.offsetHeight : 0) + "px";
 			var padding_footer = (page_footer ? page_footer.offsetHeight : 0) + "px";
 			
+			var body = document.getElementsByTagName("body")[0];
 			body.style.paddingTop = padding_header;
 			body.style.paddingBottom = padding_footer;
 			console.log("set_body_padding", padding_header, padding_footer);
@@ -56,17 +35,15 @@
 		
 		function scale_canvas() {
 			var devicePixelRatio = window.devicePixelRatio || 1;
-			var canvas = document.getElementById('Dr.Canvas');
 			var body = document.getElementsByTagName("body")[0];
-			var minSize = Math.floor(body.offsetWidth * 0.9 / 10) * 10;
-			
-			var width = Math.min(minSize, canvas.width || (parseInt(canvas.style.width)));
-			var height = Math.min(minSize, canvas.height || (parseInt(canvas.style.height)));
-			
-			canvas.width = devicePixelRatio * width;
-			canvas.height = devicePixelRatio * height;
-			canvas.style.width = width + 'px';
-			canvas.style.height = height + 'px';
+			var canvas = document.getElementById("Dr.Canvas");
+			var width = canvas.width || parseInt(canvas.style.width);
+			var height = canvas.height || parseInt(canvas.style.height);
+			var scale = Math.min(body.offsetWidth * 0.9, width) / width;
+			canvas.width = parseInt(devicePixelRatio * scale * width);
+			canvas.height = parseInt(devicePixelRatio * scale * height);
+			canvas.style.width = parseInt(scale * width) + 'px';
+			canvas.style.height = parseInt(scale * height) + 'px';
 		}
 		
 		function set_canvas_script() {
@@ -122,53 +99,23 @@
 	<div id="page-header" class="fix-top">
 		<table class="align-center">
 			<tr>
-				<td rowspan=2>
-					<b class="font-big">Goto:</b>
-				</td>
-				<td>
-					<button onclick="switch_to_url('html/index.html')"><b>HTML</b></button>
-				</td>
-				<td>
-					<button onclick="switch_to_url('files/')"><b>Files</b></button>
-				</td>
-				<td>
-					<button onclick="switch_to_url('browser/Dr.html')"><b>Dr.js</b></button>
-				</td>
-				<td>
-					<button onclick="switch_to_url('browser/Dr.Overlay_demo.html')"><b>Dr.Overlay.js</b></button>
-				</td>
-				<td>
-					<button onclick="switch_to_url('browser/Dr.Pixel3D_demo.html')"><b>Dr.Pixel3D.js</b></button>
-				</td>
-				<td>
-					<button onclick="switch_to_url('browser/Dr.Image_demo.html')"><b>Dr.Image.js</b></button>
-				</td>
-				<td>
-					<button onclick="switch_to_url('browser/Dr.Mine_demo.html')"><b>Dr.Mine.js</b></button>
-				</td>
+				<td rowspan=2><b class="font-big">Goto:</b></td>
+				<td><button onclick="switch_to_url('html/index.html')"><b>HTML</b></button></td>
+				<td><button onclick="switch_to_url('files/')"><b>Files</b></button></td>
+				<td><button onclick="switch_to_url('browser/Dr.html')"><b>Dr.js</b></button></td>
+				<td><button onclick="switch_to_url('browser/Dr.Overlay_demo.html')"><b>Dr.Overlay.js</b></button></td>
+				<td><button onclick="switch_to_url('browser/Dr.Pixel3D_demo.html')"><b>Dr.Pixel3D.js</b></button></td>
+				<td><button onclick="switch_to_url('browser/Dr.Image_demo.html')"><b>Dr.Image.js</b></button></td>
+				<td><button onclick="switch_to_url('browser/Dr.Mine_demo.html')"><b>Dr.Mine.js</b></button></td>
 			</tr>
 			<tr>
-				<td>
-					<b class="font-small">-the web site</b>
-				</td>
-				<td>
-					<b class="font-small">-something useful for download</b>
-				</td>
-				<td>
-					<b class="font-small">-test for Dr.js</b>
-				</td>
-				<td>
-					<b class="font-small">-test for Dr.js + Dr.Overlay</b>
-				</td>
-				<td>
-					<b class="font-small">-test for Dr.js + Dr.Pixel3D</b>
-				</td>
-				<td>
-					<b class="font-small">-test for Dr.js + Dr.Image</b>
-				</td>
-				<td>
-					<b class="font-small">-test for Dr.js + Dr.Mine</b>
-				</td>
+				<td><b class="font-small">-the web site</b></td>
+				<td><b class="font-small">-something useful for download</b></td>
+				<td><b class="font-small">-test for Dr.js</b></td>
+				<td><b class="font-small">-test for Dr.js + Dr.Overlay</b></td>
+				<td><b class="font-small">-test for Dr.js + Dr.Pixel3D</b></td>
+				<td><b class="font-small">-test for Dr.js + Dr.Image</b></td>
+				<td><b class="font-small">-test for Dr.js + Dr.Mine</b></td>
 			</tr>
 		</table>
 	</div>
@@ -204,9 +151,7 @@
 			<br />
 			
 			<hr />
-			<b>
-				Welcome to the entry of <a href="index.html"><b>thatbean.com</b></a>
-			</b>
+			<b>Welcome to the entry of <a href="index.html"><b>thatbean.com</b></a></b>
 	</div>
 <br />
 </body>

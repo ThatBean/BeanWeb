@@ -9,7 +9,7 @@
 	
 	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
 	
-	<title>Welcome to ThatBean.com!</title>
+	<title>Dr.Overlay Demo Page</title>
 	
 	<style>
 		#page-header td, #page-footer td { text-align: left; padding: 0.1em; border-left: 1em solid #222; border-right: 1em solid #222; }
@@ -28,57 +28,16 @@
 			], function () {
 				Dr.log("All script loaded");
 				Dr.LoadAll();
+				
+				Dr.setPageHeaderFooterPadding();
+				Dr.fitCanvas(document.getElementById('Dr.Canvas'), 1);
+				
 				Dr.Get('OverlayCursor').create();
 			})
 		})
 	</script>
 	<!-- -->
-	<script type="text/javascript">
-		var site_url = "thatbean.com";
-		
-		if(top != window){
-			top.location.href = site_url;
-		}
-		
-		window["PATHS_PASSPORT"] = site_url;
-	</script>
-	
 	<script type="text/javascript"> 
-		
-		function switch_to_url (target_url) {
-			window.location.href = target_url;
-		}
-		
-		function set_body_padding () {
-			var body = Dr.getBody();
-			
-			var page_header = document.getElementById("page-header");
-			var padding_header = (page_header ? page_header.offsetHeight : 0) + "px";
-			var page_footer = document.getElementById("page-footer");
-			var padding_footer = (page_footer ? page_footer.offsetHeight : 0) + "px";
-			
-			body.style.paddingTop = padding_header;
-			body.style.paddingBottom = padding_footer;
-			console.log("set_body_padding", padding_header, padding_footer);
-			//add watch
-			body.onresize = set_body_padding;
-		}
-		
-		function scale_canvas() {
-			var devicePixelRatio = window.devicePixelRatio || 1;
-			var canvas = document.getElementById('Dr.Canvas');
-			var body = Dr.getBody();
-			var minSize = Math.floor(body.offsetWidth * 0.9 / 10) * 10;
-			
-			var width = Math.min(minSize, canvas.width || (parseInt(canvas.style.width)));
-			var height = Math.min(minSize, canvas.height || (parseInt(canvas.style.height)));
-			
-			canvas.width = devicePixelRatio * width;
-			canvas.height = devicePixelRatio * height;
-			canvas.style.width = width + 'px';
-			canvas.style.height = height + 'px';
-		}
-		
 		function set_canvas_script() {
 			var canvas = document.getElementById("Dr.Canvas");
 			var ctx = canvas.getContext("2d");
@@ -158,8 +117,6 @@
 		}
 		
 		window.onload = function () {
-			set_body_padding();
-			scale_canvas();
 			set_canvas_script();
 			set_spec();
 		}
@@ -168,7 +125,7 @@
 
 <body>
 	<div id="page-header" class="fix-top">
-		<p class="text-center">The test Html of Dr.js</p>
+		<p class="text-center">The test Html of Dr.Overlay</p>
 	</div>
 	
 	<div id="page-footer" class="fix-bottom">
@@ -193,15 +150,9 @@
 			This should be a canvas element. If you're seeing this, consider upgrade your browser
 		</canvas>
 		
-		<p id="FPS">
-			FPS here
-		</p>
-		<p id="Log">
-			Log here
-		</p>
-		<div id="Spec">
-			Spec here
-		</div>
+		<p id="FPS">FPS here</p>
+		<p id="Log">Log here</p>
+		<div id="Spec">Spec here</div>
 		
 		<button onclick="var size = Dr.getViewportSize(); alert('width, height: (' + size.width + ', ' + size.height + ')')">getViewportSize</button>
 		<button onclick="var size = Dr.getPageSize(); alert('width, height: (' + size.width + ', ' + size.height + ')')">getPageSize</button>

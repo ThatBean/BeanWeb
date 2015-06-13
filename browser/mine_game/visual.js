@@ -91,20 +91,28 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 		IMAGE_TYPE_TRI_DOWN: 'IMAGE_TYPE_TRI_DOWN',
 	}
 	
+	Module.typeImageVariant = {
+		//image sub type
+		VARIANT_TYPE_INDICATOR: 'VARIANT_TYPE_INDICATOR',
+		VARIANT_TYPE_BLOCK_NORMAL: 'VARIANT_TYPE_BLOCK_NORMAL',
+		VARIANT_TYPE_BLOCK_PRESSED: 'VARIANT_TYPE_BLOCK_PRESSED',
+		VARIANT_TYPE_BLOCK_EMPTY: 'VARIANT_TYPE_BLOCK_EMPTY',
+	}
+	
 	Module.typeBackground = {
 		//background type
-		BACKGROUND_TYPE_INDICATOR: 'BACKGROUND_TYPE_INDICATOR',
-		BACKGROUND_TYPE_BLOCK_NORMAL: 'BACKGROUND_TYPE_BLOCK_NORMAL',
-		BACKGROUND_TYPE_BLOCK_PRESSED: 'BACKGROUND_TYPE_BLOCK_PRESSED',
-		BACKGROUND_TYPE_BLOCK_EMPTY: 'BACKGROUND_TYPE_BLOCK_EMPTY',
+		VARIANT_TYPE_INDICATOR: 'BACKGROUND_TYPE_INDICATOR',
+		VARIANT_TYPE_BLOCK_NORMAL: 'BACKGROUND_TYPE_BLOCK_NORMAL',
+		VARIANT_TYPE_BLOCK_PRESSED: 'BACKGROUND_TYPE_BLOCK_PRESSED',
+		VARIANT_TYPE_BLOCK_EMPTY: 'BACKGROUND_TYPE_BLOCK_EMPTY',
 	}
 	
 	Module.typeColor = {
 		//color
-		COLOR_TYPE_INDICATOR: [255, 255, 0],
-		COLOR_TYPE_BLOCK_NORMAL: [200, 200, 200],
-		COLOR_TYPE_BLOCK_PRESSED: [160, 160, 160],
-		COLOR_TYPE_BLOCK_EMPTY: [150, 0, 0],
+		VARIANT_TYPE_INDICATOR: [255, 255, 0],
+		VARIANT_TYPE_BLOCK_NORMAL: [200, 200, 200],
+		VARIANT_TYPE_BLOCK_PRESSED: [160, 160, 160],
+		VARIANT_TYPE_BLOCK_EMPTY: [150, 0, 0],
 	}
 	
 	Module.typeTagImage = {
@@ -147,9 +155,9 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 			],
 			tag_image_center: [4, 4],	// for tag image location
 		},
-		IMAGE_TYPE_HEX: 'IMAGE_TYPE_HEX',
-		IMAGE_TYPE_TRI_UP: 'IMAGE_TYPE_TRI_UP',
-		IMAGE_TYPE_TRI_DOWN: 'IMAGE_TYPE_TRI_DOWN',
+		// IMAGE_TYPE_HEX: 'IMAGE_TYPE_HEX',
+		// IMAGE_TYPE_TRI_UP: 'IMAGE_TYPE_TRI_UP',
+		// IMAGE_TYPE_TRI_DOWN: 'IMAGE_TYPE_TRI_DOWN',
 	}
 	
 	
@@ -164,9 +172,13 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 			
 			
 			
-			
-			
-			
+			for (var variant_type in this.typeImageVariant) {
+				var background = this.typeBackground[variant_type];
+				var color = this.typeColor[variant_type];
+				
+				
+				Dr.log('[generateImageData]', background, color);
+			}
 			
 			
 		}

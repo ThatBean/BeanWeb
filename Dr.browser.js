@@ -224,6 +224,30 @@ else {
 			element.style[key_transform] = 'rotate(' + rotate_degree + 'deg)';
 		}
 	})();
+	Dr.fitCanvas = function (canvas, devicePixelRatio) {
+		var devicePixelRatio = devicePixelRatio || window.devicePixelRatio || 1;
+		var width = canvas.width || parseInt(canvas.style.width);
+		var height = canvas.height || parseInt(canvas.style.height);
+		var scale = Math.min(Dr.getBody().offsetWidth * 0.9, width) / width;
+		canvas.width = parseInt(devicePixelRatio * scale * width);
+		canvas.height = parseInt(devicePixelRatio * scale * height);
+		canvas.style.width = parseInt(scale * width) + 'px';
+		canvas.style.height = parseInt(scale * height) + 'px';
+	}
+	Dr.setPageHeaderFooterPadding = function (page_header, page_footer) {
+		var page_header = page_header || document.getElementById("page-header");
+		var page_footer = page_footer || document.getElementById("page-footer");
+		var padding_header = (page_header ? page_header.offsetHeight : 0) + "px";
+		var padding_footer = (page_footer ? page_footer.offsetHeight : 0) + "px";
+		
+		var body = Dr.getBody();
+		body.style.paddingTop = padding_header;
+		body.style.paddingBottom = padding_footer;
+		Dr.log("[setPageHeaderFooterPadding]", padding_header, padding_footer);
+		//add watch
+		Dr.Event.addEventListener('WINDOW_RESIZE', function () { Dr.setPageHeaderFooterPadding(page_header, page_footer); });
+	}
+	
 	Dr.getViewportSize = function () {
 		var client_width, client_height;
 		if (Dr.window.innerHeight) {

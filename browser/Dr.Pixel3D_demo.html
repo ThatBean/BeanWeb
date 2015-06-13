@@ -24,45 +24,23 @@
 				'pixel3d/pixel3d_sample_code.js'
 			], function () {
 				Dr.log("All script loaded");
+				
+				Dr.setPageHeaderFooterPadding();
+				
+				function pixelate_canvas(canvas) {
+					var minSize = Math.floor(Dr.getBody().offsetWidth * 0.9 / 10) * 10;
+					canvas.style.width = Math.min(minSize, Dr.devicePixelRatio * 4 * (parseInt(canvas.style.width))) + 'px';
+					canvas.style.height = Math.min(minSize, Dr.devicePixelRatio * 4 * (parseInt(canvas.style.height))) + 'px';
+					
+					var context = canvas.getContext('2d');
+					if (context.imageSmoothingEnabled) context.imageSmoothingEnabled = false;
+					if (context.mozImageSmoothingEnabled) context.mozImageSmoothingEnabled = false;
+					if (context.webkitImageSmoothingEnabled) context.webkitImageSmoothingEnabled = false;
+				}
+				
+				pixelate_canvas(document.getElementById('Dr.Canvas'));
 			})
 		})
-		
-	</script>
-	
-	
-	<script type="text/javascript"> 
-		function set_body_padding () {
-			var body = Dr.getBody();
-			
-			var page_header = document.getElementById("page-header");
-			var padding_header = (page_header ? page_header.offsetHeight : 0) + "px";
-			var page_footer = document.getElementById("page-footer");
-			var padding_footer = (page_footer ? page_footer.offsetHeight : 0) + "px";
-			
-			body.style.paddingTop = padding_header;
-			body.style.paddingBottom = padding_footer;
-			console.log("set_body_padding", padding_header, padding_footer);
-			//add watch
-			body.onresize = set_body_padding;
-		}
-		
-		function pixelate_canvas() {
-			var canvas = document.getElementById('Dr.Canvas');
-			var body = Dr.getBody();
-			var minSize = Math.floor(body.offsetWidth * 0.9 / 10) * 10;
-			canvas.style.width = Math.min(minSize, Dr.devicePixelRatio * 4 * (parseInt(canvas.style.width))) + 'px';
-			canvas.style.height = Math.min(minSize, Dr.devicePixelRatio * 4 * (parseInt(canvas.style.height))) + 'px';
-			
-			var context = canvas.getContext('2d');
-			if (context.imageSmoothingEnabled) context.imageSmoothingEnabled = false;
-			if (context.mozImageSmoothingEnabled) context.mozImageSmoothingEnabled = false;
-			if (context.webkitImageSmoothingEnabled) context.webkitImageSmoothingEnabled = false;
-		}
-		
-		window.onload = function () {
-			set_body_padding();
-			pixelate_canvas();
-		}
 	</script>
 </head>
 <body>
@@ -86,9 +64,7 @@
 	</div>
 	
 	<div id="page-content" class="align-center text-center">
-		<div>
-		<p>This page is for <b>Dr.Pixel3D develop</b> use</p>
-		</div>
+		<div><p>This page is for <b>Dr.Pixel3D develop</b> use</p></div>
 		
 		<div>
 			<button onclick="Dr.toggle('Log')">Switch Log</button>
@@ -127,16 +103,10 @@
 		
 		<br />
 		
-		<div>
-			<canvas id="Dr.Canvas" class="pixelated" width="100" height="100"></canvas>
-		</div>
+		<div><canvas id="Dr.Canvas" class="pixelated" width="100" height="100"></canvas></div>
 		
-		<p id="FPS">
-			FPS here
-		</p>
-		<p id="Log">
-			Log here
-		</p>
+		<p id="FPS">FPS here</p>
+		<p id="Log">Log here</p>
 	</div>
 <br />
 </body>
