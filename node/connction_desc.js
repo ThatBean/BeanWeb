@@ -134,20 +134,20 @@ Dr.loadLocalScript('./Dr.node.js', function () {
 		
 		var server = Server.create(function (request, response, buffer) {
 			var request_message = buffer.toString();
+			var connection_info;
+			try { connection_info = JSON.parse(request_message); }
+			catch (error) { Dr.log('Not JSON'); }
 			
 			Dr.log('Connection:', request.socket.remoteAddress, request.socket.remotePort, request_message);
 			
 			var respond_message = '';
 			if (connection_type == 'server') {
-				if (request_message && request_message != '') {
-					var connection_info = JSON.parse(request_message);
-					if (connection_info.address && connection_info.port) {
-						Dr.log('Passing Notify Hole Punching Client', connection_info.address, connection_info.port);
-						notifyConnection(connection_info.address, connection_info.port, JSON.stringify({address: request.socket.remoteAddress, port: request.socket.remotePort}), function () {
-							Dr.log('Get Hole Punching Client Notified');
-							Dr.log(arguments);
-						});
-					}
+				if (connection_info && connection_info.address && connection_info.port) {
+					Dr.log('Passing Notify Hole Punching Client', connection_info.address, connection_info.port);
+					notifyConnection(connection_info.address, connection_info.port, JSON.stringify({address: request.socket.remoteAddress, port: request.socket.remotePort}), function () {
+						Dr.log('Get Hole Punching Client Notified');
+						Dr.log(arguments);
+					});
 				}
 				
 				recordDesc(request, request_message);
@@ -160,15 +160,12 @@ Dr.loadLocalScript('./Dr.node.js', function () {
 				response.end();
 			}
 			if (connection_type == 'client') {
-				if (request_message && request_message != '') {
-					var connection_info = JSON.parse(request_message);
-					if (connection_info.address && connection_info.port) {
-						Dr.log('Hole Punching', connection_info.address, connection_info.port);
-						notifyConnection(connection_info.address, connection_info.port, 'Hole Punching', function () {
-							Dr.log('Get Hole Punched');
-							Dr.log(arguments);
-						});
-					}
+				if (connection_info && connection_info.address && connection_info.port) {
+					Dr.log('Hole Punching', connection_info.address, connection_info.port);
+					notifyConnection(connection_info.address, connection_info.port, 'Hole Punching', function () {
+						Dr.log('Get Hole Punched');
+						Dr.log(arguments);
+					});
 				}
 				recordDesc(request, request_message);
 				respond_message = getDescPage();
