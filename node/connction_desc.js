@@ -119,15 +119,14 @@ Dr.loadLocalScript('./Dr.node.js', function () {
 		if (connection_type == 'client') {
 			Dr.log('Register Client');
 			notifyConnection(connection_server_address, connection_server_port, 'Register Client', function (response) {
-				Dr.log('STATUS: ' + response.statusCode);
-				Dr.log('HEADERS: ' + JSON.stringify(response.headers));
-				response.setEncoding('utf8');
-				response.on('data', function (chunk) {
-					Dr.log('BODY: ' + chunk);
-				});
-				
+				Dr.log('  STATUS: ' + response.statusCode);
+				Dr.log('  HEADERS: ' + JSON.stringify(response.headers));
+				// response.setEncoding('utf8');
+				// response.on('data', function (chunk) {
+					// Dr.log('BODY: ' + chunk);
+				// });
+				//response.end();
 				Dr.log('Get Client Registered');
-				Dr.log(arguments);
 			});
 		}
 		
@@ -136,8 +135,21 @@ Dr.loadLocalScript('./Dr.node.js', function () {
 		var server = Server.create(function (request, response, buffer) {
 			var request_message = buffer.toString();
 			
+			Dr.log('Connection:', request.socket.remoteAddress, request.socket.remotePort, request_message);
+			
 			var respond_message = '';
 			if (connection_type == 'server') {
+				if (request_message && request_message != '') {
+					var connection_info = JSON.parse(request_message);
+					if (connection_info.address && connection_info.port) {
+						Dr.log('Passing Notify Hole Punching Client', connection_info.address, connection_info.port);
+						notifyConnection(connection_info.address, connection_info.port, JSON.stringify({address: request.socket.remoteAddress, port: request.socket.remotePort}), function () {
+							Dr.log('Get Hole Punching Client Notified');
+							Dr.log(arguments);
+						});
+					}
+				}
+				
 				recordDesc(request, request_message);
 				respond_message = getDescPage();
 				response.writeHead(200, {
@@ -148,12 +160,15 @@ Dr.loadLocalScript('./Dr.node.js', function () {
 				response.end();
 			}
 			if (connection_type == 'client') {
-				if (request_message) {
+				if (request_message && request_message != '') {
 					var connection_info = JSON.parse(request_message);
-					notifyConnection(connection_info.address, connection_info.port, 'Hole Punching', function () {
-						Dr.log('Get Hole Punched');
-						Dr.log(arguments);
-					});
+					if (connection_info.address && connection_info.port) {
+						Dr.log('Hole Punching', connection_info.address, connection_info.port);
+						notifyConnection(connection_info.address, connection_info.port, 'Hole Punching', function () {
+							Dr.log('Get Hole Punched');
+							Dr.log(arguments);
+						});
+					}
 				}
 				recordDesc(request, request_message);
 				respond_message = getDescPage();
