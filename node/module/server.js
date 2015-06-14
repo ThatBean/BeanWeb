@@ -1,8 +1,6 @@
 Dr.Declare('Server', 'class');
 Dr.Implement('Server', function (global, module_get) {
 	var Http = Dr.require('http');
-	var Url = Dr.require('url');
-	var Util = Dr.require('util');
 	
 	var Module = function () {
 		//
@@ -61,17 +59,9 @@ Dr.Implement('Server', function (global, module_get) {
 				'Access-Control-Allow-Origin': '*',
 			});
 			
-			response.write('url:');
-			response.write(request.url);
-			response.write('\n');
-			
-			response.write('method:');
-			response.write(request.method);
-			response.write('\n');
-			
-			response.write('message:');
-			response.write(buffer.toString());
-			response.write('\n');
+			response.write('url:' + request.url + '\n');
+			response.write('method:' + request.method + '\n');
+			response.write('message:' + buffer.toString() + '\n');
 			response.end();
 		}
 	};
