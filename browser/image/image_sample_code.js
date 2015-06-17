@@ -42,15 +42,15 @@ function init() {
 	ctx.fillText("TestCanvasData", 0, test_canvas_data.height * 0.5);
 	
 	
-	var ImageData = Dr.Get("ImageData");
+	var ImageDataExt = Dr.Get("ImageDataExt");
 	
-	var image_data_image = new ImageData;
-	var image_data_canvas = new ImageData;
-	var image_data_canvas_image_data = new ImageData;
+	var image_data_image = new ImageDataExt;
+	var image_data_canvas = new ImageDataExt;
+	var image_data_canvas_image_data = new ImageDataExt;
 	
-	image_data_image.init('local', test_image_data, ImageData.type.IMAGE_ELEMENT);
-	image_data_canvas.init('local', test_canvas_data, ImageData.type.CANVAS_ELEMENT);
-	image_data_canvas_image_data.init('local', test_canvas_image_data, ImageData.type.CANVAS_IMAGE_DATA);
+	image_data_image.init('local', test_image_data, ImageDataExt.type.IMAGE_ELEMENT);
+	image_data_canvas.init('local', test_canvas_data, ImageDataExt.type.CANVAS_ELEMENT);
+	image_data_canvas_image_data.init('local', test_canvas_image_data, ImageDataExt.type.CANVAS_IMAGE_DATA);
 	
 	var loop_count = 1000;
 	

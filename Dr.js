@@ -381,7 +381,7 @@ var Dr = (
 	
 	Dr.assert = function () {
 		var arg_list = Dr.getArgumentArray(arguments);
-		Dr.logList((['[' + Dr.now().toFixed(4) + 'sec]', '[assert]']).concat(arg_list));
+		if (!Dr.debugLogLevel && Dr.debugLogLevel > 10) Dr.logList((['[' + Dr.now().toFixed(4) + 'sec]', '[assert]']).concat(arg_list));
 		Dr.assertList(arg_list);
 	}
 	

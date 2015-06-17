@@ -267,7 +267,7 @@ Dr.loadLocalScript('./Dr.node.js', function () {
 				});
 			}
 			if (closed_connection == 0) {
-				Dr.log('# noting to close');
+				Dr.log('# nothing to close');
 				tcp_server.stop();
 				udp_connection.close();
 				process.exit();

@@ -1,12 +1,12 @@
 Dr.Declare('CanvasExt', 'class');
-Dr.Require('CanvasExt', 'ImageData');
+Dr.Require('CanvasExt', 'ImageDataExt');
 Dr.Implement('CanvasExt', function (global, module_get) {
 	
 	var Module = function () {
 		//
 	}
 	
-	var ImageData = Dr.Get('ImageData');
+	var ImageDataExt = Dr.Get('ImageDataExt');
 	
 	Module.event = {
 		DRAW: 'DRAW',
@@ -136,8 +136,8 @@ Dr.Implement('CanvasExt', function (global, module_get) {
 
 
 
-Dr.Declare('ImageData', 'class');
-Dr.Implement('ImageData', function (global, module_get) {
+Dr.Declare('ImageDataExt', 'class');
+Dr.Implement('ImageDataExt', function (global, module_get) {
 	
 	var Module = function () {
 		//
@@ -160,7 +160,7 @@ Dr.Implement('ImageData', function (global, module_get) {
 			case Module.type.IMAGE_ELEMENT:
 			case Module.type.CANVAS_IMAGE_DATA:
 			default:
-				Dr.log('[ImageData][create] error type:', type);
+				Dr.log('[ImageDataExt][create] error type:', type);
 				break;
 		}
 	}
@@ -184,7 +184,7 @@ Dr.Implement('ImageData', function (global, module_get) {
 				this.drawClip = this.drawImageDataClip;
 				break;
 			default:
-				Dr.log('[ImageData][init] error type:', type, source);
+				Dr.log('[ImageDataExt][init] error type:', type, source);
 				break;
 		}
 		
@@ -235,7 +235,7 @@ Dr.Implement('ImageData', function (global, module_get) {
 			case Module.type.CANVAS_ELEMENT:
 				break;
 			default:
-				Dr.log('[ImageData][toCanvas] error type:', this.type, this._source);
+				Dr.log('[ImageDataExt][toCanvas] error type:', this.type, this._source);
 				break;
 		}
 	}
@@ -260,7 +260,7 @@ Dr.Implement('ImageData', function (global, module_get) {
 			case Module.type.CANVAS_IMAGE_DATA:
 				break;
 			default:
-				Dr.log('[ImageData][toCanvasImageData] error type:', this.type, this._source);
+				Dr.log('[ImageDataExt][toCanvasImageData] error type:', this.type, this._source);
 				break;
 		}
 	}
@@ -270,11 +270,12 @@ Dr.Implement('ImageData', function (global, module_get) {
 	//CANVAS_ELEMENT only
 	Module.prototype.scale = function (scale_x, scale_y) {
 		this.toCanvas();
-		
-		var scale_x = scale_x;
+		var canvas_element = canvas_scale(this._data, scale_x, scale_y);
+		this.init(this._source, canvas_element, Module.type.CANVAS_ELEMENT);
+	}
+	
+	var canvas_scale = function (canvas_element, scale_x, scale_y) {
 		var scale_y = scale_y || scale_x;
-		var canvas_element = this.data;
-		
 		Dr.log('scale:', scale_x, scale_y);
 		
 		//get source
@@ -284,8 +285,8 @@ Dr.Implement('ImageData', function (global, module_get) {
 		Dr.log('source canvas_element size:', canvas_element.width, canvas_element.height);
 		
 		//scale canvas
-		canvas_element.width = this.width * scale_x;
-		canvas_element.height = this.height * scale_y;
+		canvas_element.width = canvas_element.width * scale_x;
+		canvas_element.height = canvas_element.height * scale_y;
 		
 		//get target
 		var target_canvas_image_data = canvas_element.getContext('2d').getImageData(0, 0, canvas_element.width, canvas_element.height);
@@ -298,8 +299,8 @@ Dr.Implement('ImageData', function (global, module_get) {
 			var target_x = target_pixel_index % target_pixel_width;
 			var target_y = Math.floor(target_pixel_index / target_pixel_width);
 			
-			var source_x = Math.round(target_x / scale_x);
-			var source_y = Math.round(target_y / scale_y);
+			var source_x = Math.floor(target_x / scale_x);
+			var source_y = Math.floor(target_y / scale_y);
 			
 			var target_pixel_array_index = target_pixel_index * 4;
 			var source_pixel_array_index = (source_x + source_y * source_pixel_width) * 4;
@@ -310,14 +311,9 @@ Dr.Implement('ImageData', function (global, module_get) {
 			target_pixel_array[target_pixel_array_index + 3] = source_pixel_array[source_pixel_array_index + 3];
 		}
 		
-		canvas_element.getContext('2d').putImageData(target_canvas_image_data, 0, 0);
-		
-		//Dr.target_canvas_image_data = target_canvas_image_data;
-		
-		this.init(this._source, canvas_element, Module.type.CANVAS_ELEMENT);
+		canvas_element.getContext('2d').putImageData(target_canvas_image_data, 0, 0); //put back
+		return canvas_element;
 	}
-	
-	
 	
 	
 	//CANVAS_IMAGE_DATA only
@@ -353,6 +349,8 @@ Dr.Implement('ImageData', function (global, module_get) {
 	Module.prototype.drawPixelLine = function (point0, point1, color) {
 		this.toCanvasImageData();
 		
+		Dr.log('drawPixelLine');
+		
 		var x0 = Math.round(point0.x);
 		var y0 = Math.round(point0.y);
 		//var z0 = point0.z;
@@ -382,6 +380,31 @@ Dr.Implement('ImageData', function (global, module_get) {
 		}
 	};
 	
+	Module.prototype.drawPixelLineList = function (point_list, color, is_loop) {
+		this.toCanvasImageData();
+		
+		Dr.log('drawPixelLineList');
+		
+		Dr.assert(point_list.length >= 2, '[drawPixelLineList] check length');
+		
+		var from_point;
+		var point_index;
+		
+		if (is_loop) {
+			from_point = point_list[point_list.length - 1];
+			point_index = 0;
+		}
+		else {
+			from_point = point_list[0];
+			point_index = 1;
+		}
+		
+		while(point_index < point_list.length) {
+			this.drawPixelLine(from_point, point_list[point_index], color)
+			from_point = point_list[point_index];
+			point_index++;
+		}
+	};
 	
 	Module.prototype.floodFill = function (start_point, fill_color) {
 		this.toCanvasImageData();
@@ -465,6 +488,28 @@ Dr.Implement('ImageData', function (global, module_get) {
 			}
 		}
 	};
+	
+	
+	Module.arrayToPoint = function (array) {
+		return {
+			x: array[0], 
+			y: array[1],
+		};
+	}
+	Module.arrayToSize = function (array) {
+		return {
+			width: array[0], 
+			height: array[1],
+		};
+	}
+	Module.arrayToColor = function (array) {
+		return {
+			r: array[0], 
+			g: array[1],
+			b: array[2],
+			a: array[3] == undefined ? 255 : array[3],
+		};
+	}
 	
 	return Module;
 });

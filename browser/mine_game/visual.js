@@ -70,7 +70,7 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 
 Dr.Declare('Mine_ImageStore', 'class');
 Dr.Require('Mine_ImageStore', 'Mine_Type');
-Dr.Require('Mine_ImageStore', 'ImageData');
+Dr.Require('Mine_ImageStore', 'ImageDataExt');
 Dr.Implement('Mine_ImageStore', function (global, module_get) {
 	
 	var Module = function () {
@@ -78,7 +78,7 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 	}
 	
 	var Mine_Type = Dr.Get('Mine_Type');
-	var ImageData = Dr.Get('ImageData');
+	var ImageDataExt = Dr.Get('ImageDataExt');
 	
 	Module.type = Mine_Type.type;
 	
@@ -143,7 +143,7 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 		//image type
 		IMAGE_TYPE_BOX: {
 			size: [10, 10],
-			vertex_list: [
+			point_list: [
 				[2, 0],
 				[7, 0],
 				[9, 2],
@@ -160,29 +160,42 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 		// IMAGE_TYPE_TRI_DOWN: 'IMAGE_TYPE_TRI_DOWN',
 	}
 	
-	
-	
 	Module.prototype.init = function () {
-		this.generateImageData();
+		this.generated_image_data_tree = this.generateImageData();
 	}
 	
 	Module.prototype.generateImageData = function () {
-		for (var image_type in this.configImageGenerate) {
-			var config = this.configImageGenerate[image_type]
+		var canvas_element = Dr.document.createElement('canvas');
+		var canvas_context = canvas_element.getContext('2d');
+		
+		var generated_image_data_tree = {};
+		
+		for (var image_type in Module.configImageGenerate) {
+			var config = Module.configImageGenerate[image_type];
+			generated_image_data_tree[image_type] = {};
 			
+			var generated_point_list = [];
+			for (var i in config.point_list) generated_point_list.push(ImageDataExt.arrayToPoint(config.point_list[i]));
 			
-			
-			for (var variant_type in this.typeImageVariant) {
-				var background = this.typeBackground[variant_type];
-				var color = this.typeColor[variant_type];
+			for (var variant_type in Module.typeImageVariant) {
+				var background = Module.typeBackground[variant_type];
+				var color = ImageDataExt.arrayToColor(Module.typeColor[variant_type]);
 				
 				
 				Dr.log('[generateImageData]', background, color);
+				var generated_image_data = new ImageDataExt;
+				//generated_image_data.init('local', canvas_context.createImageData(config.size[0], config.size[1]), ImageDataExt.type.CANVAS_IMAGE_DATA);
+				generated_image_data.init('local', Dr.createOffscreenCanvas(config.size[0], config.size[1]), ImageDataExt.type.CANVAS_ELEMENT);
+				
+				generated_image_data.drawPixelLineList(generated_point_list, color, true);
+				generated_image_data.floodFill(ImageDataExt.arrayToPoint(config.tag_image_center), color);
+				generated_image_data.scale(6);
+				
+				generated_image_data_tree[image_type][variant_type] = generated_image_data;
 			}
-			
-			
 		}
 		
+		return generated_image_data_tree;
 	}
 	
 	

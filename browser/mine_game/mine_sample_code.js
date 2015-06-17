@@ -116,17 +116,30 @@ function init() {
 	
 	
 	
-	var ImageData = Dr.Get("ImageData");
+	var ImageDataExt = Dr.Get("ImageDataExt");
 	
-	var image_data_canvas = new ImageData;
+	var image_data_canvas = new ImageDataExt;
 	
-	image_data_canvas.init('local', main_canvas, ImageData.type.CANVAS_ELEMENT);
+	image_data_canvas.init('local', main_canvas, ImageDataExt.type.CANVAS_ELEMENT);
 	
 	Dr.image_data_canvas = image_data_canvas;
 	
-	Dr.image_data_canvas.drawPixelLine({x:1,y:3}, {x:150,y:45}, {r:200,g:30,b:0,a:100});
+	Dr.image_data_canvas.drawPixelLine({x:50,y:3}, {x:120,y:45}, {r:200,g:30,b:0,a:100});
 	Dr.image_data_canvas.drawPixelLine({x:100,y:3}, {x:15,y:45}, {r:200,g:30,b:0,a:100});
 	Dr.image_data_canvas.drawPixelLine({x:100,y:30}, {x:15,y:45}, {r:200,g:30,b:0,a:100});
+	
+	Dr.image_data_canvas.drawPixelLineList([
+		{x:2,y:0},
+		{x:7,y:0},
+		{x:9,y:2},
+		{x:9,y:7},
+		{x:7,y:9},
+		{x:2,y:9},
+		{x:0,y:7},
+		{x:0,y:2},
+	], {r:200,g:30,b:0,a:100}, true);
+	
+	
 	
 	Dr.image_data_canvas.draw(Dr.main_context, 0, 0);
 	
@@ -134,6 +147,15 @@ function init() {
 	Dr.image_data_canvas.floodFill({x:200,y:200}, {r:200,g:50,b:100,a:255})
 	
 	Dr.image_data_canvas.draw(Dr.main_context, 0, 0);
+	
+	
+	var Mine_ImageStore = Dr.Get('Mine_ImageStore');
+	var a = new Mine_ImageStore;
+	a.init();
+	a.generated_image_data_tree.IMAGE_TYPE_BOX.VARIANT_TYPE_INDICATOR.draw(Dr.main_context, 50, 200);
+	a.generated_image_data_tree.IMAGE_TYPE_BOX.VARIANT_TYPE_BLOCK_NORMAL.draw(Dr.main_context, 50, 300);
+	a.generated_image_data_tree.IMAGE_TYPE_BOX.VARIANT_TYPE_BLOCK_PRESSED.draw(Dr.main_context, 50, 400);
+	a.generated_image_data_tree.IMAGE_TYPE_BOX.VARIANT_TYPE_BLOCK_EMPTY.draw(Dr.main_context, 50, 500);
 }
 
 Dr.afterWindowLoaded(init);
