@@ -150,23 +150,23 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 	}
 	
 	Module.prototype.create = function (type, width, height) {
+		var data;
 		switch (type) {
-			case Module.type.CANVAS_ELEMENT:
-				var canvas_element = Dr.document.createElement('canvas');
-				canvas_element.width = width;
-				canvas_element.height = height;
-				this.init('create', canvas_element, Module.type.CANVAS_ELEMENT);
-				break;
 			case Module.type.IMAGE_ELEMENT:
+				data = document.createElement('img');
+			case Module.type.CANVAS_ELEMENT:
+				data = document.createElement('canvas');
 			case Module.type.CANVAS_IMAGE_DATA:
+				data = new ImageData(width, height);
 			default:
 				Dr.log('[ImageDataExt][create] error type:', type);
-				break;
 		}
+		data.width = width;
+		data.height = height;
+		this.init('create', data, type);
 	}
 	
 	Module.prototype.init = function (source, data, type) {
-		
 		switch (type) {
 			case Module.type.IMAGE_ELEMENT:
 				this._editable = false;
@@ -187,6 +187,8 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 				Dr.log('[ImageDataExt][init] error type:', type, source);
 				break;
 		}
+		
+		//var data = data || Module.CreateImageData(type);
 		
 		//all directly accessible(public)
 		this.type = type;

@@ -78,11 +78,32 @@ function init() {
 			if (is_active) {
 				
 				Dr.UpdateLoop.add(function (delta_time) { 
-					test_canvas.getMainContext().fillRect(
-						action.position_listener.x - rad, 
-						action.position_listener.y - rad, 
-						rad * 2, 
-						rad * 2);
+					// test_canvas.getMainContext().fillRect(
+						// action.position_listener.x - rad, 
+						// action.position_listener.y - rad, 
+						// rad * 2, 
+						// rad * 2);
+					
+					var ImageDataExt = Dr.Get("ImageDataExt");
+					var image_data_ext = new ImageDataExt;
+					image_data_ext.create(ImageDataExt.type.CANVAS_IMAGE_DATA, 10, 10);
+					image_data_ext.drawPixelLineList([
+						{x:2,y:0},
+						{x:7,y:0},
+						{x:9,y:2},
+						{x:9,y:7},
+						{x:7,y:9},
+						{x:2,y:9},
+						{x:0,y:7},
+						{x:0,y:2},
+					], {r:0,g:30,b:0,a:100}, true);
+					//image_data_ext.floodFill({x:0,y:0}, {r:0,g:0,b:0,a:0})
+					image_data_ext.toCanvas();
+					image_data_ext.scale(4);
+					image_data_ext.draw(
+						Dr.main_context, 
+						action.position_listener.x - image_data_ext.width * 0.5, 
+						action.position_listener.y - image_data_ext.height * 0.5);
 					return false;	//once
 				}, 'test_canvas_draw_touch_position')
 				
@@ -128,20 +149,6 @@ function init() {
 	Dr.image_data_canvas.drawPixelLine({x:100,y:3}, {x:15,y:45}, {r:200,g:30,b:0,a:100});
 	Dr.image_data_canvas.drawPixelLine({x:100,y:30}, {x:15,y:45}, {r:200,g:30,b:0,a:100});
 	
-	Dr.image_data_canvas.drawPixelLineList([
-		{x:2,y:0},
-		{x:7,y:0},
-		{x:9,y:2},
-		{x:9,y:7},
-		{x:7,y:9},
-		{x:2,y:9},
-		{x:0,y:7},
-		{x:0,y:2},
-	], {r:200,g:30,b:0,a:100}, true);
-	
-	
-	
-	Dr.image_data_canvas.draw(Dr.main_context, 0, 0);
 	
 	Dr.image_data_canvas.floodFill({x:65,y:30}, {r:20,g:50,b:100,a:255})
 	Dr.image_data_canvas.floodFill({x:200,y:200}, {r:200,g:50,b:100,a:255})
