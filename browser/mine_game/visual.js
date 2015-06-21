@@ -144,20 +144,43 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 		IMAGE_TYPE_BOX: {
 			size: [10, 10],
 			point_list: [
-				[2, 0],
-				[7, 0],
-				[9, 2],
-				[9, 7],
-				[7, 9],
-				[2, 9],
-				[0, 7],
-				[0, 2],
+				[0, 2], [2, 0],
+				[7, 0], [9, 2],
+				[9, 7], [7, 9],
+				[2, 9], [0, 7],
 			],
-			tag_image_center: [4, 4],	// for tag image location
+			tag_image_center: [5, 5],	// for tag image location
 		},
-		// IMAGE_TYPE_HEX: 'IMAGE_TYPE_HEX',
-		// IMAGE_TYPE_TRI_UP: 'IMAGE_TYPE_TRI_UP',
-		// IMAGE_TYPE_TRI_DOWN: 'IMAGE_TYPE_TRI_DOWN',
+		IMAGE_TYPE_HEX: {
+			size: [12, 10],
+			point_list: [
+				[2, 1], [3, 0],
+				[8, 0], [9, 1],
+				[11, 4], [11, 5],
+				[9, 8], [8, 9],
+				[3, 9], [2, 8],
+				[0, 5], [0, 4],
+			],
+			tag_image_center: [6, 5],	// for tag image location
+		},
+		IMAGE_TYPE_TRI_UP: {
+			size: [12, 10],
+			point_list: [
+				[5, 0], [6, 0],
+				[11, 8], [10, 9],
+				[1, 9], [0, 8],
+			],
+			tag_image_center: [6, 5],	// for tag image location
+		},
+		IMAGE_TYPE_TRI_DOWN: {
+			size: [12, 10],
+			point_list: [
+				[6, 9], [5, 9],
+				[0, 1], [1, 0],
+				[10, 0], [11, 1],
+			],
+			tag_image_center: [6, 5],	// for tag image location
+		},
 	}
 	
 	Module.prototype.init = function () {
@@ -189,7 +212,7 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 				
 				generated_image_data.drawPixelLineList(generated_point_list, color, true);
 				generated_image_data.floodFill(ImageDataExt.arrayToPoint(config.tag_image_center), color);
-				generated_image_data.scale(6);
+				generated_image_data.scale(4);
 				
 				generated_image_data_tree[image_type][variant_type] = generated_image_data;
 			}
