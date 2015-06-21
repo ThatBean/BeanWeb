@@ -104,12 +104,20 @@ function init() {
 						Dr.main_context, 
 						action.position_listener.x - image_data_ext.width * 0.5, 
 						action.position_listener.y - image_data_ext.height * 0.5);
+						
+					// for (var i = 0; i <= 10; i += 0.1) {
+					// for (var j = 0; j <= 1; j += 0.1) {
+						// image_data_ext.draw(
+							// Dr.main_context, 
+							// action.position_listener.x - image_data_ext.width * i, 
+							// action.position_listener.y - image_data_ext.height * j);
+					// }
+					// }
 					return false;	//once
 				}, 'test_canvas_draw_touch_position')
 				
 			}
 			
-			tag_log.Log([event_key, action.position_listener.x.toFixed(4), action.position_listener.y.toFixed(4)].join(' '));
 		}
 		else {
 			tag_log.Log([event_key].join(' '));
@@ -159,10 +167,26 @@ function init() {
 	var Mine_ImageStore = Dr.Get('Mine_ImageStore');
 	var a = new Mine_ImageStore;
 	a.init();
+	
 	a.generated_image_data_tree.IMAGE_TYPE_BOX.VARIANT_TYPE_INDICATOR.draw(Dr.main_context, 50, 200);
 	a.generated_image_data_tree.IMAGE_TYPE_BOX.VARIANT_TYPE_BLOCK_NORMAL.draw(Dr.main_context, 50, 300);
 	a.generated_image_data_tree.IMAGE_TYPE_BOX.VARIANT_TYPE_BLOCK_PRESSED.draw(Dr.main_context, 50, 400);
 	a.generated_image_data_tree.IMAGE_TYPE_BOX.VARIANT_TYPE_BLOCK_EMPTY.draw(Dr.main_context, 50, 500);
+	
+	a.generated_image_data_tree.IMAGE_TYPE_HEX.VARIANT_TYPE_INDICATOR.draw(Dr.main_context, 100, 200);
+	a.generated_image_data_tree.IMAGE_TYPE_HEX.VARIANT_TYPE_BLOCK_NORMAL.draw(Dr.main_context, 100, 300);
+	a.generated_image_data_tree.IMAGE_TYPE_HEX.VARIANT_TYPE_BLOCK_PRESSED.draw(Dr.main_context, 100, 400);
+	a.generated_image_data_tree.IMAGE_TYPE_HEX.VARIANT_TYPE_BLOCK_EMPTY.draw(Dr.main_context, 100, 500);
+	
+	a.generated_image_data_tree.IMAGE_TYPE_TRI_UP.VARIANT_TYPE_INDICATOR.draw(Dr.main_context, 150, 200);
+	a.generated_image_data_tree.IMAGE_TYPE_TRI_UP.VARIANT_TYPE_BLOCK_NORMAL.draw(Dr.main_context, 150, 300);
+	a.generated_image_data_tree.IMAGE_TYPE_TRI_UP.VARIANT_TYPE_BLOCK_PRESSED.draw(Dr.main_context, 150, 400);
+	a.generated_image_data_tree.IMAGE_TYPE_TRI_UP.VARIANT_TYPE_BLOCK_EMPTY.draw(Dr.main_context, 150, 500);
+	
+	a.generated_image_data_tree.IMAGE_TYPE_TRI_DOWN.VARIANT_TYPE_INDICATOR.draw(Dr.main_context, 200, 200);
+	a.generated_image_data_tree.IMAGE_TYPE_TRI_DOWN.VARIANT_TYPE_BLOCK_NORMAL.draw(Dr.main_context, 200, 300);
+	a.generated_image_data_tree.IMAGE_TYPE_TRI_DOWN.VARIANT_TYPE_BLOCK_PRESSED.draw(Dr.main_context, 200, 400);
+	a.generated_image_data_tree.IMAGE_TYPE_TRI_DOWN.VARIANT_TYPE_BLOCK_EMPTY.draw(Dr.main_context, 200, 500);
 }
 
 Dr.afterWindowLoaded(init);

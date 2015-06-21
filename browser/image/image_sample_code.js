@@ -77,7 +77,7 @@ function init() {
 	Dr.log(log_list.join(' '));
 	
 	
-	var log_list = ['Testing draw speed of <drawClip>', 'loop_count:', loop_count];
+	var log_list = ['Testing draw speed of <drawClip> (with bigger size error, seee Safari)', 'loop_count:', loop_count];
 	tag_log.Log(log_list.join(' '));
 	Dr.log(log_list.join(' '));
 	

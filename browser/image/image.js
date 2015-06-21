@@ -156,12 +156,17 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 		switch (type) {
 			case Module.type.IMAGE_ELEMENT:
 				data = document.createElement('img');
+				break;
 			case Module.type.CANVAS_ELEMENT:
 				data = document.createElement('canvas');
+				break;
 			case Module.type.CANVAS_IMAGE_DATA:
 				data = Module._quick_context.createImageData(width, height);
+				break;
 			default:
 				Dr.log('[ImageDataExt][create] error type:', type);
+				data = document.createElement('canvas');
+				break;
 		}
 		data.width = width;
 		data.height = height;
