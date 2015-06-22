@@ -20,7 +20,7 @@ function init() {
 	tag_log.listMax = 50; 
 	
 	
-	var main_canvas = document.getElementById('Dr.Canvas');
+	var main_canvas = document.getElementById('Dr.TestCanvas');
 	var main_context = main_canvas.getContext('2d');
 	
 	Dr.main_canvas = main_canvas;
@@ -187,6 +187,51 @@ function init() {
 	a.generated_image_data_tree.IMAGE_TYPE_TRI_DOWN.VARIANT_TYPE_BLOCK_NORMAL.draw(Dr.main_context, 200, 300);
 	a.generated_image_data_tree.IMAGE_TYPE_TRI_DOWN.VARIANT_TYPE_BLOCK_PRESSED.draw(Dr.main_context, 200, 400);
 	a.generated_image_data_tree.IMAGE_TYPE_TRI_DOWN.VARIANT_TYPE_BLOCK_EMPTY.draw(Dr.main_context, 200, 500);
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	var main_canvas = document.getElementById('Dr.Canvas');
+	var main_context = main_canvas.getContext('2d');
+	
+	var Mine_Map = Dr.Get("Mine_Map");
+	var CanvasExt = Dr.Get('CanvasExt');
+	var Mine_Grid = Dr.Get('Mine_Grid');
+	
+	var test_map = new Mine_Map;
+	var test_canvas = new CanvasExt;
+	var test_grid = new Mine_Grid;
+	
+	//test_map.init(block_type, row, col, mine_block_count, empty_block_count, lock_block_count)
+	test_map.init('TRI', 20, 30, 5, 10, 10);
+	test_canvas.init(main_canvas);
+	test_grid.init(test_canvas, test_map);
 }
 
 Dr.afterWindowLoaded(init);

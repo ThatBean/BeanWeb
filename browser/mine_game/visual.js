@@ -19,17 +19,17 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 	Module.type = Mine_Type.type;
 	
 	
-	Module.prototype.init = function (canvas_ext, map) {
+	Module.prototype.init = function (canvas_ext, map, scale) {
 		this._canvas_ext = canvas_ext;
 		this._map = map;
-		this._image_store = new Mine_ImageStore;
+		this._scale = scale || 1;
 		
 		this._block_type = map.block_type;
 		this._map_row_count = map.row_count;
 		this._map_col_count = map.col_count;
 		
-		this._block_width = image_store.width;
-		this._block_height = image_store.height;
+		this._block_width = 10;//image_store.width;
+		this._block_height = 10;//image_store.height;
 		
 		this._visible_width = canvas_ext.width;
 		this._visible_height = canvas_ext.height;
@@ -40,15 +40,26 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 		this._total_height = (this._block_height / Mine_Type.fragSizeBlock[this._block_type][1] * Mine_Type.fragSizeCondensedBlock[this._block_type][1]) 
 				* (this._map_col_count * Mine_Type.sizeAdjustment[this._block_type].col[0] + Mine_Type.sizeAdjustment[this._block_type].col[1]);
 		
-		// top left == (0 ,0)
+		// top left == (0 ,0), for scroll
 		this._visible_offset_top = 0;
 		this._visible_offset_left = 0;
+		
+		var _this = this;
+		var on_event_callback =  function (event_key, action) { _this.onAction(event_key, action); };
+		this._canvas_ext.getEventCenter().addEventListener('action_move', on_event_callback);
+		this._canvas_ext.getEventCenter().addEventListener('action_start', on_event_callback);
+		this._canvas_ext.getEventCenter().addEventListener('action_end', on_event_callback);
+		this._canvas_ext.getEventCenter().addEventListener('action_cancel', on_event_callback);
+		
+		this.initImageData();
 	}
 	
 	Module.prototype.initImageData = function () {
 		// TODO
 		// TODO
 		// TODO
+		this._image_store = new Mine_ImageStore;
+		this._image_store.init(this._scale);
 		// TODO
 		// TODO
 	}
@@ -57,8 +68,13 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 		
 	}
 	
-	Module.prototype.onAction = function (action) {
+	Module.prototype.onAction = function (event_key, action) {
 		
+		action.event.preventDefault();
+		
+		Dr.UpdateLoop.add(function (delta_time) { 
+			Dr.log('Get', event_key, action.position_listener.x, action.position_listener.y);
+		});
 	}
 	
 	return Module;
@@ -183,7 +199,9 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 		},
 	}
 	
-	Module.prototype.init = function () {
+	Module.prototype.init = function (scale) {
+		this._scale = scale || 1;
+		
 		this.generated_image_data_tree = this.generateImageData();
 	}
 	
@@ -212,7 +230,8 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 				
 				generated_image_data.drawPixelLineList(generated_point_list, color, true);
 				generated_image_data.floodFill(ImageDataExt.arrayToPoint(config.tag_image_center), color);
-				generated_image_data.scale(4);
+				generated_image_data.scale(this._scale);
+				generated_image_data.toCanvas();
 				
 				generated_image_data_tree[image_type][variant_type] = generated_image_data;
 			}
