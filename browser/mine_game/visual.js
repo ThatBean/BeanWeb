@@ -158,44 +158,44 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 	Module.configImageGenerate = {
 		//image type
 		IMAGE_TYPE_BOX: {
-			size: [10, 10],
+			size: [22, 22],
 			point_list: [
 				[0, 2], [2, 0],
-				[7, 0], [9, 2],
-				[9, 7], [7, 9],
-				[2, 9], [0, 7],
+				[19, 0], [21, 2],
+				[21, 19], [19, 21],
+				[2, 21], [0, 19],
 			],
-			tag_image_center: [5, 5],	// for tag image location
+			tag_image_center: [11, 11],	// for tag image location
 		},
 		IMAGE_TYPE_HEX: {
-			size: [12, 10],
+			size: [26, 24],
 			point_list: [
-				[2, 1], [3, 0],
-				[8, 0], [9, 1],
-				[11, 4], [11, 5],
-				[9, 8], [8, 9],
-				[3, 9], [2, 8],
-				[0, 5], [0, 4],
+				[6, 1], [7, 0],
+				[18, 0], [19, 1],
+				[25, 10], [25, 13],
+				[19, 22], [18, 23],
+				[7, 23], [6, 22],
+				[0, 13], [0, 10],
 			],
-			tag_image_center: [6, 5],	// for tag image location
+			tag_image_center: [13, 12],	// for tag image location
 		},
 		IMAGE_TYPE_TRI_UP: {
-			size: [12, 10],
+			size: [30, 28],
 			point_list: [
-				[5, 0], [6, 0],
-				[11, 8], [10, 9],
-				[1, 9], [0, 8],
+				[13, 0], [16, 0],
+				[29, 25], [28, 27],
+				[1, 27], [0, 25],
 			],
-			tag_image_center: [6, 5],	// for tag image location
+			tag_image_center: [15, 5],	// for tag image location
 		},
 		IMAGE_TYPE_TRI_DOWN: {
-			size: [12, 10],
+			size: [30, 28],
 			point_list: [
-				[6, 9], [5, 9],
+				[16, 27], [13, 27],
 				[0, 1], [1, 0],
-				[10, 0], [11, 1],
+				[28, 0], [29, 1],
 			],
-			tag_image_center: [6, 5],	// for tag image location
+			tag_image_center: [15, 22],	// for tag image location
 		},
 	}
 	
@@ -203,6 +203,23 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 		this._scale = scale || 1;
 		
 		this.generated_image_data_tree = this.generateImageData();
+	}
+	
+	function approach (point, center, dist) {
+		var calc = function (a, b, k) { return Math.round(a == b ? a : (a + (b - a) / Math.abs(b - a) * k)); }
+		return {
+			x: calc(point.x, center.x, dist),
+			y: calc(point.y, center.y, dist),
+		};
+	}
+	function fade (color, target, ratio) {
+		var calc = function (a, b, k) { return Math.round(a == b ? a : (a + (b - a) * k)); }
+		return {
+			r: calc(color.r, target.r, ratio), 
+			g: calc(color.g, target.g, ratio), 
+			b: calc(color.b, target.b, ratio), 
+			a: calc(color.a, target.a, ratio), 
+		};
 	}
 	
 	Module.prototype.generateImageData = function () {
@@ -215,22 +232,42 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 			var config = Module.configImageGenerate[image_type];
 			generated_image_data_tree[image_type] = {};
 			
+			var center_point = ImageDataExt.arrayToPoint(config.tag_image_center);
+			
 			var generated_point_list = [];
 			for (var i in config.point_list) generated_point_list.push(ImageDataExt.arrayToPoint(config.point_list[i]));
+			
+			var generated_point_list_1 = [];
+			for (var i in config.point_list) generated_point_list_1.push(approach(ImageDataExt.arrayToPoint(config.point_list[i]), center_point, 0.5));
+			
+			var generated_point_list_2 = [];
+			for (var i in config.point_list) generated_point_list_2.push(approach(ImageDataExt.arrayToPoint(config.point_list[i]), center_point, 1.5));
 			
 			for (var variant_type in Module.typeImageVariant) {
 				var background = Module.typeBackground[variant_type];
 				var color = ImageDataExt.arrayToColor(Module.typeColor[variant_type]);
-				
+				var target_color = {r: 50, g: 50, b: 50, a: 255};
 				
 				Dr.log('[generateImageData]', background, color);
 				var generated_image_data = new ImageDataExt;
 				//generated_image_data.init('local', canvas_context.createImageData(config.size[0], config.size[1]), ImageDataExt.type.CANVAS_IMAGE_DATA);
 				generated_image_data.init('local', Dr.createOffscreenCanvas(config.size[0], config.size[1]), ImageDataExt.type.CANVAS_ELEMENT);
 				
-				generated_image_data.drawPixelLineList(generated_point_list, color, true);
-				generated_image_data.floodFill(ImageDataExt.arrayToPoint(config.tag_image_center), color);
+				var apply_color = fade(color, target_color, 0.5);
+				generated_image_data.drawPixelLineList(generated_point_list, apply_color, true);
+				generated_image_data.floodFill(ImageDataExt.arrayToPoint(config.tag_image_center), apply_color);
+				
+				var apply_color = fade(color, target_color, 0.3);
+				generated_image_data.drawPixelLineList(generated_point_list_1, apply_color, true);
+				generated_image_data.floodFill(ImageDataExt.arrayToPoint(config.tag_image_center), apply_color);
+				
+				var apply_color = fade(color, target_color, 0.1);
+				generated_image_data.drawPixelLineList(generated_point_list_2, apply_color, true);
+				generated_image_data.floodFill(ImageDataExt.arrayToPoint(config.tag_image_center), apply_color);
+				
 				generated_image_data.scale(this._scale);
+				
+				//important! canvas keep 
 				generated_image_data.toCanvas();
 				
 				generated_image_data_tree[image_type][variant_type] = generated_image_data;

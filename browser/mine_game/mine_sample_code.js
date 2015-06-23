@@ -165,7 +165,7 @@ function init() {
 	
 	var Mine_ImageStore = Dr.Get('Mine_ImageStore');
 	var a = new Mine_ImageStore;
-	a.init();
+	a.init(2);
 	
 	a.generated_image_data_tree.IMAGE_TYPE_BOX.VARIANT_TYPE_INDICATOR.draw(Dr.main_context, 50, 200);
 	a.generated_image_data_tree.IMAGE_TYPE_BOX.VARIANT_TYPE_BLOCK_NORMAL.draw(Dr.main_context, 50, 300);
