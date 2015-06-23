@@ -28,17 +28,8 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 		this._map_row_count = map.row_count;
 		this._map_col_count = map.col_count;
 		
-		this._block_width = 10;//image_store.width;
-		this._block_height = 10;//image_store.height;
-		
 		this._visible_width = canvas_ext.width;
 		this._visible_height = canvas_ext.height;
-		
-		//calculated value
-		this._total_width = (this._block_width / Mine_Type.fragSizeBlock[this._block_type][0] * Mine_Type.fragSizeCondensedBlock[this._block_type][0]) 
-				* (this._map_row_count * Mine_Type.sizeAdjustment[this._block_type].row[0] + Mine_Type.sizeAdjustment[this._block_type].row[1]);
-		this._total_height = (this._block_height / Mine_Type.fragSizeBlock[this._block_type][1] * Mine_Type.fragSizeCondensedBlock[this._block_type][1]) 
-				* (this._map_col_count * Mine_Type.sizeAdjustment[this._block_type].col[0] + Mine_Type.sizeAdjustment[this._block_type].col[1]);
 		
 		// top left == (0 ,0), for scroll
 		this._visible_offset_top = 0;
@@ -57,9 +48,19 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 	Module.prototype.initImageData = function () {
 		// TODO
 		// TODO
-		// TODO
 		this._image_store = new Mine_ImageStore;
 		this._image_store.init(this._scale);
+		
+		this._block_width = 10;//image_store.width;
+		this._block_height = 10;//image_store.height;
+		
+		//calculated value
+		this._total_width = (this._block_width / Mine_Type.fragSizeBlock[this._block_type][0] * Mine_Type.fragSizeCondensedBlock[this._block_type][0]) 
+				* (this._map_row_count * Mine_Type.sizeAdjustment[this._block_type].row[0] + Mine_Type.sizeAdjustment[this._block_type].row[1]);
+		this._total_height = (this._block_height / Mine_Type.fragSizeBlock[this._block_type][1] * Mine_Type.fragSizeCondensedBlock[this._block_type][1]) 
+				* (this._map_col_count * Mine_Type.sizeAdjustment[this._block_type].col[0] + Mine_Type.sizeAdjustment[this._block_type].col[1]);
+		
+		// TODO
 		// TODO
 		// TODO
 	}
@@ -97,7 +98,6 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 	var ImageDataExt = Dr.Get('ImageDataExt');
 	
 	Module.type = Mine_Type.type;
-	
 	
 	Module.typeImage = {
 		//image type

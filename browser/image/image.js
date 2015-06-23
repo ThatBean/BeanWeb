@@ -69,6 +69,7 @@ Dr.Implement('CanvasExt', function (global, module_get) {
 		return this._event_center;
 	}
 	
+	// TODO: replace with ImageDataExt and separate
 	//simple buffer canvas list, could be a separated class
 	Module.prototype.createBuffer = function (buffer_index, buffer_canvas/* ... will pass to configBuffer */) {
 		var buffer_index = buffer_index || this._buffer_list.length;
@@ -149,7 +150,7 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 		CANVAS_IMAGE_DATA: 'CANVAS_IMAGE_DATA',	//slow, but with pixel manipulation
 	}
 	
-	Module.prototype.create = function (type, width, height) {
+	Module.create = function (type, width, height) {
 		Module._quick_canvas = Module._quick_canvas || document.createElement('canvas');
 		Module._quick_context = Module._quick_context || Module._quick_canvas.getContext("2d");
 		var data;
@@ -170,7 +171,10 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 		}
 		data.width = width;
 		data.height = height;
-		this.init('create', data, type);
+		
+		var instance = new Module;
+		instance.init('create', data, type);
+		return instance;
 	}
 	
 	Module.prototype.init = function (source, data, type) {
@@ -528,7 +532,7 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 /*
 
 
-	Module.seperate = function (combined_image_data, combined_info) {
+	Module.separate = function (combined_image_data, combined_info) {
 		
 		return image_data_list;
 	}

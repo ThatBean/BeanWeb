@@ -85,8 +85,7 @@ function init() {
 						// rad * 2);
 					
 					var ImageDataExt = Dr.Get("ImageDataExt");
-					var image_data_ext = new ImageDataExt;
-					image_data_ext.create(ImageDataExt.type.CANVAS_IMAGE_DATA, 10, 10);
+					var image_data_ext = ImageDataExt.create(ImageDataExt.type.CANVAS_IMAGE_DATA, 10, 10);
 					image_data_ext.drawPixelLineList([
 						{x:2,y:0},
 						{x:7,y:0},
@@ -217,20 +216,18 @@ function init() {
 	
 	
 	
-	var main_canvas = document.getElementById('Dr.Canvas');
-	var main_context = main_canvas.getContext('2d');
 	
-	var Mine_Map = Dr.Get("Mine_Map");
 	var CanvasExt = Dr.Get('CanvasExt');
+	var Mine_Map = Dr.Get("Mine_Map");
 	var Mine_Grid = Dr.Get('Mine_Grid');
 	
-	var test_map = new Mine_Map;
 	var test_canvas = new CanvasExt;
+	var test_map = new Mine_Map;
 	var test_grid = new Mine_Grid;
 	
 	//test_map.init(block_type, row, col, mine_block_count, empty_block_count, lock_block_count)
+	test_canvas.init(document.getElementById('Dr.Canvas'));
 	test_map.init('TRI', 20, 30, 5, 10, 10);
-	test_canvas.init(main_canvas);
 	test_grid.init(test_canvas, test_map);
 }
 
