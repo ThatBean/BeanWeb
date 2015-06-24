@@ -165,7 +165,7 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 				[21, 19], [19, 21],
 				[2, 21], [0, 19],
 			],
-			tag_image_center: [11, 11],	// for tag image location
+			tag_image_center: [10.5, 10.5],	// for tag image location
 		},
 		IMAGE_TYPE_HEX: {
 			size: [26, 24],
@@ -177,7 +177,7 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 				[7, 23], [6, 22],
 				[0, 13], [0, 10],
 			],
-			tag_image_center: [13, 12],	// for tag image location
+			tag_image_center: [12.5, 11.5],	// for tag image location
 		},
 		IMAGE_TYPE_TRI_UP: {
 			size: [30, 28],
@@ -186,7 +186,7 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 				[29, 25], [28, 27],
 				[1, 27], [0, 25],
 			],
-			tag_image_center: [15, 5],	// for tag image location
+			tag_image_center: [14.5, 18],	// for tag image location
 		},
 		IMAGE_TYPE_TRI_DOWN: {
 			size: [30, 28],
@@ -195,7 +195,7 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 				[0, 1], [1, 0],
 				[28, 0], [29, 1],
 			],
-			tag_image_center: [15, 22],	// for tag image location
+			tag_image_center: [14.5, 9],	// for tag image location
 		},
 	}
 	
@@ -205,11 +205,14 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 		this.generated_image_data_tree = this.generateImageData();
 	}
 	
-	function approach (point, center, dist) {
-		var calc = function (a, b, k) { return Math.round(a == b ? a : (a + (b - a) / Math.abs(b - a) * k)); }
-		return {
-			x: calc(point.x, center.x, dist),
-			y: calc(point.y, center.y, dist),
+	function approach (point, center, scalar) {
+		var dx = center.x - point.x;
+		var dy = center.y - point.y;
+		var dist = Math.sqrt(dx * dx + dy * dy);
+		if (dist == 0) return point;
+		else return {
+			x: point.x + dx / dist * scalar,
+			y: point.y + dy / dist * scalar,
 		};
 	}
 	function fade (color, target, ratio) {
@@ -238,10 +241,10 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 			for (var i in config.point_list) generated_point_list.push(ImageDataExt.arrayToPoint(config.point_list[i]));
 			
 			var generated_point_list_1 = [];
-			for (var i in config.point_list) generated_point_list_1.push(approach(ImageDataExt.arrayToPoint(config.point_list[i]), center_point, 0.5));
+			for (var i in config.point_list) generated_point_list_1.push(approach(ImageDataExt.arrayToPoint(config.point_list[i]), center_point, 1));
 			
 			var generated_point_list_2 = [];
-			for (var i in config.point_list) generated_point_list_2.push(approach(ImageDataExt.arrayToPoint(config.point_list[i]), center_point, 1.5));
+			for (var i in config.point_list) generated_point_list_2.push(approach(ImageDataExt.arrayToPoint(config.point_list[i]), center_point, 2));
 			
 			for (var variant_type in Module.typeImageVariant) {
 				var background = Module.typeBackground[variant_type];
