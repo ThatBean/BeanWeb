@@ -31,6 +31,36 @@
 				
 				Dr.setPageHeaderFooterPadding();
 				Dr.fitCanvas(document.getElementById('Dr.Canvas'), 1);
+				
+				var div_drag_zone = document.getElementById('DivDragZone');
+				Dr.listenFileDrag(div_drag_zone, function (file_list) {
+					div_drag_zone.innerHTML = 'Get File Count:' + file_list.length + '<br />';
+					
+					for (var i = 0; i < file_list.length; i++) {
+						var file = file_list[i];
+						var titleHTML = '<b>[' + i + ']' + file.name + '</b>';
+						if (file.type.search('image') != -1) {
+							(function (titleHTML) {
+								Dr.parseFile(file, 'url', function (url_text) { div_drag_zone.innerHTML += titleHTML + '<p>' + url_text + '</p><br />'; });
+							})(titleHTML); //or the last titleHTML will be used for all
+						}
+						else {
+							div_drag_zone.innerHTML += titleHTML + ' - ' + (file.type || 'unknown MIME type') + ' - ' + file.size + 'bytes<br />';
+						}
+					}
+				});
+				
+				Dr.autoProcess = function autoProcess(data_url_text, callback) {
+					Dr.loadImage(data_url_text, function (image_element) {
+						var ImageDataExt = Dr.Get("ImageDataExt");
+						var image_data_ext = new ImageDataExt;
+						image_data_ext.init('local', image_element, ImageDataExt.type.IMAGE_ELEMENT);
+						image_data_ext.replaceColor({r:255,g:255,b:255,a:255}, {r:0,g:0,b:0,a:0});
+						image_data_ext.crop({r:0,g:0,b:0,a:0});
+						image_data_ext.toCanvas();
+						callback(image_data_ext.data.toDataURL());
+					})
+				}
 			})
 		})
 	</script>
@@ -77,6 +107,8 @@
 		<p id="FPS">FPS here</p>
 		<p id="Log">Log here</p>
 		<div><canvas id="Dr.Canvas" class="pixelated" width="400" height="600"></canvas></div>
+		
+		<div id="DivDragZone" class="text-left align-center" style="width: 90%; min-height: 5em; background-color: #ddd; overflow-x: auto;">Drag image file here</div>
 		
 		<pre class="text-left align-center" style="width: 90%; background-color: #eee; overflow-x: auto;">
 <b>Notes</b>

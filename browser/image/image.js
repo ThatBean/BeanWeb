@@ -150,9 +150,16 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 		CANVAS_IMAGE_DATA: 'CANVAS_IMAGE_DATA',	//slow, but with pixel manipulation
 	}
 	
-	Module.create = function (type, width, height) {
+	Module.getQuickCancas = function () {
 		Module._quick_canvas = Module._quick_canvas || document.createElement('canvas');
-		Module._quick_context = Module._quick_context || Module._quick_canvas.getContext("2d");
+		return Module._quick_canvas;
+	}
+	Module.getQuickContext = function () {
+		Module._quick_context = Module._quick_context || Module.getQuickCancas().getContext("2d");
+		return Module._quick_context;
+	}
+	
+	Module.create = function (type, width, height) {
 		var data;
 		switch (type) {
 			case Module.type.IMAGE_ELEMENT:
@@ -162,7 +169,7 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 				data = document.createElement('canvas');
 				break;
 			case Module.type.CANVAS_IMAGE_DATA:
-				data = Module._quick_context.createImageData(width, height);
+				data = Module.getQuickContext().createImageData(width, height);
 				break;
 			default:
 				Dr.log('[ImageDataExt][create] error type:', type);
@@ -498,6 +505,67 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 				if (current_y - 1 >= 0) combo_push(x_left, x_right, current_y - 1);
 				//down check
 				if (current_y + 1 < height) combo_push(x_left, x_right, current_y + 1);
+			}
+		}
+	};
+	
+	Module.prototype.crop = function (crop_color) {
+		this.toCanvasImageData();
+		
+		var data = this._data.data;
+		
+		var x_min = this.width - 1;
+		var x_max = 0;
+		var y_min = this.height - 1;
+		var y_max = 0;
+		
+		for (var y = 0; y < this.height; y++) {
+			for (var x = 0; x < this.width; x++) {
+				var index = (y * this.width + x) * 4;
+				if (
+					data[index] == crop_color.r
+					&& data[index + 1] == crop_color.g
+					&& data[index + 2] == crop_color.b
+					&& data[index + 3] == crop_color.a
+				) {
+					x_min = Math.min(x_min, x);
+					x_max = Math.max(x_max, x);
+					y_min = Math.min(y_min, y);
+					y_max = Math.max(y_max, y);
+				}   
+			}
+		}
+		
+		var canvas_image_data = this._data;	// keep data src
+		this.toCanvas();
+		this._data.width = x_max - x_min;
+		this._data.height = y_max - y_min;
+		//context.putImageData(imgData,x,y,dirtyX,dirtyY,dirtyWidth,dirtyHeight);
+		this._data.getContext('2d').putImageData(canvas_image_data, 0, 0, x_min, y_min, x_max - x_min, y_max - y_min);
+		
+		//reset size
+		this.init(this._source, this._data, Module.type.CANVAS_ELEMENT);
+	};
+	
+	Module.prototype.replaceColor = function (target_color, replace_color) {
+		this.toCanvasImageData();
+		
+		var data = this._data.data;
+		
+		for (var y = 0; y < this.height; y++) {
+			for (var x = 0; x < this.width; x++) {
+				var index = (y * this.width + x) * 4;
+				if (
+					data[index] == target_color.r
+					&& data[index + 1] == target_color.g
+					&& data[index + 2] == target_color.b
+					&& data[index + 3] == target_color.a
+				) {
+					data[index] = replace_color.r;
+					data[index + 1] = replace_color.g;
+					data[index + 2] = replace_color.b;
+					data[index + 3] = replace_color.a;
+				}   
 			}
 		}
 	};

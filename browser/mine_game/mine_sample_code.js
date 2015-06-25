@@ -135,15 +135,6 @@ function init() {
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	var ImageDataExt = Dr.Get("ImageDataExt");
 	
 	var image_data_canvas = new ImageDataExt;

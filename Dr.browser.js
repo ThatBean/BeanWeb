@@ -291,6 +291,28 @@ else {
 			height: page_height,
 		};
 	};
+	
+	Dr.listenFileDrag = function (element, callback) {	//callback will receive dataTransfer.files (FileList)
+		if (!window.File) { alert('File Not support'); return; }
+		if (!window.FileReader) { alert('FileReader Not support'); return; }
+		
+		var muteEvent = function (event) { event.stopPropagation(); event.preventDefault(); }
+		
+		element.addEventListener('dragenter', muteEvent);
+		element.addEventListener('dragover', muteEvent);
+		element.addEventListener('drop', function (event) { muteEvent(event); callback(event.dataTransfer.files); });
+	}
+	
+	Dr.parseFile = function (file, parse_method, callback) {
+		var reader  = new FileReader();
+		reader.onloadend = function () { callback(reader.result); }
+		switch (parse_method) {
+			case 'url': reader.readAsDataURL(file); break;
+			case 'buffer': reader.readAsArrayBuffer(file); break;
+			case 'text': reader.readAsText(file); break;
+			default: alert('[parseFile] error parse_method'); break;
+		}
+	}
 
 	//window related
 	Dr.onNextScreenUpdate = function (callback) {
