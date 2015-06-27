@@ -159,21 +159,30 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 		return Module._quick_context;
 	}
 	
-	function create_data (type) {
+	function create_data (type, width, height) {
+		var data;
 		switch (type) {
-			case Module.type.IMAGE_ELEMENT: return document.createElement('img');
-			case Module.type.CANVAS_ELEMENT: return document.createElement('canvas');
-			case Module.type.CANVAS_IMAGE_DATA: return Module.getQuickContext().createImageData(width, height);
+			case Module.type.IMAGE_ELEMENT: 
+				data = document.createElement('img');
+				break;
+			case Module.type.CANVAS_ELEMENT: 
+				data = document.createElement('canvas');
+				break;
+			case Module.type.CANVAS_IMAGE_DATA: 
+				data = Module.getQuickContext().createImageData(width, height);
+				break;
 			default:
 				Dr.log('[ImageDataExt][create] error type:', type, 'canvas used instead');
-				return document.createElement('canvas');
+				data = document.createElement('canvas');
+				break;
 		}
+		data.width = width;
+		data.height = height;
+		return data;
 	}
 	
 	Module.create = function (type, width, height) {
-		var data = create_data(type);
-		data.width = width;
-		data.height = height;
+		var data = create_data(type, width, height);
 		
 		var instance = new Module;
 		instance.init('create', data, type);
@@ -181,10 +190,7 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 	}
 	
 	Module.copy = function (image_data_ext) {
-		var data = create_data(Module.type.CANVAS_ELEMENT);
-		data.width = image_data_ext.width;
-		data.height = image_data_ext.height;
-		
+		var data = create_data(Module.type.CANVAS_ELEMENT, image_data_ext.width, image_data_ext.height);
 		image_data_ext.draw(data.getContext('2d'), 0, 0);
 		
 		var instance = new Module;
