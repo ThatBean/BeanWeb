@@ -156,30 +156,32 @@ function init() {
 	
 	var Mine_ImageStore = Dr.Get('Mine_ImageStore');
 	var image_store = new Mine_ImageStore;
-	image_store.init(2);
+	image_store.init(function (image_store) {
+		
+		image_store.generated_image_data_tree.IMAGE_TYPE_BOX.VARIANT_TYPE_INDICATOR.draw(Dr.main_context, 50, 200);
+		image_store.generated_image_data_tree.IMAGE_TYPE_BOX.VARIANT_TYPE_BLOCK_NORMAL.draw(Dr.main_context, 50, 300);
+		image_store.generated_image_data_tree.IMAGE_TYPE_BOX.VARIANT_TYPE_BLOCK_PRESSED.draw(Dr.main_context, 50, 400);
+		image_store.generated_image_data_tree.IMAGE_TYPE_BOX.VARIANT_TYPE_BLOCK_EMPTY.draw(Dr.main_context, 50, 500);
+		
+		image_store.generated_image_data_tree.IMAGE_TYPE_HEX.VARIANT_TYPE_INDICATOR.draw(Dr.main_context, 100, 200);
+		image_store.generated_image_data_tree.IMAGE_TYPE_HEX.VARIANT_TYPE_BLOCK_NORMAL.draw(Dr.main_context, 100, 300);
+		image_store.generated_image_data_tree.IMAGE_TYPE_HEX.VARIANT_TYPE_BLOCK_PRESSED.draw(Dr.main_context, 100, 400);
+		image_store.generated_image_data_tree.IMAGE_TYPE_HEX.VARIANT_TYPE_BLOCK_EMPTY.draw(Dr.main_context, 100, 500);
+		
+		image_store.generated_image_data_tree.IMAGE_TYPE_TRI_UP.VARIANT_TYPE_INDICATOR.draw(Dr.main_context, 150, 200);
+		image_store.generated_image_data_tree.IMAGE_TYPE_TRI_UP.VARIANT_TYPE_BLOCK_NORMAL.draw(Dr.main_context, 150, 300);
+		image_store.generated_image_data_tree.IMAGE_TYPE_TRI_UP.VARIANT_TYPE_BLOCK_PRESSED.draw(Dr.main_context, 150, 400);
+		image_store.generated_image_data_tree.IMAGE_TYPE_TRI_UP.VARIANT_TYPE_BLOCK_EMPTY.draw(Dr.main_context, 150, 500);
+		
+		image_store.generated_image_data_tree.IMAGE_TYPE_TRI_DOWN.VARIANT_TYPE_INDICATOR.draw(Dr.main_context, 200, 200);
+		image_store.generated_image_data_tree.IMAGE_TYPE_TRI_DOWN.VARIANT_TYPE_BLOCK_NORMAL.draw(Dr.main_context, 200, 300);
+		image_store.generated_image_data_tree.IMAGE_TYPE_TRI_DOWN.VARIANT_TYPE_BLOCK_PRESSED.draw(Dr.main_context, 200, 400);
+		image_store.generated_image_data_tree.IMAGE_TYPE_TRI_DOWN.VARIANT_TYPE_BLOCK_EMPTY.draw(Dr.main_context, 200, 500);
+		
+		Dr.image_store = image_store;
+	}, 2);
 	
-	image_store.generated_image_data_tree.IMAGE_TYPE_BOX.VARIANT_TYPE_INDICATOR.draw(Dr.main_context, 50, 200);
-	image_store.generated_image_data_tree.IMAGE_TYPE_BOX.VARIANT_TYPE_BLOCK_NORMAL.draw(Dr.main_context, 50, 300);
-	image_store.generated_image_data_tree.IMAGE_TYPE_BOX.VARIANT_TYPE_BLOCK_PRESSED.draw(Dr.main_context, 50, 400);
-	image_store.generated_image_data_tree.IMAGE_TYPE_BOX.VARIANT_TYPE_BLOCK_EMPTY.draw(Dr.main_context, 50, 500);
 	
-	image_store.generated_image_data_tree.IMAGE_TYPE_HEX.VARIANT_TYPE_INDICATOR.draw(Dr.main_context, 100, 200);
-	image_store.generated_image_data_tree.IMAGE_TYPE_HEX.VARIANT_TYPE_BLOCK_NORMAL.draw(Dr.main_context, 100, 300);
-	image_store.generated_image_data_tree.IMAGE_TYPE_HEX.VARIANT_TYPE_BLOCK_PRESSED.draw(Dr.main_context, 100, 400);
-	image_store.generated_image_data_tree.IMAGE_TYPE_HEX.VARIANT_TYPE_BLOCK_EMPTY.draw(Dr.main_context, 100, 500);
-	
-	image_store.generated_image_data_tree.IMAGE_TYPE_TRI_UP.VARIANT_TYPE_INDICATOR.draw(Dr.main_context, 150, 200);
-	image_store.generated_image_data_tree.IMAGE_TYPE_TRI_UP.VARIANT_TYPE_BLOCK_NORMAL.draw(Dr.main_context, 150, 300);
-	image_store.generated_image_data_tree.IMAGE_TYPE_TRI_UP.VARIANT_TYPE_BLOCK_PRESSED.draw(Dr.main_context, 150, 400);
-	image_store.generated_image_data_tree.IMAGE_TYPE_TRI_UP.VARIANT_TYPE_BLOCK_EMPTY.draw(Dr.main_context, 150, 500);
-	
-	image_store.generated_image_data_tree.IMAGE_TYPE_TRI_DOWN.VARIANT_TYPE_INDICATOR.draw(Dr.main_context, 200, 200);
-	image_store.generated_image_data_tree.IMAGE_TYPE_TRI_DOWN.VARIANT_TYPE_BLOCK_NORMAL.draw(Dr.main_context, 200, 300);
-	image_store.generated_image_data_tree.IMAGE_TYPE_TRI_DOWN.VARIANT_TYPE_BLOCK_PRESSED.draw(Dr.main_context, 200, 400);
-	image_store.generated_image_data_tree.IMAGE_TYPE_TRI_DOWN.VARIANT_TYPE_BLOCK_EMPTY.draw(Dr.main_context, 200, 500);
-	
-	
-	Dr.image_store = image_store;
 	
 	
 	Dr.loadImage(Mine_ImageStore.typeTagImage['TAG_IMAGE_FACE_COOL'] , function (image_element) {

@@ -45,11 +45,11 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 		this.initImageData();
 	}
 	
-	Module.prototype.initImageData = function () {
+	Module.prototype.initImageData = function (callback) {
 		// TODO
 		// TODO
 		this._image_store = new Mine_ImageStore;
-		this._image_store.init(this._scale);
+		this._image_store.init(callback, this._scale);
 		
 		this._block_width = 10;//image_store.width;
 		this._block_height = 10;//image_store.height;
@@ -195,10 +195,24 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 		},
 	}
 	
-	Module.prototype.init = function (scale) {
+	Module.prototype.init = function (callback, scale) {
+		this._callback = callback;
 		this._scale = scale || 1;
+		this._all_done = false;
+		this._all_out = false;
+		this._item_pending = 0;
 		
 		this.generated_image_data_tree = this.generateImageData();
+		
+		this._all_out = true;
+		this.checkFinish();
+	}
+	
+	Module.prototype.checkFinish = function () {
+		if (this._all_out == true && this._item_pending == 0) {
+			this._all_done = true;
+			if (this._callback) this._callback(this);
+		}
 	}
 	
 	function approach (point, center, scalar) {
@@ -269,19 +283,33 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 				generated_image_data.drawPixelLineList(generated_point_list_2, apply_color, true);
 				generated_image_data.floodFill(center_point, apply_color);
 				
-				generated_image_data.scale(this._scale);
+				// generated_image_data.scale(this._scale);
 				
 				//important! canvas will mix alpha 
-				generated_image_data.toCanvas();
-				
-				Dr.loadImage(Module.typeTagImage['TAG_IMAGE_FACE_COOL'] , function (image_element) {
-					//generated_image_data.data.getContext('2d').drawImage(image_element, center_point.x - image_element.width * 0.5, center_point.y - image_element.height * 0.5);
-					generated_image_data.data.getContext('2d').drawImage(image_element, 0, 0);
-				});
-				
-				
+				// generated_image_data.toCanvas();
 				
 				generated_image_data_tree[image_type][variant_type] = generated_image_data;
+				
+				(function (_this) {
+					var _image_data = generated_image_data;
+					var _center_point = center_point;
+					_this._item_pending ++;
+					Dr.loadImage(Module.typeTagImage['TAG_IMAGE_FACE_COOL'] , function (image_element) {
+						
+						//important! canvas will mix alpha 
+						_image_data.toCanvas();
+						
+						_image_data.data.getContext('2d').drawImage(image_element, _center_point.x - image_element.width * 0.5, _center_point.y - image_element.height * 0.5);
+						//_canvas.getContext('2d').drawImage(image_element, 0, 0);
+						
+						//scale finally
+						_image_data.scale(_this._scale);
+						
+						_this._item_pending --;
+						_this.checkFinish();
+					});
+				})(this);
+				
 			}
 		}
 		
