@@ -158,58 +158,82 @@ function init() {
 	var image_store = new Mine_ImageStore;
 	image_store.init(function (image_store) {
 		
-		image_store.generated_image_data_tree.IMAGE_TYPE_BOX.VARIANT_TYPE_INDICATOR.draw(Dr.main_context, 50, 200);
-		image_store.generated_image_data_tree.IMAGE_TYPE_BOX.VARIANT_TYPE_BLOCK_NORMAL.draw(Dr.main_context, 50, 300);
-		image_store.generated_image_data_tree.IMAGE_TYPE_BOX.VARIANT_TYPE_BLOCK_PRESSED.draw(Dr.main_context, 50, 400);
-		image_store.generated_image_data_tree.IMAGE_TYPE_BOX.VARIANT_TYPE_BLOCK_EMPTY.draw(Dr.main_context, 50, 500);
+		var image_type_list = [
+			'IMAGE_TYPE_BOX',
+			'IMAGE_TYPE_HEX',
+			'IMAGE_TYPE_TRI_UP',
+			'IMAGE_TYPE_TRI_DOWN',
+		];
+		var variant_type_list = [
+			'VARIANT_TYPE_INDICATOR',
+			'VARIANT_TYPE_BLOCK_NORMAL',
+			'VARIANT_TYPE_BLOCK_PRESSED',
+			'VARIANT_TYPE_BLOCK_EMPTY',
+		];
+		var tag_image_type_list = [
+			'TAG_IMAGE_NUMBER_12',
+			'TAG_IMAGE_FACE_COOL',
+			'TAG_IMAGE_MARK_FLAG',
+			'TAG_IMAGE_MARK_EMPTY',
+		];
 		
-		image_store.generated_image_data_tree.IMAGE_TYPE_HEX.VARIANT_TYPE_INDICATOR.draw(Dr.main_context, 100, 200);
-		image_store.generated_image_data_tree.IMAGE_TYPE_HEX.VARIANT_TYPE_BLOCK_NORMAL.draw(Dr.main_context, 100, 300);
-		image_store.generated_image_data_tree.IMAGE_TYPE_HEX.VARIANT_TYPE_BLOCK_PRESSED.draw(Dr.main_context, 100, 400);
-		image_store.generated_image_data_tree.IMAGE_TYPE_HEX.VARIANT_TYPE_BLOCK_EMPTY.draw(Dr.main_context, 100, 500);
 		
-		image_store.generated_image_data_tree.IMAGE_TYPE_TRI_UP.VARIANT_TYPE_INDICATOR.draw(Dr.main_context, 150, 200);
-		image_store.generated_image_data_tree.IMAGE_TYPE_TRI_UP.VARIANT_TYPE_BLOCK_NORMAL.draw(Dr.main_context, 150, 300);
-		image_store.generated_image_data_tree.IMAGE_TYPE_TRI_UP.VARIANT_TYPE_BLOCK_PRESSED.draw(Dr.main_context, 150, 400);
-		image_store.generated_image_data_tree.IMAGE_TYPE_TRI_UP.VARIANT_TYPE_BLOCK_EMPTY.draw(Dr.main_context, 150, 500);
+		var start_time = Dr.now();
+		Dr.log('Start time', start_time);
 		
-		image_store.generated_image_data_tree.IMAGE_TYPE_TRI_DOWN.VARIANT_TYPE_INDICATOR.draw(Dr.main_context, 200, 200);
-		image_store.generated_image_data_tree.IMAGE_TYPE_TRI_DOWN.VARIANT_TYPE_BLOCK_NORMAL.draw(Dr.main_context, 200, 300);
-		image_store.generated_image_data_tree.IMAGE_TYPE_TRI_DOWN.VARIANT_TYPE_BLOCK_PRESSED.draw(Dr.main_context, 200, 400);
-		image_store.generated_image_data_tree.IMAGE_TYPE_TRI_DOWN.VARIANT_TYPE_BLOCK_EMPTY.draw(Dr.main_context, 200, 500);
+		var x = 5;
+		for (var i in image_type_list) {
+			var y = 50;
+			for (var j in variant_type_list) {
+				for (var k in tag_image_type_list) {
+					var image_data_ext = image_store.getImageData(
+						image_type_list[i],
+						variant_type_list[j],
+						tag_image_type_list[k],
+						2
+					);
+					
+					image_data_ext.draw(Dr.main_context, x, y);
+					y += 1.2 * image_data_ext.height;
+				}
+			}
+			x += 75;
+		}
+		
+		var end_time = Dr.now();
+		Dr.log('End time', end_time);
+		Dr.log('Delta time', end_time - start_time);
+		tag_log.Log('Generate time: ' + (end_time - start_time).toFixed(3));
+		
+		var start_time = Dr.now();
+		Dr.log('Start time', start_time);
+		
+		var x = 50;
+		for (var i in image_type_list) {
+			var y = 50;
+			for (var j in variant_type_list) {
+				for (var k in tag_image_type_list) {
+					var image_data_ext = image_store.getImageData(
+						image_type_list[i],
+						variant_type_list[j],
+						tag_image_type_list[k],
+						1
+					);
+					
+					image_data_ext.draw(Dr.main_context, x, y);
+					y += 1.2 * image_data_ext.height;
+				}
+			}
+			x += 75;
+		}
+		
+		var end_time = Dr.now();
+		Dr.log('End time', end_time);
+		Dr.log('Delta time', end_time - start_time);
+		tag_log.Log('Generate time: ' + (end_time - start_time).toFixed(3));
 		
 		Dr.image_store = image_store;
-	}, 2);
-	
-	
-	
-	
-	Dr.loadImage(Mine_ImageStore.typeTagImage['TAG_IMAGE_FACE_COOL'] , function (image_element) {
-		//generated_image_data.data.getContext('2d').drawImage(image_element, center_point.x - image_element.width * 0.5, center_point.y - image_element.height * 0.5);
-		Dr.main_context.drawImage(image_element, 0, 0);
 	});
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	
 	

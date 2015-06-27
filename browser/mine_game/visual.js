@@ -45,11 +45,11 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 		this.initImageData();
 	}
 	
-	Module.prototype.initImageData = function (callback) {
+	Module.prototype.initImageData = function () {
 		// TODO
 		// TODO
 		this._image_store = new Mine_ImageStore;
-		this._image_store.init(callback, this._scale);
+		this._image_store.init();
 		
 		this._block_width = 10;//image_store.width;
 		this._block_height = 10;//image_store.height;
@@ -128,10 +128,10 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 		VARIANT_TYPE_INDICATOR: [255, 255, 0],
 		VARIANT_TYPE_BLOCK_NORMAL: [200, 200, 200],
 		VARIANT_TYPE_BLOCK_PRESSED: [160, 160, 160],
-		VARIANT_TYPE_BLOCK_EMPTY: [150, 0, 0],
+		VARIANT_TYPE_BLOCK_EMPTY: [120, 0, 0],
 	}
 	
-	Module.typeTagImage = {
+	Module.sourceTagImage = {
 		//image(tag image)
 		TAG_IMAGE_NUMBER_1: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAMCAYAAABfnvydAAAAP0lEQVQYV2NkQALfGRj+g7icDAyMMGE4A1khMpsRWRdWEwgqwGU0VjcQdCRBBdisQ/EmQRMIKsBqBa5wgIkDAK7cGAOaCe0dAAAAAElFTkSuQmCC',
 		TAG_IMAGE_NUMBER_2: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAMCAYAAABfnvydAAAAQElEQVQYV2P8zsDwn4GBgYGTgYERmQ0SAwFGGAMXjVMBzDTyFcDdgMuRcCsIKiDoC2x+R9aENXBQFJBkBTYHAwABKx3bUtOfLAAAAABJRU5ErkJggg==',
@@ -195,14 +195,15 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 		},
 	}
 	
-	Module.prototype.init = function (callback, scale) {
+	Module.prototype.init = function (callback) {
 		this._callback = callback;
-		this._scale = scale || 1;
 		this._all_done = false;
 		this._all_out = false;
 		this._item_pending = 0;
 		
-		this.generated_image_data_tree = this.generateImageData();
+		this.cached = {};
+		
+		this.generated = this.generateImageData();
 		
 		this._all_out = true;
 		this.checkFinish();
@@ -236,14 +237,11 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 	}
 	
 	Module.prototype.generateImageData = function () {
-		var canvas_element = Dr.document.createElement('canvas');
-		var canvas_context = canvas_element.getContext('2d');
-		
-		var generated_image_data_tree = {};
+		var generated = {};
 		
 		for (var image_type in Module.configImageGenerate) {
 			var config = Module.configImageGenerate[image_type];
-			generated_image_data_tree[image_type] = {};
+			generated[image_type] = {};
 			
 			var center_point_x = 0, center_point_y = 0;
 			for (var i in config.point_list) {
@@ -267,62 +265,78 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 				var target_color = {r: 50, g: 50, b: 50, a: 255};
 				
 				Dr.log('[generateImageData]', background, color);
-				var generated_image_data = new ImageDataExt;
-				//generated_image_data.init('local', canvas_context.createImageData(config.size[0], config.size[1]), ImageDataExt.type.CANVAS_IMAGE_DATA);
-				generated_image_data.init('local', Dr.createOffscreenCanvas(config.size[0], config.size[1]), ImageDataExt.type.CANVAS_ELEMENT);
+				var generated_image_data_ext = ImageDataExt.create(ImageDataExt.type.CANVAS_ELEMENT, config.size[0], config.size[1]);
+				
+				//record
+				generated_image_data_ext.image_type = image_type;
+				generated_image_data_ext.variant_type = variant_type;
+				generated_image_data_ext.center_point = center_point;
 				
 				var apply_color = fade(color, target_color, 0.5);
-				generated_image_data.drawPixelLineList(generated_point_list, apply_color, true);
-				generated_image_data.floodFill(center_point, apply_color);
+				generated_image_data_ext.drawPixelLineList(generated_point_list, apply_color, true);
+				generated_image_data_ext.floodFill(center_point, apply_color);
 				
 				var apply_color = fade(color, target_color, 0.3);
-				generated_image_data.drawPixelLineList(generated_point_list_1, apply_color, true);
-				generated_image_data.floodFill(center_point, apply_color);
+				generated_image_data_ext.drawPixelLineList(generated_point_list_1, apply_color, true);
+				generated_image_data_ext.floodFill(center_point, apply_color);
 				
 				var apply_color = fade(color, target_color, 0.1);
-				generated_image_data.drawPixelLineList(generated_point_list_2, apply_color, true);
-				generated_image_data.floodFill(center_point, apply_color);
-				
-				// generated_image_data.scale(this._scale);
+				generated_image_data_ext.drawPixelLineList(generated_point_list_2, apply_color, true);
+				generated_image_data_ext.floodFill(center_point, apply_color);
 				
 				//important! canvas will mix alpha 
-				// generated_image_data.toCanvas();
+				generated_image_data_ext.toCanvas();
 				
-				generated_image_data_tree[image_type][variant_type] = generated_image_data;
-				
-				(function (_this) {
-					var _image_data = generated_image_data;
-					var _center_point = center_point;
-					_this._item_pending ++;
-					Dr.loadImage(Module.typeTagImage['TAG_IMAGE_FACE_COOL'] , function (image_element) {
-						
-						//important! canvas will mix alpha 
-						_image_data.toCanvas();
-						
-						_image_data.data.getContext('2d').drawImage(image_element, _center_point.x - image_element.width * 0.5, _center_point.y - image_element.height * 0.5);
-						//_canvas.getContext('2d').drawImage(image_element, 0, 0);
-						
-						//scale finally
-						_image_data.scale(_this._scale);
-						
-						_this._item_pending --;
-						_this.checkFinish();
-					});
-				})(this);
-				
+				generated[image_type][variant_type] = generated_image_data_ext;
 			}
 		}
 		
-		return generated_image_data_tree;
+		//tag image
+		for (var image_type in Module.sourceTagImage) {
+			var image_source = Module.sourceTagImage[image_type];
+			
+			(function (_this) {
+				var _image_source = image_source;
+				var _image_type = image_type;
+				_this._item_pending ++;
+				Dr.loadImage(_image_source , function (image_element) {
+					generated[_image_type] = new ImageDataExt;
+					generated[_image_type].init('local', image_element, ImageDataExt.type.IMAGE_ELEMENT);
+					
+					_this._item_pending --;
+					_this.checkFinish();
+				});
+			})(this);
+		};
+		
+		return generated;
 	}
 	
 	
-	Module.prototype.getImageData = function (image_type, background_type, color_type, tag_image) {
-		// TODO
-		// TODO
-		// TODO
-		// TODO
-		// TODO
+	Module.prototype.getImageData = function (image_type, variant_type, tag_image_type, scale_ratio) {
+		var scale_ratio = scale_ratio || 1;
+		var cache_key = image_type + '|' + variant_type + '|' + tag_image_type + '|' + scale_ratio;
+		if (!this.cached[cache_key]) {
+			var base_image_data_ext = this.generated[image_type][variant_type];
+			var tag_image_data_ext = this.generated[tag_image_type];
+			
+			Dr.debug(5, 'cache add', image_type, variant_type, tag_image_type);
+			
+			var cache_image = ImageDataExt.copy(base_image_data_ext);
+			cache_image.toCanvas();
+			
+			tag_image_data_ext.draw(cache_image.data.getContext('2d'), 
+				base_image_data_ext.center_point.x - tag_image_data_ext.width * 0.5, 
+				base_image_data_ext.center_point.y - tag_image_data_ext.height * 0.5);
+			
+			cache_image.scale(scale_ratio);
+			
+			this.cached[cache_key] = cache_image;
+		}
+		
+		return this.cached[cache_key];
+		
+		image_store.generated.IMAGE_TYPE_BOX.VARIANT_TYPE_INDICATOR.draw(Dr.main_context, 50, 200);
 	}
 	
 	return Module;

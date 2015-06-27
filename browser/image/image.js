@@ -159,23 +159,19 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 		return Module._quick_context;
 	}
 	
-	Module.create = function (type, width, height) {
-		var data;
+	function create_data (type) {
 		switch (type) {
-			case Module.type.IMAGE_ELEMENT:
-				data = document.createElement('img');
-				break;
-			case Module.type.CANVAS_ELEMENT:
-				data = document.createElement('canvas');
-				break;
-			case Module.type.CANVAS_IMAGE_DATA:
-				data = Module.getQuickContext().createImageData(width, height);
-				break;
+			case Module.type.IMAGE_ELEMENT: return document.createElement('img');
+			case Module.type.CANVAS_ELEMENT: return document.createElement('canvas');
+			case Module.type.CANVAS_IMAGE_DATA: return Module.getQuickContext().createImageData(width, height);
 			default:
 				Dr.log('[ImageDataExt][create] error type:', type, 'canvas used instead');
-				data = document.createElement('canvas');
-				break;
+				return document.createElement('canvas');
 		}
+	}
+	
+	Module.create = function (type, width, height) {
+		var data = create_data(type);
 		data.width = width;
 		data.height = height;
 		
@@ -185,27 +181,14 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 	}
 	
 	Module.copy = function (image_data_ext) {
-		var data;
-		switch (type) {
-			case Module.type.IMAGE_ELEMENT:
-				data = document.createElement('img');
-				break;
-			case Module.type.CANVAS_ELEMENT:
-				data = document.createElement('canvas');
-				break;
-			case Module.type.CANVAS_IMAGE_DATA:
-				data = Module.getQuickContext().createImageData(width, height);
-				break;
-			default:
-				Dr.log('[ImageDataExt][create] error type:', type);
-				data = document.createElement('canvas');
-				break;
-		}
-		data.width = width;
-		data.height = height;
+		var data = create_data(Module.type.CANVAS_ELEMENT);
+		data.width = image_data_ext.width;
+		data.height = image_data_ext.height;
+		
+		image_data_ext.draw(data.getContext('2d'), 0, 0);
 		
 		var instance = new Module;
-		instance.init('create', data, type);
+		instance.init('copy', data, Module.type.CANVAS_ELEMENT);
 		return instance;
 	}
 	
@@ -322,13 +305,13 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 	
 	var canvas_scale = function (canvas_element, scale_x, scale_y) {
 		var scale_y = scale_y || scale_x;
-		Dr.log('scale:', scale_x, scale_y);
+		Dr.debug(5, 'scale:', scale_x, scale_y);
 		
 		//get source
 		var source_canvas_image_data = canvas_element.getContext('2d').getImageData(0, 0, canvas_element.width, canvas_element.height);
 		var source_pixel_array = source_canvas_image_data.data;
 		var source_pixel_width = canvas_element.width;
-		Dr.log('source canvas_element size:', canvas_element.width, canvas_element.height);
+		Dr.debug(5, 'source canvas_element size:', canvas_element.width, canvas_element.height);
 		
 		//scale canvas
 		canvas_element.width = canvas_element.width * scale_x;
@@ -338,7 +321,7 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 		var target_canvas_image_data = canvas_element.getContext('2d').getImageData(0, 0, canvas_element.width, canvas_element.height);
 		var target_pixel_array = target_canvas_image_data.data;
 		var target_pixel_width = canvas_element.width;
-		Dr.log('source canvas_element size:', canvas_element.width, canvas_element.height);
+		Dr.debug(5, 'source canvas_element size:', canvas_element.width, canvas_element.height);
 		
 		var target_pixel_count = canvas_element.width * canvas_element.height;
 		for (var target_pixel_index = 0; target_pixel_index < target_pixel_count; target_pixel_index++) {
@@ -395,7 +378,7 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 	Module.prototype.drawPixelLine = function (point0, point1, color) {
 		this.toCanvasImageData();
 		
-		Dr.log('drawPixelLine');
+		Dr.debug(5, 'drawPixelLine');
 		
 		var x0 = Math.round(point0.x);
 		var y0 = Math.round(point0.y);
@@ -429,7 +412,7 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 	Module.prototype.drawPixelLineList = function (point_list, color, is_loop) {
 		this.toCanvasImageData();
 		
-		Dr.log('drawPixelLineList');
+		Dr.debug(5, 'drawPixelLineList');
 		
 		Dr.assert(point_list.length >= 2, '[drawPixelLineList] check length');
 		
@@ -541,7 +524,7 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 		
 		var data = this._data.data;
 		
-		Dr.log('[crop] size before', this.width, this.height);
+		Dr.debug(5, '[crop] size before', this.width, this.height);
 		
 		var x_min = this.width - 1;
 		var x_max = 0;
@@ -557,27 +540,16 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 					data[index + 2], 
 					data[index + 3]);
 				if (!is_crop) {
-					Dr.log('[crop] check');
+					//Dr.log('[crop] check');
 					x_min = Math.min(x_min, x);
 					x_max = Math.max(x_max, x);
 					y_min = Math.min(y_min, y);
 					y_max = Math.max(y_max, y);
 				}
-				// if (
-					// data[index] == crop_color.r
-					// && data[index + 1] == crop_color.g
-					// && data[index + 2] == crop_color.b
-					// && data[index + 3] == crop_color.a
-				// ) {
-					// x_min = Math.min(x_min, x);
-					// x_max = Math.max(x_max, x);
-					// y_min = Math.min(y_min, y);
-					// y_max = Math.max(y_max, y);
-				// }   
 			}
 		}
 		
-		Dr.log('[crop] size result', x_min, y_min, x_max - x_min, y_max - y_min);
+		Dr.debug(5, '[crop] size result', x_min, y_min, x_max - x_min, y_max - y_min);
 		
 		if (x_max == 0 && y_max == 0) return;	//nothing changed
 		
@@ -592,7 +564,7 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 		//reset size
 		this.init(this._source, this._data, Module.type.CANVAS_ELEMENT);
 		
-		Dr.log('[crop] size after', this.width, this.height);
+		Dr.debug(5, '[crop] size after', this.width, this.height);
 	};
 	
 	//Module.prototype.replaceColor = function (target_color, replace_color) {
@@ -611,24 +583,12 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 					data[index + 3]);
 				
 				if (replace_color) {
-					Dr.log('[replaceColor] check');
+					//Dr.log('[replaceColor] check');
 					data[index] = replace_color.r;
 					data[index + 1] = replace_color.g;
 					data[index + 2] = replace_color.b;
 					data[index + 3] = replace_color.a;
 				}
-				
-				// if (
-					// data[index] == target_color.r
-					// && data[index + 1] == target_color.g
-					// && data[index + 2] == target_color.b
-					// && data[index + 3] == target_color.a
-				// ) {
-					// data[index] = replace_color.r;
-					// data[index + 1] = replace_color.g;
-					// data[index + 2] = replace_color.b;
-					// data[index + 3] = replace_color.a;
-				// }   
 			}
 		}
 	};
