@@ -133,25 +133,25 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 	
 	Module.typeTagImage = {
 		//image(tag image)
-		TAG_IMAGE_NUMBER_1: 'TAG_IMAGE_NUMBER_1',
-		TAG_IMAGE_NUMBER_2: 'TAG_IMAGE_NUMBER_2',
-		TAG_IMAGE_NUMBER_3: 'TAG_IMAGE_NUMBER_3',
-		TAG_IMAGE_NUMBER_4: 'TAG_IMAGE_NUMBER_4',
-		TAG_IMAGE_NUMBER_5: 'TAG_IMAGE_NUMBER_5',
-		TAG_IMAGE_NUMBER_6: 'TAG_IMAGE_NUMBER_6',
-		TAG_IMAGE_NUMBER_7: 'TAG_IMAGE_NUMBER_7',
-		TAG_IMAGE_NUMBER_8: 'TAG_IMAGE_NUMBER_8',
-		TAG_IMAGE_NUMBER_9: 'TAG_IMAGE_NUMBER_9',
-		TAG_IMAGE_NUMBER_10: 'TAG_IMAGE_NUMBER_10',
-		TAG_IMAGE_NUMBER_11: 'TAG_IMAGE_NUMBER_11',
-		TAG_IMAGE_NUMBER_12: 'TAG_IMAGE_NUMBER_12',
-		TAG_IMAGE_MARK_EMPTY: 'TAG_IMAGE_MARK_EMPTY',
-		TAG_IMAGE_MARK_LOCK: 'TAG_IMAGE_MARK_LOCK',
-		TAG_IMAGE_MARK_FLAG: 'TAG_IMAGE_MARK_FLAG',
-		TAG_IMAGE_FACE_COOL: 'TAG_IMAGE_FACE_COOL',
-		TAG_IMAGE_FACE_SMILE: 'TAG_IMAGE_FACE_SMILE',
-		TAG_IMAGE_FACE_OOPS: 'TAG_IMAGE_FACE_OOPS',
-		TAG_IMAGE_FACE_DIE: 'TAG_IMAGE_FACE_DIE',
+		TAG_IMAGE_NUMBER_1: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAMCAYAAABfnvydAAAAP0lEQVQYV2NkQALfGRj+g7icDAyMMGE4A1khMpsRWRdWEwgqwGU0VjcQdCRBBdisQ/EmQRMIKsBqBa5wgIkDAK7cGAOaCe0dAAAAAElFTkSuQmCC',
+		TAG_IMAGE_NUMBER_2: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAMCAYAAABfnvydAAAAQElEQVQYV2P8zsDwn4GBgYGTgYERmQ0SAwFGGAMXjVMBzDTyFcDdgMuRcCsIKiDoC2x+R9aENXBQFJBkBTYHAwABKx3bUtOfLAAAAABJRU5ErkJggg==',
+		TAG_IMAGE_NUMBER_3: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAMCAYAAABfnvydAAAAOElEQVQYV2P8zsDwn4GBgYGTgYERG5sRJIkP4FQAM418BTBrUUwg6EiCCrD5hnxHEvQm3BeEghoAH9UbveyX9S4AAAAASUVORK5CYII=',
+		TAG_IMAGE_NUMBER_4: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAMCAYAAABfnvydAAAAQ0lEQVQYV2P8zsDwn4GBgYGTgYERRMMATBxFEFkBjM1I0ASCCrAZiyyGYgWyaXBHYhME+Yh4X+ByA0ETCCqABxQhKwDuwR29bm8/SAAAAABJRU5ErkJggg==',
+		TAG_IMAGE_NUMBER_5: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAMCAYAAABfnvydAAAAPElEQVQYV2P8zsDwn4GBgYGTgYERG5sRJIkPoOjCppCwApKswOpIyn2Byw0wk3GGA0EFMJOxBi8o2GEKANiTHduKm9JEAAAAAElFTkSuQmCC',
+		TAG_IMAGE_NUMBER_6: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAMCAYAAABfnvydAAAAOUlEQVQYV2NkQALfGRj+g7icDAyMMDYjsgJsbLhKkC7yFJBkBVZHYhOkji/g4YBsBbZAIy2gsDkYAJXnIdHZvL6kAAAAAElFTkSuQmCC',
+		TAG_IMAGE_NUMBER_7: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAMCAYAAABfnvydAAAAMUlEQVQYV2P8zsDwn4GBgYGTgYERG5sRJIkP4FQAM418BTBrUUxAdiR5CrD5ZjBYAQAreRPvI30nqQAAAABJRU5ErkJggg==',
+		TAG_IMAGE_NUMBER_8: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAMCAYAAABfnvydAAAALElEQVQYV2P8zsDwn4GBgYGTgYERG5sRJIkPoOhCVggzjbACkqzA6shh4QsADosnvdsrZicAAAAASUVORK5CYII=',
+		TAG_IMAGE_NUMBER_9: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAMCAYAAABfnvydAAAAOklEQVQYV2P8zsDwn4GBgYGTgYERG5sRJIkPoOhCVggzjbACkqzA6kjKfYHLDXBfkK0AphFr8CIHOwBLDSO9aYo84QAAAABJRU5ErkJggg==',
+		TAG_IMAGE_NUMBER_10: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAASklEQVQoU2NkgILvDAz/QUxOBgZGdDEYHyQHl4QJEqIZQSaDdKLbgItPugZCTkCXx/AgzNM4nYQrlAhqINZpg9FJ2CIOXQw5aQAA+1kz0c6VyYIAAAAASUVORK5CYII=',
+		TAG_IMAGE_NUMBER_11: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAARUlEQVQoU2NkgILvDAz/QUxOBgZGmBiIRhdHkURWiIvNCDIBZCq6SbjESddAjDOQ1cD9QLKnSdZArNMGo5OwRRByAKCzAbz6LgOYcNLJAAAAAElFTkSuQmCC',
+		TAG_IMAGE_NUMBER_12: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAT0lEQVQoU2NkgILvDAz/QUxOBgZGEA3ig9jo4mBJUgDYBGwmYTMEpJZ0DaQ4B6QW7gdiPA12EimhhKKBWKcRtAHdIPI1EO0kbBGHHGLobADO8DPb86qTRgAAAABJRU5ErkJggg==',
+		TAG_IMAGE_MARK_EMPTY: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAT0lEQVQoU2OcycDwn4GBgSGdgYERROMCMHWMMAY+TchqwKbi04QuB3cGNk3YxFDcjawA2S/I/sPwKLom9MCgTANJTiLJ0yQFK8kRR2rSAACV6iZtj6T9ZgAAAABJRU5ErkJggg==',
+		TAG_IMAGE_MARK_LOCK: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAOCAYAAAAbvf3sAAAAV0lEQVQoU2NkQAX/0fgwLiMGg4GB4f+rV6+wqhcTEwOJgzXBdIIVQyUwNCHJMWLTALceqhPZMDppwBUyWAMA5N7/6enpOEITVXjmzJngUBqZGogKIqgiAMTwPgfUTtJqAAAAAElFTkSuQmCC',
+		TAG_IMAGE_MARK_FLAG: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAOCAYAAAD5YeaVAAAAVklEQVQoU8WSQRIAEAwD408e2Af6E9MDgpQjpwy7DmkT5qmUE+UR+bLCCmC5Px7CCTsaCBoOhBgWwh3ehDdMwgqrvoI+e8+yY3fUzx9h3ovruBUo96gBKbkaDbc3xaQAAAAASUVORK5CYII=',
+		TAG_IMAGE_FACE_COOL: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAALCAYAAABPhbxiAAAASUlEQVQoU2NkYGD4z0AGYMSjESQHAlgNHhiN2JwDcybM9+jOZURXQHQwUawR5BRiDQGrRVZMjGa4GmyBgMtmFIOxKcKVklDUAgBnsxAITW12JwAAAABJRU5ErkJggg==',
+		TAG_IMAGE_FACE_SMILE: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAKCAYAAACALL/6AAAAPklEQVQYV2NkgID/UBpEMSKxMeRgkrTXgOYK3Fx09xLUSJYGkIeJ1fgfOZQIaQIbjKwIn01wOXyRhBwAcHUA1R0NCka+3DoAAAAASUVORK5CYII=',
+		TAG_IMAGE_FACE_OOPS: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQ0lEQVQYV2NkgID/DAwMjFA2OgWWA0mCGDCArhguB5MgykQcNqIKY3MXzDoUOWxuwuocZIXY3AkXI0shenii2EC0ZwD2gBAKYHntKQAAAABJRU5ErkJggg==',
+		TAG_IMAGE_FACE_DIE: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAALCAYAAABLcGxfAAAASElEQVQoU2NkYGD4z8DAwMiAAMh8DDmYQpgEugKQMShyuExGshDMhBtElg1k+QHdCTj5yH4gShPFGkD+wQbgBlMcrPj8AQ5NAHwFFwpuPDIVAAAAAElFTkSuQmCC',
 	}
 	
 	
@@ -165,7 +165,6 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 				[21, 19], [19, 21],
 				[2, 21], [0, 19],
 			],
-			tag_image_center: [10.5, 10.5],	// for tag image location
 		},
 		IMAGE_TYPE_HEX: {
 			size: [26, 24],
@@ -177,7 +176,6 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 				[7, 23], [6, 22],
 				[0, 13], [0, 10],
 			],
-			tag_image_center: [12.5, 11.5],	// for tag image location
 		},
 		IMAGE_TYPE_TRI_UP: {
 			size: [30, 28],
@@ -186,7 +184,6 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 				[29, 25], [28, 27],
 				[1, 27], [0, 25],
 			],
-			tag_image_center: [14.5, 18],	// for tag image location
 		},
 		IMAGE_TYPE_TRI_DOWN: {
 			size: [30, 28],
@@ -195,7 +192,6 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 				[0, 1], [1, 0],
 				[28, 0], [29, 1],
 			],
-			tag_image_center: [14.5, 9],	// for tag image location
 		},
 	}
 	
@@ -235,7 +231,12 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 			var config = Module.configImageGenerate[image_type];
 			generated_image_data_tree[image_type] = {};
 			
-			var center_point = ImageDataExt.arrayToPoint(config.tag_image_center);
+			var center_point_x = 0, center_point_y = 0;
+			for (var i in config.point_list) {
+				center_point_x += config.point_list[i][0] / config.point_list.length;
+				center_point_y += config.point_list[i][1] / config.point_list.length;
+			}
+			var center_point = {x: center_point_x, y: center_point_y};
 			
 			var generated_point_list = [];
 			for (var i in config.point_list) generated_point_list.push(ImageDataExt.arrayToPoint(config.point_list[i]));
@@ -258,20 +259,27 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 				
 				var apply_color = fade(color, target_color, 0.5);
 				generated_image_data.drawPixelLineList(generated_point_list, apply_color, true);
-				generated_image_data.floodFill(ImageDataExt.arrayToPoint(config.tag_image_center), apply_color);
+				generated_image_data.floodFill(center_point, apply_color);
 				
 				var apply_color = fade(color, target_color, 0.3);
 				generated_image_data.drawPixelLineList(generated_point_list_1, apply_color, true);
-				generated_image_data.floodFill(ImageDataExt.arrayToPoint(config.tag_image_center), apply_color);
+				generated_image_data.floodFill(center_point, apply_color);
 				
 				var apply_color = fade(color, target_color, 0.1);
 				generated_image_data.drawPixelLineList(generated_point_list_2, apply_color, true);
-				generated_image_data.floodFill(ImageDataExt.arrayToPoint(config.tag_image_center), apply_color);
+				generated_image_data.floodFill(center_point, apply_color);
 				
 				generated_image_data.scale(this._scale);
 				
-				//important! canvas keep 
+				//important! canvas will mix alpha 
 				generated_image_data.toCanvas();
+				
+				Dr.loadImage(Module.typeTagImage['TAG_IMAGE_FACE_COOL'] , function (image_element) {
+					//generated_image_data.data.getContext('2d').drawImage(image_element, center_point.x - image_element.width * 0.5, center_point.y - image_element.height * 0.5);
+					generated_image_data.data.getContext('2d').drawImage(image_element, 0, 0);
+				});
+				
+				
 				
 				generated_image_data_tree[image_type][variant_type] = generated_image_data;
 			}

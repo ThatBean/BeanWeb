@@ -31,6 +31,7 @@
 				
 				Dr.setPageHeaderFooterPadding();
 				Dr.fitCanvas(document.getElementById('Dr.Canvas'), 1);
+				Dr.fitCanvas(document.getElementById('Dr.TestCanvas'), 1);
 				
 				var div_drag_zone = document.getElementById('DivDragZone');
 				Dr.listenFileDrag(div_drag_zone, function (file_list) {
@@ -41,7 +42,12 @@
 						var titleHTML = '<b>[' + i + ']' + file.name + '</b>';
 						if (file.type.search('image') != -1) {
 							(function (titleHTML) {
-								Dr.parseFile(file, 'url', function (url_text) { div_drag_zone.innerHTML += titleHTML + '<p>' + url_text + '</p><br />'; });
+								Dr.parseFile(file, 'url', function (url_text) { 
+									div_drag_zone.innerHTML += titleHTML + '<img src="' + url_text + '" style="border: 5px solid #e3a;" /><p>' + url_text + '</p><br />'; 
+									Dr.autoProcess(url_text, function (processed_url_text) {
+										div_drag_zone.innerHTML += titleHTML + '<img src="' + processed_url_text + '" style="border: 5px solid #e3a;" /> auto processed <p>' + processed_url_text + '</p><br />'; 
+									});
+								});
 							})(titleHTML); //or the last titleHTML will be used for all
 						}
 						else {
@@ -55,8 +61,8 @@
 						var ImageDataExt = Dr.Get("ImageDataExt");
 						var image_data_ext = new ImageDataExt;
 						image_data_ext.init('local', image_element, ImageDataExt.type.IMAGE_ELEMENT);
-						image_data_ext.replaceColor({r:255,g:255,b:255,a:255}, {r:0,g:0,b:0,a:0});
-						image_data_ext.crop({r:0,g:0,b:0,a:0});
+						image_data_ext.replaceColor(function (r, g, b, a) { if (r == 255 && g == 255 && b == 255) return {r:0,g:0,b:0,a:0}; });
+						image_data_ext.crop(function (r, g, b, a) { if (a == 0) return true; });
 						image_data_ext.toCanvas();
 						callback(image_data_ext.data.toDataURL());
 					})

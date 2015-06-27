@@ -238,6 +238,7 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 	
 	Module.prototype.drawImageDataClip = function (context, x, y, clip_x, clip_y, clip_width, clip_height) {
 		//for CANVAS_IMAGE_DATA
+		//(the dirty rect only mute other color, leaving blank space around, so the origin will be adjusted)
 		//context.putImageData(imgData,x,y,dirtyX,dirtyY,dirtyWidth,dirtyHeight);
 		context.putImageData(this._data, clip_x ? x - clip_x : x, clip_y ? y - clip_y : y, clip_x, clip_y, clip_width, clip_height);
 	}
@@ -509,10 +510,13 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 		}
 	};
 	
-	Module.prototype.crop = function (crop_color) {
+	//Module.prototype.crop = function (crop_color) {
+	Module.prototype.crop = function (crop_func) {
 		this.toCanvasImageData();
 		
 		var data = this._data.data;
+		
+		Dr.log('[crop] size before', this.width, this.height);
 		
 		var x_min = this.width - 1;
 		var x_max = 0;
@@ -522,32 +526,52 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 		for (var y = 0; y < this.height; y++) {
 			for (var x = 0; x < this.width; x++) {
 				var index = (y * this.width + x) * 4;
-				if (
-					data[index] == crop_color.r
-					&& data[index + 1] == crop_color.g
-					&& data[index + 2] == crop_color.b
-					&& data[index + 3] == crop_color.a
-				) {
+				var is_crop = crop_func(
+					data[index], 
+					data[index + 1], 
+					data[index + 2], 
+					data[index + 3]);
+				if (!is_crop) {
+					Dr.log('[crop] check');
 					x_min = Math.min(x_min, x);
 					x_max = Math.max(x_max, x);
 					y_min = Math.min(y_min, y);
 					y_max = Math.max(y_max, y);
-				}   
+				}
+				// if (
+					// data[index] == crop_color.r
+					// && data[index + 1] == crop_color.g
+					// && data[index + 2] == crop_color.b
+					// && data[index + 3] == crop_color.a
+				// ) {
+					// x_min = Math.min(x_min, x);
+					// x_max = Math.max(x_max, x);
+					// y_min = Math.min(y_min, y);
+					// y_max = Math.max(y_max, y);
+				// }   
 			}
 		}
 		
-		var canvas_image_data = this._data;	// keep data src
-		this.toCanvas();
-		this._data.width = x_max - x_min;
-		this._data.height = y_max - y_min;
-		//context.putImageData(imgData,x,y,dirtyX,dirtyY,dirtyWidth,dirtyHeight);
-		this._data.getContext('2d').putImageData(canvas_image_data, 0, 0, x_min, y_min, x_max - x_min, y_max - y_min);
+		Dr.log('[crop] size result', x_min, y_min, x_max - x_min, y_max - y_min);
 		
+		if (x_max == 0 && y_max == 0) return;	//nothing changed
+		
+		var canvas_image_data = this._data;	// keep data source
+		
+		//to canvas and resize
+		this.toCanvas();
+		this._data.width = x_max - x_min + 1;
+		this._data.height = y_max - y_min + 1;
+		//context.putImageData(imgData,x,y,dirtyX,dirtyY,dirtyWidth,dirtyHeight);
+		this._data.getContext('2d').putImageData(canvas_image_data, 0 - x_min, 0 - y_min, x_min, y_min, x_max - x_min + 1, y_max - y_min + 1);
 		//reset size
 		this.init(this._source, this._data, Module.type.CANVAS_ELEMENT);
+		
+		Dr.log('[crop] size after', this.width, this.height);
 	};
 	
-	Module.prototype.replaceColor = function (target_color, replace_color) {
+	//Module.prototype.replaceColor = function (target_color, replace_color) {
+	Module.prototype.replaceColor = function (replacer_func) {
 		this.toCanvasImageData();
 		
 		var data = this._data.data;
@@ -555,17 +579,31 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 		for (var y = 0; y < this.height; y++) {
 			for (var x = 0; x < this.width; x++) {
 				var index = (y * this.width + x) * 4;
-				if (
-					data[index] == target_color.r
-					&& data[index + 1] == target_color.g
-					&& data[index + 2] == target_color.b
-					&& data[index + 3] == target_color.a
-				) {
+				var replace_color = replacer_func(
+					data[index], 
+					data[index + 1], 
+					data[index + 2], 
+					data[index + 3]);
+				
+				if (replace_color) {
+					Dr.log('[replaceColor] check');
 					data[index] = replace_color.r;
 					data[index + 1] = replace_color.g;
 					data[index + 2] = replace_color.b;
 					data[index + 3] = replace_color.a;
-				}   
+				}
+				
+				// if (
+					// data[index] == target_color.r
+					// && data[index + 1] == target_color.g
+					// && data[index + 2] == target_color.b
+					// && data[index + 3] == target_color.a
+				// ) {
+					// data[index] = replace_color.r;
+					// data[index + 1] = replace_color.g;
+					// data[index + 2] = replace_color.b;
+					// data[index + 3] = replace_color.a;
+				// }   
 			}
 		}
 	};
