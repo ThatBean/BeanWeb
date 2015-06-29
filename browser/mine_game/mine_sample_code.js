@@ -225,18 +225,18 @@ function init() {
 	
 	
 	
-	// var CanvasExt = Dr.Get('CanvasExt');
-	// var Mine_Map = Dr.Get("Mine_Map");
-	// var Mine_Grid = Dr.Get('Mine_Grid');
+	var CanvasExt = Dr.Get('CanvasExt');
+	var Mine_Map = Dr.Get("Mine_Map");
+	var Mine_Grid = Dr.Get('Mine_Grid');
 	
-	// var test_canvas = new CanvasExt;
-	// var test_map = new Mine_Map;
-	// var test_grid = new Mine_Grid;
+	var test_canvas = new CanvasExt;
+	var test_map = new Mine_Map;
+	var test_grid = new Mine_Grid;
 	
-			//test_map.init(block_type, row, col, mine_block_count, empty_block_count, lock_block_count)
-	// test_canvas.init(document.getElementById('Dr.Canvas'));
-	// test_map.init('TRI', 20, 30, 5, 10, 10);
-	// test_grid.init(test_canvas, test_map);
+		//test_map.init(block_type, row, col, mine_block_count, empty_block_count, lock_block_count)
+	test_canvas.init(document.getElementById('Dr.Canvas'));
+	test_map.init('TRI', 20, 30, 5, 10, 10);
+	test_grid.init(test_canvas, test_map);
 }
 
 Dr.afterWindowLoaded(init);

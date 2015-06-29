@@ -128,7 +128,7 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 		VARIANT_TYPE_INDICATOR: [255, 255, 0],
 		VARIANT_TYPE_BLOCK_NORMAL: [200, 200, 200],
 		VARIANT_TYPE_BLOCK_PRESSED: [160, 160, 160],
-		VARIANT_TYPE_BLOCK_EMPTY: [120, 0, 0],
+		VARIANT_TYPE_BLOCK_EMPTY: [0, 0, 0],
 	}
 	
 	Module.sourceTagImage = {
@@ -272,7 +272,7 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 				generated_image_data_ext.variant_type = variant_type;
 				generated_image_data_ext.center_point = center_point;
 				
-				var apply_color = fade(color, target_color, 0.5);
+				var apply_color = fade(color, target_color, 0.8);
 				generated_image_data_ext.drawPixelLineList(generated_point_list, apply_color, true);
 				generated_image_data_ext.floodFill(center_point, apply_color);
 				
@@ -280,8 +280,8 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 				generated_image_data_ext.drawPixelLineList(generated_point_list_1, apply_color, true);
 				generated_image_data_ext.floodFill(center_point, apply_color);
 				
-				var apply_color = fade(color, target_color, 0.1);
-				generated_image_data_ext.drawPixelLineList(generated_point_list_2, apply_color, true);
+				var apply_color = color; //fade(color, target_color, 0.1);
+				generated_image_data_ext.drawPixelLineList(generated_point_list_2, color, true);
 				generated_image_data_ext.floodFill(center_point, apply_color);
 				
 				//important! canvas will mix alpha 
