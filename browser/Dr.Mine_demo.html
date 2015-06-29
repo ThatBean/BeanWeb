@@ -31,7 +31,6 @@
 				
 				Dr.setPageHeaderFooterPadding();
 				Dr.fitCanvas(document.getElementById('Dr.Canvas'), 1);
-				Dr.fitCanvas(document.getElementById('Dr.TestCanvas'), 1);
 				
 				var div_drag_zone = document.getElementById('DivDragZone');
 				Dr.listenFileDrag(div_drag_zone, function (file_list) {
@@ -109,10 +108,11 @@
 		
 		<br />
 		
-		<div><canvas id="Dr.TestCanvas" class="pixelated" width="400" height="600"></canvas></div>
 		<p id="FPS">FPS here</p>
-		<p id="Log">Log here</p>
+		
 		<div><canvas id="Dr.Canvas" class="pixelated" width="400" height="600"></canvas></div>
+		
+		<p id="Log">Log here</p>
 		
 		<div id="DivDragZone" class="text-left align-center" style="width: 90%; min-height: 5em; background-color: #ddd; overflow-x: auto;">Drag image file here</div>
 		

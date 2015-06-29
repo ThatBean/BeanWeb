@@ -20,7 +20,7 @@ function init() {
 	tag_log.listMax = 50; 
 	
 	
-	var main_canvas = document.getElementById('Dr.TestCanvas');
+	var main_canvas = document.getElementById('Dr.Canvas');
 	var main_context = main_canvas.getContext('2d');
 	
 	Dr.main_canvas = main_canvas;
@@ -72,27 +72,18 @@ function init() {
 		
 		var rad = 2;
 		if (action.position_listener) {
-			//if (Dr.devicePixelRatio >  1) 
 			action.event.preventDefault();
-			
 			if (is_active) {
-				
 				Dr.UpdateLoop.add(function (delta_time) {
 					if (Dr.image_store) {
 						var image_data_ext = Dr.image_store.getRandomImageData();
-						image_data_ext.draw(
-							Dr.main_context, 
+						image_data_ext.draw(Dr.main_context, 
 							action.position_listener.x - image_data_ext.width * 0.5, 
 							action.position_listener.y - image_data_ext.height * 0.5);
 					}
 					return false;	//once
 				}, 'test_canvas_draw_touch_position')
-				
 			}
-			
-		}
-		else {
-			tag_log.Log([event_key].join(' '));
 		}
 	};
 	
@@ -104,63 +95,31 @@ function init() {
 	Dr.test_canvas = test_canvas;
 	
 	
-	
-	
-	
-	
-	var ImageDataExt = Dr.Get("ImageDataExt");
-	
-	var image_data_canvas = new ImageDataExt;
-	
-	image_data_canvas.init('local', main_canvas, ImageDataExt.type.CANVAS_ELEMENT);
-	
-	Dr.image_data_canvas = image_data_canvas;
-	
-	Dr.image_data_canvas.drawPixelLine({x:50,y:3}, {x:120,y:45}, {r:200,g:30,b:0,a:100});
-	Dr.image_data_canvas.drawPixelLine({x:100,y:3}, {x:15,y:45}, {r:200,g:30,b:0,a:100});
-	Dr.image_data_canvas.drawPixelLine({x:100,y:30}, {x:15,y:45}, {r:200,g:30,b:0,a:100});
-	
-	
-	Dr.image_data_canvas.floodFill({x:65,y:30}, {r:20,g:50,b:100,a:255})
-	Dr.image_data_canvas.floodFill({x:200,y:200}, {r:200,g:50,b:100,a:255})
-	
-	Dr.image_data_canvas.draw(Dr.main_context, 0, 0);
-	
+	var image_type_list = [
+		'IMAGE_TYPE_BOX',
+		'IMAGE_TYPE_HEX',
+		'IMAGE_TYPE_TRI_UP',
+		'IMAGE_TYPE_TRI_DOWN',
+	];
+	var variant_type_list = [
+		'VARIANT_TYPE_INDICATOR',
+		'VARIANT_TYPE_BLOCK_NORMAL',
+		'VARIANT_TYPE_BLOCK_PRESSED',
+		'VARIANT_TYPE_BLOCK_EMPTY',
+	];
+	var tag_image_type_list = [
+		'TAG_IMAGE_NUMBER_12',
+		'TAG_IMAGE_FACE_COOL',
+		'TAG_IMAGE_MARK_FLAG',
+		'TAG_IMAGE_MARK_EMPTY',
+	];
 	
 	Dr.test_draw = function (image_store) {
-		
 		var image_store = image_store || Dr.image_store;
-		Dr.image_store = image_store;
-		
-		var image_type_list = [
-			'IMAGE_TYPE_BOX',
-			'IMAGE_TYPE_HEX',
-			'IMAGE_TYPE_TRI_UP',
-			'IMAGE_TYPE_TRI_DOWN',
-		];
-		var variant_type_list = [
-			'VARIANT_TYPE_INDICATOR',
-			'VARIANT_TYPE_BLOCK_NORMAL',
-			'VARIANT_TYPE_BLOCK_PRESSED',
-			'VARIANT_TYPE_BLOCK_EMPTY',
-		];
-		var tag_image_type_list = [
-			'TAG_IMAGE_NUMBER_12',
-			'TAG_IMAGE_FACE_COOL',
-			'TAG_IMAGE_MARK_FLAG',
-			'TAG_IMAGE_MARK_EMPTY',
-		];
-		
-		var test_canvas = document.getElementById('Dr.TestCanvas');
-		var text_context = test_canvas.getContext('2d');
-			
-		var main_canvas = document.getElementById('Dr.Canvas');
-		var main_context = main_canvas.getContext('2d');
 		
 		for (var loop = 9; loop >= 0; loop --) {
 			var scale = loop % 5 + 1;
 			var is_redraw = loop < 5;
-			var draw_context = is_redraw ? main_context : text_context;
 			
 			var start_time = Dr.now();
 			
@@ -170,7 +129,7 @@ function init() {
 				for (var j in variant_type_list) {
 					for (var k in tag_image_type_list) {
 						var image_data_ext = image_store.getImageData(image_type_list[i], variant_type_list[j], tag_image_type_list[k], scale);
-						image_data_ext.draw(draw_context, x, y);
+						image_data_ext.draw(Dr.main_context, x, y);
 						y += 1.0 * image_data_ext.height;
 					}
 				}
@@ -185,9 +144,8 @@ function init() {
 	
 	var Mine_ImageStore = Dr.Get('Mine_ImageStore');
 	var image_store = new Mine_ImageStore;
+	Dr.image_store = image_store;
 	image_store.init(Dr.test_draw);
-	
-	
 	
 	
 	

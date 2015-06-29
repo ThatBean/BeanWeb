@@ -77,7 +77,7 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 		action.event.preventDefault();
 		
 		Dr.UpdateLoop.add(function (delta_time) { 
-			Dr.log('Get', event_key, action.position_listener.x, action.position_listener.y);
+			Dr.log('Get', event_key, action.position_listener);
 		});
 	}
 	
