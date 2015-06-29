@@ -154,9 +154,9 @@ function init() {
 	Dr.image_data_canvas.draw(Dr.main_context, 0, 0);
 	
 	
-	var Mine_ImageStore = Dr.Get('Mine_ImageStore');
-	var image_store = new Mine_ImageStore;
-	image_store.init(function (image_store) {
+	Dr.test_draw = function (image_store) {
+		
+		var image_store = image_store || Dr.image_store;
 		
 		var image_type_list = [
 			'IMAGE_TYPE_BOX',
@@ -178,79 +178,65 @@ function init() {
 		];
 		
 		
-		var start_time = Dr.now();
-		Dr.log('Start time', start_time);
 		
-		var x = 5;
-		for (var i in image_type_list) {
-			var y = 50;
-			for (var j in variant_type_list) {
-				for (var k in tag_image_type_list) {
-					var image_data_ext = image_store.getImageData(
-						image_type_list[i],
-						variant_type_list[j],
-						tag_image_type_list[k],
-						2
-					);
-					
-					image_data_ext.draw(Dr.main_context, x, y);
-					y += 1.2 * image_data_ext.height;
+		var test_canvas = document.getElementById('Dr.TestCanvas');
+		var text_context = test_canvas.getContext('2d');
+			
+		var main_canvas = document.getElementById('Dr.Canvas');
+		var main_context = main_canvas.getContext('2d');
+		
+		for (var loop = 9; loop >= 0; loop --) {
+			var scale = loop % 5 + 1;
+			var is_redraw = loop < 5;
+			var draw_context = !is_redraw ? main_context : text_context;
+			
+			var start_time = Dr.now();
+			Dr.log('Start time', start_time);
+			
+			var x = 0;
+			for (var i in image_type_list) {
+				var y = 0;
+				for (var j in variant_type_list) {
+					for (var k in tag_image_type_list) {
+						var image_data_ext = image_store.getImageData(image_type_list[i], variant_type_list[j], tag_image_type_list[k], scale);
+						image_data_ext.draw(draw_context, x, y);
+						y += 1.0 * image_data_ext.height;
+					}
 				}
+				x += 75;
 			}
-			x += 75;
+			
+			var end_time = Dr.now();
+			var delta_time = end_time - start_time;
+			Dr.log('End time', end_time);
+			Dr.log('Delta time', delta_time);
+			tag_log.Log('scale:' + scale + ' redraw:' + is_redraw + ' time: ' + delta_time.toFixed(3) + ' fps: ' + (delta_time == 0 ? 'max' : (1 / delta_time).toFixed(2)));
 		}
 		
-		var end_time = Dr.now();
-		Dr.log('End time', end_time);
-		Dr.log('Delta time', end_time - start_time);
-		tag_log.Log('Generate time: ' + (end_time - start_time).toFixed(3));
-		
-		var start_time = Dr.now();
-		Dr.log('Start time', start_time);
-		
-		var x = 50;
-		for (var i in image_type_list) {
-			var y = 50;
-			for (var j in variant_type_list) {
-				for (var k in tag_image_type_list) {
-					var image_data_ext = image_store.getImageData(
-						image_type_list[i],
-						variant_type_list[j],
-						tag_image_type_list[k],
-						1
-					);
-					
-					image_data_ext.draw(Dr.main_context, x, y);
-					y += 1.2 * image_data_ext.height;
-				}
-			}
-			x += 75;
-		}
-		
-		var end_time = Dr.now();
-		Dr.log('End time', end_time);
-		Dr.log('Delta time', end_time - start_time);
-		tag_log.Log('Generate time: ' + (end_time - start_time).toFixed(3));
 		
 		Dr.image_store = image_store;
-	});
+	};
+	
+	var Mine_ImageStore = Dr.Get('Mine_ImageStore');
+	var image_store = new Mine_ImageStore;
+	image_store.init(Dr.test_draw);
 	
 	
 	
 	
 	
-	var CanvasExt = Dr.Get('CanvasExt');
-	var Mine_Map = Dr.Get("Mine_Map");
-	var Mine_Grid = Dr.Get('Mine_Grid');
+	// var CanvasExt = Dr.Get('CanvasExt');
+	// var Mine_Map = Dr.Get("Mine_Map");
+	// var Mine_Grid = Dr.Get('Mine_Grid');
 	
-	var test_canvas = new CanvasExt;
-	var test_map = new Mine_Map;
-	var test_grid = new Mine_Grid;
+	// var test_canvas = new CanvasExt;
+	// var test_map = new Mine_Map;
+	// var test_grid = new Mine_Grid;
 	
-	//test_map.init(block_type, row, col, mine_block_count, empty_block_count, lock_block_count)
-	test_canvas.init(document.getElementById('Dr.Canvas'));
-	test_map.init('TRI', 20, 30, 5, 10, 10);
-	test_grid.init(test_canvas, test_map);
+			//test_map.init(block_type, row, col, mine_block_count, empty_block_count, lock_block_count)
+	// test_canvas.init(document.getElementById('Dr.Canvas'));
+	// test_map.init('TRI', 20, 30, 5, 10, 10);
+	// test_grid.init(test_canvas, test_map);
 }
 
 Dr.afterWindowLoaded(init);
