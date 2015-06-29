@@ -2,7 +2,7 @@
 
 Dr.Declare('Mine_Grid', 'class');
 Dr.Require('Mine_Grid', 'Mine_Type');
-//Dr.Require('Mine_Grid', 'Mine_Map');
+Dr.Require('Mine_Grid', 'Mine_Map');
 Dr.Require('Mine_Grid', 'CanvasExt');
 Dr.Require('Mine_Grid', 'Mine_ImageStore');
 Dr.Implement('Mine_Grid', function (global, module_get) {
@@ -12,14 +12,18 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 	}
 	
 	var Mine_Type = Dr.Get('Mine_Type');
-	//var Mine_Map = Dr.Get('Mine_Map');
+	var Mine_Map = Dr.Get('Mine_Map');
 	var CanvasExt = Dr.Get('CanvasExt');
 	var Mine_ImageStore = Dr.Get('Mine_ImageStore');
 	
 	Module.type = Mine_Type.type;
 	
 	
-	Module.prototype.init = function (canvas_ext, map, scale) {
+	Module.prototype.init = function (canvas_element, map, scale) {
+		var CanvasExt = Dr.Get('CanvasExt');
+		var canvas_ext = new CanvasExt;
+		canvas_ext.init(canvas_element);
+		
 		this._canvas_ext = canvas_ext;
 		this._map = map;
 		this._scale = scale || 1;
@@ -70,7 +74,6 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 	}
 	
 	Module.prototype.onAction = function (event_key, action) {
-		
 		action.event.preventDefault();
 		
 		Dr.UpdateLoop.add(function (delta_time) { 
@@ -243,6 +246,7 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 			var config = Module.configImageGenerate[image_type];
 			generated[image_type] = {};
 			
+			//calc center point
 			var center_point_x = 0, center_point_y = 0;
 			for (var i in config.point_list) {
 				center_point_x += config.point_list[i][0] / config.point_list.length;
@@ -250,19 +254,20 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 			}
 			var center_point = {x: center_point_x, y: center_point_y};
 			
-			var generated_point_list = [];
-			for (var i in config.point_list) generated_point_list.push(ImageDataExt.arrayToPoint(config.point_list[i]));
+			//process data
+			var draw_process_data = [];
+			var process_count = 5;
 			
-			var generated_point_list_1 = [];
-			for (var i in config.point_list) generated_point_list_1.push(approach(ImageDataExt.arrayToPoint(config.point_list[i]), center_point, 1));
-			
-			var generated_point_list_2 = [];
-			for (var i in config.point_list) generated_point_list_2.push(approach(ImageDataExt.arrayToPoint(config.point_list[i]), center_point, 2));
+			for (var i = 0; i < process_count; i ++) {
+				var point_list = [];
+				for (var index in config.point_list) point_list.push(approach(ImageDataExt.arrayToPoint(config.point_list[index]), center_point, i));
+				draw_process_data.push(point_list);
+			}
 			
 			for (var variant_type in Module.typeImageVariant) {
 				var background = Module.typeBackground[variant_type];
 				var color = ImageDataExt.arrayToColor(Module.typeColor[variant_type]);
-				var target_color = {r: 50, g: 50, b: 50, a: 255};
+				var background_color = {r: 50, g: 50, b: 50, a: 255};
 				
 				Dr.log('[generateImageData]', background, color);
 				var generated_image_data_ext = ImageDataExt.create(ImageDataExt.type.CANVAS_ELEMENT, config.size[0], config.size[1]);
@@ -272,17 +277,13 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 				generated_image_data_ext.variant_type = variant_type;
 				generated_image_data_ext.center_point = center_point;
 				
-				var apply_color = fade(color, target_color, 0.8);
-				generated_image_data_ext.drawPixelLineList(generated_point_list, apply_color, true);
-				generated_image_data_ext.floodFill(center_point, apply_color);
-				
-				var apply_color = fade(color, target_color, 0.3);
-				generated_image_data_ext.drawPixelLineList(generated_point_list_1, apply_color, true);
-				generated_image_data_ext.floodFill(center_point, apply_color);
-				
-				var apply_color = color; //fade(color, target_color, 0.1);
-				generated_image_data_ext.drawPixelLineList(generated_point_list_2, color, true);
-				generated_image_data_ext.floodFill(center_point, apply_color);
+				for (var index in draw_process_data) {
+					var apply_color = fade(color, background_color, (process_count - index - 1) / process_count);
+					var point_list = draw_process_data[index];
+					
+					generated_image_data_ext.drawPixelLineList(point_list, apply_color, true);
+					generated_image_data_ext.floodFill(center_point, apply_color);
+				}
 				
 				//important! canvas will mix alpha 
 				generated_image_data_ext.toCanvas();
@@ -337,6 +338,17 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 		return this.cached[cache_key];
 		
 		image_store.generated.IMAGE_TYPE_BOX.VARIANT_TYPE_INDICATOR.draw(Dr.main_context, 50, 200);
+	}
+	
+	
+	Module.prototype.getRandomImageData = function () {
+		var getRandomKey = function (map) {
+			var key_count = 0;
+			var key_list = [];
+			for (var key in map) { key_count++; key_list.push(key); }
+			return key_list[Dr.getRandomInt(0, key_count - 1)];
+		}
+		return this.getImageData(getRandomKey(Module.typeImage), getRandomKey(Module.typeImageVariant), getRandomKey(Module.sourceTagImage), Dr.getRandomInt(1, 5));
 	}
 	
 	return Module;
