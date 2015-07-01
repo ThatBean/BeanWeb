@@ -1,91 +1,3 @@
-//the map for drawing
-
-Dr.Declare('Mine_Grid', 'class');
-Dr.Require('Mine_Grid', 'Mine_Type');
-Dr.Require('Mine_Grid', 'Mine_Map');
-Dr.Require('Mine_Grid', 'CanvasExt');
-Dr.Require('Mine_Grid', 'Mine_ImageStore');
-Dr.Implement('Mine_Grid', function (global, module_get) {
-	
-	var Module = function () {
-		//
-	}
-	
-	var Mine_Type = Dr.Get('Mine_Type');
-	var Mine_Map = Dr.Get('Mine_Map');
-	var CanvasExt = Dr.Get('CanvasExt');
-	var Mine_ImageStore = Dr.Get('Mine_ImageStore');
-	
-	Module.type = Mine_Type.type;
-	
-	
-	Module.prototype.init = function (canvas_element, map, scale) {
-		var CanvasExt = Dr.Get('CanvasExt');
-		var canvas_ext = new CanvasExt;
-		canvas_ext.init(canvas_element);
-		
-		this._canvas_ext = canvas_ext;
-		this._map = map;
-		this._scale = scale || 1;
-		
-		this._block_type = map.block_type;
-		this._map_row_count = map.row_count;
-		this._map_col_count = map.col_count;
-		
-		this._visible_width = canvas_ext.width;
-		this._visible_height = canvas_ext.height;
-		
-		// top left == (0 ,0), for scroll
-		this._visible_offset_top = 0;
-		this._visible_offset_left = 0;
-		
-		var _this = this;
-		var on_event_callback =  function (event_key, action) { _this.onAction(event_key, action); };
-		this._canvas_ext.getEventCenter().addEventListener('action_move', on_event_callback);
-		this._canvas_ext.getEventCenter().addEventListener('action_start', on_event_callback);
-		this._canvas_ext.getEventCenter().addEventListener('action_end', on_event_callback);
-		this._canvas_ext.getEventCenter().addEventListener('action_cancel', on_event_callback);
-		
-		this.initImageData();
-	}
-	
-	Module.prototype.initImageData = function () {
-		// TODO
-		// TODO
-		this._image_store = new Mine_ImageStore;
-		this._image_store.init();
-		
-		this._block_width = 10;//image_store.width;
-		this._block_height = 10;//image_store.height;
-		
-		//calculated value
-		this._total_width = (this._block_width / Mine_Type.fragSizeBlock[this._block_type][0] * Mine_Type.fragSizeCondensedBlock[this._block_type][0]) 
-				* (this._map_row_count * Mine_Type.sizeAdjustment[this._block_type].row[0] + Mine_Type.sizeAdjustment[this._block_type].row[1]);
-		this._total_height = (this._block_height / Mine_Type.fragSizeBlock[this._block_type][1] * Mine_Type.fragSizeCondensedBlock[this._block_type][1]) 
-				* (this._map_col_count * Mine_Type.sizeAdjustment[this._block_type].col[0] + Mine_Type.sizeAdjustment[this._block_type].col[1]);
-		
-		// TODO
-		// TODO
-		// TODO
-	}
-	
-	Module.prototype.drawBlock = function (block) {
-		
-	}
-	
-	Module.prototype.onAction = function (event_key, action) {
-		action.event.preventDefault();
-		
-		Dr.UpdateLoop.add(function (delta_time) { 
-			Dr.log('Get', event_key, action.position_listener);
-		});
-	}
-	
-	return Module;
-});
-
-
-
 //image generator
 
 Dr.Declare('Mine_ImageStore', 'class');
@@ -349,6 +261,23 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 			return key_list[Dr.getRandomInt(0, key_count - 1)];
 		}
 		return this.getImageData(getRandomKey(Module.typeImage), getRandomKey(Module.typeImageVariant), getRandomKey(Module.sourceTagImage), Dr.getRandomInt(1, 5));
+	}
+	
+	Module.prototype.getBlockImageSizeByType = function (block_type) {
+		switch (block_type) {
+			case Module.type.BOX:
+				return ImageDataExt.arrayToSize(Module.configImageGenerate.IMAGE_TYPE_BOX.size);
+				break;
+			case Module.type.HEX:
+				return ImageDataExt.arrayToSize(Module.configImageGenerate.IMAGE_TYPE_HEX.size);
+				break;
+			case Module.type.TRI:
+				return ImageDataExt.arrayToSize(Module.configImageGenerate.IMAGE_TYPE_TRI_UP.size);
+				break;
+			default:
+				Dr.assert(false, '[getBlockImageSizeByType] error type', block_type);
+				break;
+		}
 	}
 	
 	return Module;

@@ -1,3 +1,5 @@
+//basic type and function definition
+
 /*
 	[BOX] (Block W x H: 1 x 1)
 	
@@ -43,19 +45,19 @@ Dr.Implement('Mine_Type', function (global, module_get) {
 		LockBlock: 'L',
 	}
 	
-	Module.fragSizeBlock = {
+	Module.fragSizeBlock = {	//how many frag for one block
 		BOX: [1, 1],
 		HEX: [4, 2],
 		TRI: [2, 1],
 	}
 	
-	Module.fragSizeCondensedBlock = {
+	Module.fragSizeCondensedBlock = {	//how many frag for one condensed block
 		BOX: [1, 1],
 		HEX: [3, 2],
 		TRI: [1, 1],
 	}
 	
-	Module.sizeAdjustment = {
+	Module.sizeAdjustment = {	//for calculate condensed block size to map size
 		BOX: {
 			row: [1, 0],	//scale, add
 			col: [1, 0],
@@ -68,6 +70,19 @@ Dr.Implement('Mine_Type', function (global, module_get) {
 			row: [1, 1 / 2],	//scale, add
 			col: [0.5, 0],
 		},
+	}
+	
+	Module.getTotalSize = function (block_size, block_type, map_row_count, map_col_count) {
+		var condensed_block_width = block_size.width / Module.fragSizeBlock[block_type][0] * Module.fragSizeCondensedBlock[block_type][0];
+		var condensed_block_row_count = map_row_count * Module.sizeAdjustment[block_type].row[0] + Module.sizeAdjustment[block_type].row[1];
+		
+		var condensed_block_height = block_size.height / Module.fragSizeBlock[block_type][1] * Module.fragSizeCondensedBlock[block_type][1];
+		var condensed_block_col_count = map_col_count * Module.sizeAdjustment[block_type].col[0] + Module.sizeAdjustment[block_type].col[1];
+		
+		return {
+			width: condensed_block_width * condensed_block_row_count,
+			height: condensed_block_height * condensed_block_col_count,
+		};
 	}
 	
 	// ( [/] )

@@ -1,3 +1,5 @@
+//block data & logic
+
 Dr.Declare('Mine_Block', 'class');
 Dr.Require('Mine_Block', 'Mine_Type');
 Dr.Implement('Mine_Block', function (global, module_get) {

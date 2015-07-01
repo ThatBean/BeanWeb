@@ -1,3 +1,5 @@
+//map data and logic, receive user operation and send to block
+
 Dr.Declare('Mine_Map', 'class');
 Dr.Require('Mine_Map', 'Mine_Type');
 Dr.Require('Mine_Map', 'Mine_Block');
@@ -110,7 +112,7 @@ Dr.Implement('Mine_Map', function (global, module_get) {
 			}
 		}
 		
-		apply_data(this._map_mine_data, this._col_count, mine_block_id_list, 1);
+		apply_data(this._map_mine_data, this._col_count, mine_block_id_list, Dr.getRandomInt(1, 9));	//currently set mine count to 1, could any though
 		apply_data(this._map_visual_data, this._col_count, empty_block_id_list, Module.type.EmptyBlock);
 		apply_data(this._map_visual_data, this._col_count, lock_block_id_list, Module.type.LockBlock);
 	}
