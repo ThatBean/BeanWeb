@@ -39,7 +39,7 @@ function init() {
 	test_map = new Mine_Map;
 	
 	//test_map.init(block_type, row, col, mine_block_count, empty_block_count, lock_block_count)
-	test_map.init('TRI', 20, 30, 10, 10, 10);
+	test_map.init('HEX', 20, 30, 10, 10, 10);
 	
 	
 	Dr.test_map = test_map;
@@ -103,9 +103,9 @@ function init() {
 	];
 	var variant_type_list = [
 		'VARIANT_TYPE_INDICATOR',
-		'VARIANT_TYPE_BLOCK_NORMAL',
-		'VARIANT_TYPE_BLOCK_PRESSED',
-		'VARIANT_TYPE_BLOCK_EMPTY',
+		'VARIANT_TYPE_NORMAL',
+		'VARIANT_TYPE_PRESSED',
+		'VARIANT_TYPE_FLIPPED',
 	];
 	var tag_image_type_list = [
 		'TAG_IMAGE_NUMBER_12',
@@ -156,8 +156,8 @@ function init() {
 	var test_grid = new Mine_Grid;
 	
 	//test_map.init(block_type, row, col, mine_block_count, empty_block_count, lock_block_count)
-	test_map.init('TRI', 20, 30, 5, 10, 10);
-	test_grid.init(document.getElementById('Dr.Canvas'), test_map);
+	test_map.init('TRI', 10, 30, 5, 10, 10);
+	test_grid.init(document.getElementById('Dr.Canvas'), test_map, 1);
 }
 
 Dr.afterWindowLoaded(init);

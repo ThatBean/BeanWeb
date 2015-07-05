@@ -25,48 +25,40 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 	Module.typeImageVariant = {
 		//image sub type
 		VARIANT_TYPE_INDICATOR: 'VARIANT_TYPE_INDICATOR',
-		VARIANT_TYPE_BLOCK_NORMAL: 'VARIANT_TYPE_BLOCK_NORMAL',
-		VARIANT_TYPE_BLOCK_PRESSED: 'VARIANT_TYPE_BLOCK_PRESSED',
-		VARIANT_TYPE_BLOCK_EMPTY: 'VARIANT_TYPE_BLOCK_EMPTY',
-	}
-	
-	Module.typeBackground = {
-		//background type
-		VARIANT_TYPE_INDICATOR: 'BACKGROUND_TYPE_INDICATOR',
-		VARIANT_TYPE_BLOCK_NORMAL: 'BACKGROUND_TYPE_BLOCK_NORMAL',
-		VARIANT_TYPE_BLOCK_PRESSED: 'BACKGROUND_TYPE_BLOCK_PRESSED',
-		VARIANT_TYPE_BLOCK_EMPTY: 'BACKGROUND_TYPE_BLOCK_EMPTY',
+		VARIANT_TYPE_NORMAL: 'VARIANT_TYPE_NORMAL',
+		VARIANT_TYPE_PRESSED: 'VARIANT_TYPE_PRESSED',
+		VARIANT_TYPE_FLIPPED: 'VARIANT_TYPE_FLIPPED',
 	}
 	
 	Module.typeColor = {
 		//color
 		VARIANT_TYPE_INDICATOR: [255, 255, 0],
-		VARIANT_TYPE_BLOCK_NORMAL: [200, 200, 200],
-		VARIANT_TYPE_BLOCK_PRESSED: [160, 160, 160],
-		VARIANT_TYPE_BLOCK_EMPTY: [0, 0, 0],
+		VARIANT_TYPE_NORMAL: [200, 200, 200],
+		VARIANT_TYPE_PRESSED: [160, 160, 160],
+		VARIANT_TYPE_FLIPPED: [0, 0, 0],
 	}
 	
 	Module.sourceTagImage = {
 		//image(tag image)
-		TAG_IMAGE_NUMBER_1: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAMCAYAAABfnvydAAAAP0lEQVQYV2NkQALfGRj+g7icDAyMMGE4A1khMpsRWRdWEwgqwGU0VjcQdCRBBdisQ/EmQRMIKsBqBa5wgIkDAK7cGAOaCe0dAAAAAElFTkSuQmCC',
-		TAG_IMAGE_NUMBER_2: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAMCAYAAABfnvydAAAAQElEQVQYV2P8zsDwn4GBgYGTgYERmQ0SAwFGGAMXjVMBzDTyFcDdgMuRcCsIKiDoC2x+R9aENXBQFJBkBTYHAwABKx3bUtOfLAAAAABJRU5ErkJggg==',
-		TAG_IMAGE_NUMBER_3: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAMCAYAAABfnvydAAAAOElEQVQYV2P8zsDwn4GBgYGTgYERG5sRJIkP4FQAM418BTBrUUwg6EiCCrD5hnxHEvQm3BeEghoAH9UbveyX9S4AAAAASUVORK5CYII=',
-		TAG_IMAGE_NUMBER_4: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAMCAYAAABfnvydAAAAQ0lEQVQYV2P8zsDwn4GBgYGTgYERRMMATBxFEFkBjM1I0ASCCrAZiyyGYgWyaXBHYhME+Yh4X+ByA0ETCCqABxQhKwDuwR29bm8/SAAAAABJRU5ErkJggg==',
-		TAG_IMAGE_NUMBER_5: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAMCAYAAABfnvydAAAAPElEQVQYV2P8zsDwn4GBgYGTgYERG5sRJIkPoOjCppCwApKswOpIyn2Byw0wk3GGA0EFMJOxBi8o2GEKANiTHduKm9JEAAAAAElFTkSuQmCC',
-		TAG_IMAGE_NUMBER_6: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAMCAYAAABfnvydAAAAOUlEQVQYV2NkQALfGRj+g7icDAyMMDYjsgJsbLhKkC7yFJBkBVZHYhOkji/g4YBsBbZAIy2gsDkYAJXnIdHZvL6kAAAAAElFTkSuQmCC',
-		TAG_IMAGE_NUMBER_7: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAMCAYAAABfnvydAAAAMUlEQVQYV2P8zsDwn4GBgYGTgYERG5sRJIkP4FQAM418BTBrUUxAdiR5CrD5ZjBYAQAreRPvI30nqQAAAABJRU5ErkJggg==',
-		TAG_IMAGE_NUMBER_8: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAMCAYAAABfnvydAAAALElEQVQYV2P8zsDwn4GBgYGTgYERG5sRJIkPoOhCVggzjbACkqzA6shh4QsADosnvdsrZicAAAAASUVORK5CYII=',
-		TAG_IMAGE_NUMBER_9: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAMCAYAAABfnvydAAAAOklEQVQYV2P8zsDwn4GBgYGTgYERG5sRJIkPoOhCVggzjbACkqzA6kjKfYHLDXBfkK0AphFr8CIHOwBLDSO9aYo84QAAAABJRU5ErkJggg==',
-		TAG_IMAGE_NUMBER_10: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAASklEQVQoU2NkgILvDAz/QUxOBgZGdDEYHyQHl4QJEqIZQSaDdKLbgItPugZCTkCXx/AgzNM4nYQrlAhqINZpg9FJ2CIOXQw5aQAA+1kz0c6VyYIAAAAASUVORK5CYII=',
-		TAG_IMAGE_NUMBER_11: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAARUlEQVQoU2NkgILvDAz/QUxOBgZGmBiIRhdHkURWiIvNCDIBZCq6SbjESddAjDOQ1cD9QLKnSdZArNMGo5OwRRByAKCzAbz6LgOYcNLJAAAAAElFTkSuQmCC',
-		TAG_IMAGE_NUMBER_12: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAT0lEQVQoU2NkgILvDAz/QUxOBgZGEA3ig9jo4mBJUgDYBGwmYTMEpJZ0DaQ4B6QW7gdiPA12EimhhKKBWKcRtAHdIPI1EO0kbBGHHGLobADO8DPb86qTRgAAAABJRU5ErkJggg==',
-		TAG_IMAGE_MARK_EMPTY: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAT0lEQVQoU2OcycDwn4GBgSGdgYERROMCMHWMMAY+TchqwKbi04QuB3cGNk3YxFDcjawA2S/I/sPwKLom9MCgTANJTiLJ0yQFK8kRR2rSAACV6iZtj6T9ZgAAAABJRU5ErkJggg==',
-		TAG_IMAGE_MARK_LOCK: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAOCAYAAAAbvf3sAAAAV0lEQVQoU2NkQAX/0fgwLiMGg4GB4f+rV6+wqhcTEwOJgzXBdIIVQyUwNCHJMWLTALceqhPZMDppwBUyWAMA5N7/6enpOEITVXjmzJngUBqZGogKIqgiAMTwPgfUTtJqAAAAAElFTkSuQmCC',
-		TAG_IMAGE_MARK_FLAG: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAOCAYAAAD5YeaVAAAAVklEQVQoU8WSQRIAEAwD408e2Af6E9MDgpQjpwy7DmkT5qmUE+UR+bLCCmC5Px7CCTsaCBoOhBgWwh3ehDdMwgqrvoI+e8+yY3fUzx9h3ovruBUo96gBKbkaDbc3xaQAAAAASUVORK5CYII=',
-		TAG_IMAGE_FACE_COOL: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAALCAYAAABPhbxiAAAASUlEQVQoU2NkYGD4z0AGYMSjESQHAlgNHhiN2JwDcybM9+jOZURXQHQwUawR5BRiDQGrRVZMjGa4GmyBgMtmFIOxKcKVklDUAgBnsxAITW12JwAAAABJRU5ErkJggg==',
-		TAG_IMAGE_FACE_SMILE: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAKCAYAAACALL/6AAAAPklEQVQYV2NkgID/UBpEMSKxMeRgkrTXgOYK3Fx09xLUSJYGkIeJ1fgfOZQIaQIbjKwIn01wOXyRhBwAcHUA1R0NCka+3DoAAAAASUVORK5CYII=',
-		TAG_IMAGE_FACE_OOPS: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQ0lEQVQYV2NkgID/DAwMjFA2OgWWA0mCGDCArhguB5MgykQcNqIKY3MXzDoUOWxuwuocZIXY3AkXI0shenii2EC0ZwD2gBAKYHntKQAAAABJRU5ErkJggg==',
-		TAG_IMAGE_FACE_DIE: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAALCAYAAABLcGxfAAAASElEQVQoU2NkYGD4z8DAwMiAAMh8DDmYQpgEugKQMShyuExGshDMhBtElg1k+QHdCTj5yH4gShPFGkD+wQbgBlMcrPj8AQ5NAHwFFwpuPDIVAAAAAElFTkSuQmCC',
+		TAG_IMAGE_NUMBER_1: 	'gAAAAMCAYAAABfnvydAAAAP0lEQVQYV2NkQALfGRj+g7icDAyMMGE4A1khMpsRWRdWEwgqwGU0VjcQdCRBBdisQ/EmQRMIKsBqBa5wgIkDAK7cGAOaCe0dAAAAAElFTkSuQmCC',
+		TAG_IMAGE_NUMBER_2: 	'gAAAAMCAYAAABfnvydAAAAQElEQVQYV2P8zsDwn4GBgYGTgYERmQ0SAwFGGAMXjVMBzDTyFcDdgMuRcCsIKiDoC2x+R9aENXBQFJBkBTYHAwABKx3bUtOfLAAAAABJRU5ErkJggg==',
+		TAG_IMAGE_NUMBER_3: 	'gAAAAMCAYAAABfnvydAAAAOElEQVQYV2P8zsDwn4GBgYGTgYERG5sRJIkP4FQAM418BTBrUUwg6EiCCrD5hnxHEvQm3BeEghoAH9UbveyX9S4AAAAASUVORK5CYII=',
+		TAG_IMAGE_NUMBER_4: 	'gAAAAMCAYAAABfnvydAAAAQ0lEQVQYV2P8zsDwn4GBgYGTgYERRMMATBxFEFkBjM1I0ASCCrAZiyyGYgWyaXBHYhME+Yh4X+ByA0ETCCqABxQhKwDuwR29bm8/SAAAAABJRU5ErkJggg==',
+		TAG_IMAGE_NUMBER_5: 	'gAAAAMCAYAAABfnvydAAAAPElEQVQYV2P8zsDwn4GBgYGTgYERG5sRJIkPoOjCppCwApKswOpIyn2Byw0wk3GGA0EFMJOxBi8o2GEKANiTHduKm9JEAAAAAElFTkSuQmCC',
+		TAG_IMAGE_NUMBER_6: 	'gAAAAMCAYAAABfnvydAAAAOUlEQVQYV2NkQALfGRj+g7icDAyMMDYjsgJsbLhKkC7yFJBkBVZHYhOkji/g4YBsBbZAIy2gsDkYAJXnIdHZvL6kAAAAAElFTkSuQmCC',
+		TAG_IMAGE_NUMBER_7: 	'gAAAAMCAYAAABfnvydAAAAMUlEQVQYV2P8zsDwn4GBgYGTgYERG5sRJIkP4FQAM418BTBrUUxAdiR5CrD5ZjBYAQAreRPvI30nqQAAAABJRU5ErkJggg==',
+		TAG_IMAGE_NUMBER_8: 	'gAAAAMCAYAAABfnvydAAAALElEQVQYV2P8zsDwn4GBgYGTgYERG5sRJIkPoOhCVggzjbACkqzA6shh4QsADosnvdsrZicAAAAASUVORK5CYII=',
+		TAG_IMAGE_NUMBER_9: 	'gAAAAMCAYAAABfnvydAAAAOklEQVQYV2P8zsDwn4GBgYGTgYERG5sRJIkPoOhCVggzjbACkqzA6kjKfYHLDXBfkK0AphFr8CIHOwBLDSO9aYo84QAAAABJRU5ErkJggg==',
+		TAG_IMAGE_NUMBER_10: 	'wAAAAMCAYAAABWdVznAAAASklEQVQoU2NkgILvDAz/QUxOBgZGdDEYHyQHl4QJEqIZQSaDdKLbgItPugZCTkCXx/AgzNM4nYQrlAhqINZpg9FJ2CIOXQw5aQAA+1kz0c6VyYIAAAAASUVORK5CYII=',
+		TAG_IMAGE_NUMBER_11: 	'wAAAAMCAYAAABWdVznAAAARUlEQVQoU2NkgILvDAz/QUxOBgZGmBiIRhdHkURWiIvNCDIBZCq6SbjESddAjDOQ1cD9QLKnSdZArNMGo5OwRRByAKCzAbz6LgOYcNLJAAAAAElFTkSuQmCC',
+		TAG_IMAGE_NUMBER_12: 	'wAAAAMCAYAAABWdVznAAAAT0lEQVQoU2NkgILvDAz/QUxOBgZGEA3ig9jo4mBJUgDYBGwmYTMEpJZ0DaQ4B6QW7gdiPA12EimhhKKBWKcRtAHdIPI1EO0kbBGHHGLobADO8DPb86qTRgAAAABJRU5ErkJggg==',
+		TAG_IMAGE_MARK_EMPTY: 	'wAAAAMCAYAAABWdVznAAAAT0lEQVQoU2OcycDwn4GBgSGdgYERROMCMHWMMAY+TchqwKbi04QuB3cGNk3YxFDcjawA2S/I/sPwKLom9MCgTANJTiLJ0yQFK8kRR2rSAACV6iZtj6T9ZgAAAABJRU5ErkJggg==',
+		TAG_IMAGE_MARK_LOCK: 	'wAAAAOCAYAAAAbvf3sAAAAV0lEQVQoU2NkQAX/0fgwLiMGg4GB4f+rV6+wqhcTEwOJgzXBdIIVQyUwNCHJMWLTALceqhPZMDppwBUyWAMA5N7/6enpOEITVXjmzJngUBqZGogKIqgiAMTwPgfUTtJqAAAAAElFTkSuQmCC',
+		TAG_IMAGE_MARK_FLAG: 	'sAAAAOCAYAAAD5YeaVAAAAVklEQVQoU8WSQRIAEAwD408e2Af6E9MDgpQjpwy7DmkT5qmUE+UR+bLCCmC5Px7CCTsaCBoOhBgWwh3ehDdMwgqrvoI+e8+yY3fUzx9h3ovruBUo96gBKbkaDbc3xaQAAAAASUVORK5CYII=',
+		TAG_IMAGE_FACE_COOL: 	'4AAAALCAYAAABPhbxiAAAASUlEQVQoU2NkYGD4z0AGYMSjESQHAlgNHhiN2JwDcybM9+jOZURXQHQwUawR5BRiDQGrRVZMjGa4GmyBgMtmFIOxKcKVklDUAgBnsxAITW12JwAAAABJRU5ErkJggg==',
+		TAG_IMAGE_FACE_SMILE: 	'wAAAAKCAYAAACALL/6AAAAPklEQVQYV2NkgID/UBpEMSKxMeRgkrTXgOYK3Fx09xLUSJYGkIeJ1fgfOZQIaQIbjKwIn01wOXyRhBwAcHUA1R0NCka+3DoAAAAASUVORK5CYII=',
+		TAG_IMAGE_FACE_OOPS: 	'oAAAAKCAYAAACNMs+9AAAAQ0lEQVQYV2NkgID/DAwMjFA2OgWWA0mCGDCArhguB5MgykQcNqIKY3MXzDoUOWxuwuocZIXY3AkXI0shenii2EC0ZwD2gBAKYHntKQAAAABJRU5ErkJggg==',
+		TAG_IMAGE_FACE_DIE: 	'wAAAALCAYAAABLcGxfAAAASElEQVQoU2NkYGD4z8DAwMiAAMh8DDmYQpgEugKQMShyuExGshDMhBtElg1k+QHdCTj5yH4gShPFGkD+wQbgBlMcrPj8AQ5NAHwFFwpuPDIVAAAAAElFTkSuQmCC',
 	}
 	
 	
@@ -177,11 +169,10 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 			}
 			
 			for (var variant_type in Module.typeImageVariant) {
-				var background = Module.typeBackground[variant_type];
 				var color = ImageDataExt.arrayToColor(Module.typeColor[variant_type]);
 				var background_color = {r: 50, g: 50, b: 50, a: 255};
 				
-				Dr.log('[generateImageData]', background, color);
+				Dr.log('[generateImageData]', variant_type, color);
 				var generated_image_data_ext = ImageDataExt.create(ImageDataExt.type.CANVAS_ELEMENT, config.size[0], config.size[1]);
 				
 				//record
@@ -206,7 +197,7 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 		
 		//tag image
 		for (var image_type in Module.sourceTagImage) {
-			var image_source = Module.sourceTagImage[image_type];
+			var image_source = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA' + Module.sourceTagImage[image_type];
 			
 			(function (_this) {
 				var _image_source = image_source;
@@ -230,17 +221,19 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 		var scale_ratio = scale_ratio || 1;
 		var cache_key = image_type + '|' + variant_type + '|' + tag_image_type + '|' + scale_ratio;
 		if (!this.cached[cache_key]) {
-			var base_image_data_ext = this.generated[image_type][variant_type];
-			var tag_image_data_ext = this.generated[tag_image_type];
-			
 			Dr.debug(5, 'cache add', image_type, variant_type, tag_image_type);
 			
+			var base_image_data_ext = this.generated[image_type][variant_type];
 			var cache_image = ImageDataExt.copy(base_image_data_ext);
 			cache_image.toCanvas();
 			
-			tag_image_data_ext.draw(cache_image.data.getContext('2d'), 
-				base_image_data_ext.center_point.x - tag_image_data_ext.width * 0.5, 
-				base_image_data_ext.center_point.y - tag_image_data_ext.height * 0.5);
+			if (tag_image_type && this.generated[tag_image_type]) {
+				var tag_image_data_ext = this.generated[tag_image_type];
+				tag_image_data_ext.draw(
+					cache_image.data.getContext('2d'), 
+					base_image_data_ext.center_point.x - tag_image_data_ext.width * 0.5, 
+					base_image_data_ext.center_point.y - tag_image_data_ext.height * 0.5);
+			}
 			
 			cache_image.scale(scale_ratio);
 			
@@ -248,8 +241,6 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 		}
 		
 		return this.cached[cache_key];
-		
-		image_store.generated.IMAGE_TYPE_BOX.VARIANT_TYPE_INDICATOR.draw(Dr.main_context, 50, 200);
 	}
 	
 	
@@ -260,7 +251,11 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 			for (var key in map) { key_count++; key_list.push(key); }
 			return key_list[Dr.getRandomInt(0, key_count - 1)];
 		}
-		return this.getImageData(getRandomKey(Module.typeImage), getRandomKey(Module.typeImageVariant), getRandomKey(Module.sourceTagImage), Dr.getRandomInt(1, 5));
+		return this.getImageData(
+			getRandomKey(Module.typeImage), 
+			getRandomKey(Module.typeImageVariant), 
+			getRandomKey(Module.sourceTagImage), 
+			Dr.getRandomInt(1, 5));
 	}
 	
 	Module.prototype.getBlockImageSizeByType = function (block_type) {

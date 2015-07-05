@@ -22,11 +22,14 @@ Dr.Implement('Mine_Block', function (global, module_get) {
 	
 	Module.prototype.initSurround = function () {
 		this.initSurroundList();
-		this._surround_mine_count = this.calcSurroundMineCount();
+		this._surround_mine_count = this._mine_count > 0 ? 'X' : this.calcSurroundMineCount();
 	}
 	
+	Module.prototype.getRow = function () { return this._row; }
+	Module.prototype.getCol = function () { return this._col; }
 	Module.prototype.getMineCount = function () { return this._mine_count; }
 	Module.prototype.getSurroundMineCount = function () { return this._surround_mine_count; }
+	Module.prototype.getSpecialType = function () { return this._special_type; }
 	
 	Module.prototype.initSurroundList = function () {
 		// the block around this one

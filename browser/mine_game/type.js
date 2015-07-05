@@ -40,7 +40,8 @@ Dr.Implement('Mine_Type', function (global, module_get) {
 		HEX: 'HEX',
 		TRI: 'TRI',
 		
-		NormalBlock: ' ',
+		FlippedBlock: ' ',
+		NormalBlock: '?',
 		EmptyBlock: 'E',
 		LockBlock: 'L',
 	}
@@ -72,6 +73,13 @@ Dr.Implement('Mine_Type', function (global, module_get) {
 		},
 	}
 	
+	Module.getFragSize = function (block_size, block_type) {
+		return {
+			width: block_size.width / Module.fragSizeBlock[block_type][0],
+			height: block_size.height / Module.fragSizeBlock[block_type][1],
+		};
+	}
+	
 	Module.getTotalSize = function (block_size, block_type, map_row_count, map_col_count) {
 		var condensed_block_width = block_size.width / Module.fragSizeBlock[block_type][0] * Module.fragSizeCondensedBlock[block_type][0];
 		var condensed_block_row_count = map_row_count * Module.sizeAdjustment[block_type].row[0] + Module.sizeAdjustment[block_type].row[1];
@@ -83,6 +91,32 @@ Dr.Implement('Mine_Type', function (global, module_get) {
 			width: condensed_block_width * condensed_block_row_count,
 			height: condensed_block_height * condensed_block_col_count,
 		};
+	}
+	
+	Module.getFragPosition = function (block_type, row, col) {
+		var condensed_block_x = Module.fragSizeCondensedBlock[block_type][0];
+		var condensed_block_y = Module.fragSizeCondensedBlock[block_type][1];
+		
+		switch (block_type) {
+			case Module.type.BOX:
+				var x = row * condensed_block_x;
+				var y = col * condensed_block_y;
+				return [x, y];
+				break;
+			case Module.type.HEX:
+				var x = row * condensed_block_x;
+				var y = col * condensed_block_y + ((row % 2) == 1 ? 1 : 0);
+				return [x, y];
+				break;
+			case Module.type.TRI:
+				var x = row * condensed_block_x * 2 + (((col % 4) == 1 || (col % 4) == 2) ? 1 : 0);
+				var y = Math.floor(col * 0.5) * condensed_block_y;
+				return [x, y];
+				break;
+			default:
+				Dr.log('[Mine_Map] error block_type:', block_type);
+				break;
+		}
 	}
 	
 	// ( [/] )
