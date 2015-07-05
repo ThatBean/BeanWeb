@@ -85,19 +85,19 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 			],
 		},
 		IMAGE_TYPE_TRI_UP: {
-			size: [30, 28],
+			size: [34, 30],
 			point_list: [
-				[13, 0], [16, 0],
-				[29, 25], [28, 27],
-				[1, 27], [0, 25],
+				[15, 2], [18, 2],
+				[31, 27], [30, 29],
+				[3, 29], [2, 27],
 			],
 		},
 		IMAGE_TYPE_TRI_DOWN: {
-			size: [30, 28],
+			size: [34, 30],
 			point_list: [
-				[16, 27], [13, 27],
-				[0, 1], [1, 0],
-				[28, 0], [29, 1],
+				[18, 27], [15, 27],
+				[2, 1], [3, 0],
+				[30, 0], [31, 1],
 			],
 		},
 	}
@@ -160,7 +160,7 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 			
 			//process data
 			var draw_process_data = [];
-			var process_count = 5;
+			var process_count = 4;
 			
 			for (var i = 0; i < process_count; i ++) {
 				var point_list = [];
@@ -227,8 +227,9 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 			var cache_image = ImageDataExt.copy(base_image_data_ext);
 			cache_image.toCanvas();
 			
-			if (tag_image_type && this.generated[tag_image_type]) {
+			if (tag_image_type) {
 				var tag_image_data_ext = this.generated[tag_image_type];
+				//Dr.assert(tag_image_data_ext, 'Error tag_image_type', tag_image_type);
 				tag_image_data_ext.draw(
 					cache_image.data.getContext('2d'), 
 					base_image_data_ext.center_point.x - tag_image_data_ext.width * 0.5, 

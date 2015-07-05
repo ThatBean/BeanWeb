@@ -20,38 +20,19 @@ function init() {
 	tag_log.listMax = 50; 
 	
 	
-	var main_canvas = document.getElementById('Dr.Canvas');
-	var main_context = main_canvas.getContext('2d');
-	
-	Dr.main_canvas = main_canvas;
-	Dr.main_context = main_context;
 	
 	// Dr.UpdateLoop.add(function (delta_time) { 
 		// return true;
 	// })
 	
 	
+	/*
 	
+	var main_canvas = document.getElementById('Dr.Canvas');
+	var main_context = main_canvas.getContext('2d');
 	
-	var Mine_Map = Dr.Get("Mine_Map");
-	
-	
-	test_map = new Mine_Map;
-	
-	//test_map.init(block_type, row, col, mine_block_count, empty_block_count, lock_block_count)
-	test_map.init('HEX', 20, 30, 10, 10, 10);
-	
-	
-	Dr.test_map = test_map;
-	
-	
-	Dr.test_map.print();
-	
-	Dr.log(Dr.Get('Mine_Type').getSurroundList('BOX', 2, 3));
-	Dr.log(Dr.Get('Mine_Type').getSurroundList('HEX', 2, 3));
-	Dr.log(Dr.Get('Mine_Type').getSurroundList('TRI', 2, 3));
-	
-	
+	Dr.main_canvas = main_canvas;
+	Dr.main_context = main_context;
 	
 	var CanvasExt = Dr.Get('CanvasExt');
 	var test_canvas = new CanvasExt;
@@ -146,7 +127,8 @@ function init() {
 	var image_store = new Mine_ImageStore;
 	Dr.image_store = image_store;
 	image_store.init(Dr.test_draw);
-	
+	Dr.image_store = image_store;
+	*/
 	
 	
 	var Mine_Map = Dr.Get("Mine_Map");
@@ -156,8 +138,18 @@ function init() {
 	var test_grid = new Mine_Grid;
 	
 	//test_map.init(block_type, row, col, mine_block_count, empty_block_count, lock_block_count)
-	test_map.init('TRI', 10, 30, 5, 10, 10);
-	test_grid.init(document.getElementById('Dr.Canvas'), test_map, 1);
+	test_map.init('TRI', 20, 40, 5, 10, 10);
+	test_grid.init(document.getElementById('Dr.Canvas'), test_map, 2);
+	
+	Dr.test_grid = test_grid;
+	Dr.test_map = test_map;
+	
+	Dr.test_map.print();
+	
+	
+	Dr.log(Dr.Get('Mine_Type').getSurroundList('BOX', 2, 3));
+	Dr.log(Dr.Get('Mine_Type').getSurroundList('HEX', 2, 3));
+	Dr.log(Dr.Get('Mine_Type').getSurroundList('TRI', 2, 3));
 }
 
 Dr.afterWindowLoaded(init);

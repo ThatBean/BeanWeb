@@ -80,19 +80,6 @@ Dr.Implement('Mine_Type', function (global, module_get) {
 		};
 	}
 	
-	Module.getTotalSize = function (block_size, block_type, map_row_count, map_col_count) {
-		var condensed_block_width = block_size.width / Module.fragSizeBlock[block_type][0] * Module.fragSizeCondensedBlock[block_type][0];
-		var condensed_block_row_count = map_row_count * Module.sizeAdjustment[block_type].row[0] + Module.sizeAdjustment[block_type].row[1];
-		
-		var condensed_block_height = block_size.height / Module.fragSizeBlock[block_type][1] * Module.fragSizeCondensedBlock[block_type][1];
-		var condensed_block_col_count = map_col_count * Module.sizeAdjustment[block_type].col[0] + Module.sizeAdjustment[block_type].col[1];
-		
-		return {
-			width: condensed_block_width * condensed_block_row_count,
-			height: condensed_block_height * condensed_block_col_count,
-		};
-	}
-	
 	Module.getFragPosition = function (block_type, row, col) {
 		var condensed_block_x = Module.fragSizeCondensedBlock[block_type][0];
 		var condensed_block_y = Module.fragSizeCondensedBlock[block_type][1];
@@ -119,52 +106,53 @@ Dr.Implement('Mine_Type', function (global, module_get) {
 		}
 	}
 	
+	//these are only for normal coordinate system bottom-left (0, 0), not canvas top-left (0, 0) coordinate system
 	// ( [/] )
 	Module.getTLBR = function (x, y) {
-		return x + y > 1;	// true = top
+		return x < y;	// true = top
 	}
 	// ( [\] )
 	Module.getTRBL = function (x, y) {
-		return x < y;	// true = top
+		return x + y > 1;	// true = top
 	}
 	
 	Module.mapCondensedBlock = {
 		HEX: [
 			[
-				[Module.getTLBR, [-1, 0], [0, 0]],
-				[false, [0, 0]],
-				[false, [0, 0]],
-				[Module.getTRBL, [1, 0], [0, 0]]
-				[false, [1, 0]],
-				[false, [1, 0]],
+				function (x_decimal, y_decimal) { return Module.getTLBR(x_decimal, y_decimal) ? [-1, -1] : [0, 0]; },
+				function (x_decimal, y_decimal) { return [0, 0]; },
+				function (x_decimal, y_decimal) { return [0, 0]; },
+				function (x_decimal, y_decimal) { return Module.getTRBL(x_decimal, y_decimal) ? [1, -1] : [0, 0]; },
+				function (x_decimal, y_decimal) { return [1, -1]; },
+				function (x_decimal, y_decimal) { return [1, -1]; },
 			], 
 			[
-				[Module.getTRBL, [0, 0], [-1, 0]],
-				[false, [0, 0]],
-				[false, [0, 0]],
-				[Module.getTLBR, [0, 0], [1, 0]]
-				[false, [1, 0]],
-				[false, [1, 0]],
+				function (x_decimal, y_decimal) { return Module.getTRBL(x_decimal, y_decimal) ? [0, 0] : [-1, 0]; },
+				function (x_decimal, y_decimal) { return [0, 0]; },
+				function (x_decimal, y_decimal) { return [0, 0]; },
+				function (x_decimal, y_decimal) { return Module.getTLBR(x_decimal, y_decimal) ? [0, 0] : [1, 0]; },
+				function (x_decimal, y_decimal) { return [1, 0]; },
+				function (x_decimal, y_decimal) { return [1, 0]; },
 			], 
 		],
 		TRI: [
 			[
-				[Module.getTRBL, [0, 0], [-1, 1]],
-				[Module.getTLBR, [0, 0], [0, 1]]
+				function (x_decimal, y_decimal) { Dr.log('TRI, 0, 0', x_decimal, y_decimal); return Module.getTRBL(x_decimal, y_decimal) ? [0, 0] : [-1, 1]; },
+				function (x_decimal, y_decimal) { Dr.log('TRI, 0, 1', x_decimal, y_decimal); return Module.getTLBR(x_decimal, y_decimal) ? [0, 0] : [0, 1]; },
 			], 
 			[
-				[Module.getTLBR, [-1, 2], [0, 3]],
-				[Module.getTRBL, [0, 2], [0, 3]]
+				function (x_decimal, y_decimal) { Dr.log('TRI, 1, 0', x_decimal, y_decimal); return Module.getTLBR(x_decimal, y_decimal) ? [-1, 2] : [0, 3]; },
+				function (x_decimal, y_decimal) { Dr.log('TRI, 1, 1', x_decimal, y_decimal); return Module.getTRBL(x_decimal, y_decimal) ? [0, 2] : [0, 3]; },
 			], 
 		],
 	}
 	
 	//the x and y will be normalized first(based on fragment(smallest triangle))
-	Module.getBlockFromPosition = function (block_type, x, y) {
-		var x_integer = Math.floor(x);
-		var y_integer = Math.floor(y);
-		var x_decimal = x - x_integer;
-		var y_decimal = y - y_integer;
+	Module.getBlockFromPosition = function (block_type, frag_x, frag_y) {
+		var x_integer = Math.floor(frag_x);
+		var y_integer = Math.floor(frag_y);
+		var x_decimal = frag_x - x_integer;
+		var y_decimal = frag_y - y_integer;
 		switch (block_type) {
 			case Module.type.BOX:
 				var row = x_integer;
@@ -172,18 +160,11 @@ Dr.Implement('Mine_Type', function (global, module_get) {
 				return [row, col];
 				break;
 			case Module.type.HEX:
+				var map_func = Module.mapCondensedBlock.HEX[y_integer % 2][x_integer % 6];
+				var location_mod = map_func(x_decimal, 1 - y_decimal);
+				
 				var row = (x_integer - x_integer % 6) / 3;
 				var col = (y_integer - y_integer % 2) / 2;
-				
-				var map = Module.mapCondensedBlock.HEX[y_integer % 2][x_integer % 6];
-				var location_mod;
-				
-				if (map[0]) {
-					location_mod = map[0](x_decimal, y_decimal) ? map[1] : map[2];
-				}
-				else {
-					location_mod = map[1][0];
-				}
 				
 				row += location_mod[0];
 				col += location_mod[1];
@@ -191,18 +172,11 @@ Dr.Implement('Mine_Type', function (global, module_get) {
 				return [row, col];
 				break;
 			case Module.type.TRI:
-				var row = (x_integer - x_integer % 2);
-				var col = (y_integer - y_integer % 2);
+				var map_func = Module.mapCondensedBlock.TRI[y_integer % 2][x_integer % 2];
+				var location_mod = map_func(x_decimal, 1 - y_decimal);
 				
-				var map = Module.mapCondensedBlock.HEX[y_integer % 2][x_integer % 2];
-				var location_mod;
-				
-				if (map[0]) {
-					location_mod = map[0](x_decimal, y_decimal) ? map[1] : map[2];
-				}
-				else {
-					location_mod = map[1][0];
-				}
+				var row = (x_integer - x_integer % 2) / 2;
+				var col = (y_integer - y_integer % 2) * 2;
 				
 				row += location_mod[0];
 				col += location_mod[1];

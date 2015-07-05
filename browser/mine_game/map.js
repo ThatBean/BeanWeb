@@ -146,20 +146,13 @@ Dr.Implement('Mine_Map', function (global, module_get) {
 	}
 	
 	
-	Module.prototype.getBlockFromPosition = function (x, y) {
-		var location = Mine_Type.getBlockFromPosition(this._block_type, x, y);
-		var row = location[0];
-		var col = location[1];
-		
-		return this.getBlockFromLocation(row, col);
-	}
-	
 	Module.prototype.getBlockFromLocation = function (row, col) {
 		if (this.checkLocationValid(row, col)) {
 			return this._map_block[row][col];
 		}
 		else {
 			Dr.debug(5, '[getBlockFromLocation] checkLocationValid', row, col);
+			return;
 		}
 	}
 	
@@ -181,6 +174,7 @@ Dr.Implement('Mine_Map', function (global, module_get) {
 			surround_mine_map_text += surround_mine_count_row.join(' ') + '\n';
 		}
 		
+		Dr.log('Notice the map is filpped');
 		Dr.log(mine_map_text);
 		Dr.log(visual_map_text);
 		Dr.log(surround_mine_map_text);

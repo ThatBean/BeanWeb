@@ -53,21 +53,15 @@ Dr.Implement('CanvasExt', function (global, module_get) {
 		this.applyBuffer(buffer_index);
 	}
 	
-	Module.prototype.getMainCanvas = function () {
-		return this._main_canvas;
-	}
+	Module.prototype.getWidth = function () { return this._width; }
+	Module.prototype.getHeight = function () { return this._height; }
+	Module.prototype.getMainCanvas = function () { return this._main_canvas; }
+	Module.prototype.getMainContext = function () { return this._main_context; }
+	Module.prototype.getEventCenter = function () { return this._event_center; }
 	
-	Module.prototype.getMainContext = function () {
-		return this._main_context;
-	}
+	Module.prototype.clearCanvas = function () { this._main_canvas.width += 0; }
+	Module.prototype.drawImageData = function (image_data, x, y) { this._event_center.emit(Module.event.DRAW); }
 	
-	Module.prototype.drawImageData = function (image_data, x, y) {
-		this._event_center.emit(Module.event.DRAW);
-	}
-	
-	Module.prototype.getEventCenter = function () {
-		return this._event_center;
-	}
 	
 	// TODO: replace with ImageDataExt and separate
 	//simple buffer canvas list, could be a separated class
