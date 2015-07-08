@@ -40,6 +40,7 @@ Dr.Implement('Mine_Type', function (global, module_get) {
 		HEX: 'HEX',
 		TRI: 'TRI',
 		
+		//visual type
 		FlippedBlock: ' ',
 		NormalBlock: '?',
 		EmptyBlock: 'E',
@@ -137,12 +138,12 @@ Dr.Implement('Mine_Type', function (global, module_get) {
 		],
 		TRI: [
 			[
-				function (x_decimal, y_decimal) { Dr.log('TRI, 0, 0', x_decimal, y_decimal); return Module.getTRBL(x_decimal, y_decimal) ? [0, 0] : [-1, 1]; },
-				function (x_decimal, y_decimal) { Dr.log('TRI, 0, 1', x_decimal, y_decimal); return Module.getTLBR(x_decimal, y_decimal) ? [0, 0] : [0, 1]; },
+				function (x_decimal, y_decimal) { return Module.getTRBL(x_decimal, y_decimal) ? [0, 0] : [-1, 1]; },
+				function (x_decimal, y_decimal) { return Module.getTLBR(x_decimal, y_decimal) ? [0, 0] : [0, 1]; },
 			], 
 			[
-				function (x_decimal, y_decimal) { Dr.log('TRI, 1, 0', x_decimal, y_decimal); return Module.getTLBR(x_decimal, y_decimal) ? [-1, 2] : [0, 3]; },
-				function (x_decimal, y_decimal) { Dr.log('TRI, 1, 1', x_decimal, y_decimal); return Module.getTRBL(x_decimal, y_decimal) ? [0, 2] : [0, 3]; },
+				function (x_decimal, y_decimal) { return Module.getTLBR(x_decimal, y_decimal) ? [-1, 2] : [0, 3]; },
+				function (x_decimal, y_decimal) { return Module.getTRBL(x_decimal, y_decimal) ? [0, 2] : [0, 3]; },
 			], 
 		],
 	}

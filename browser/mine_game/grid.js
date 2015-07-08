@@ -51,11 +51,11 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 		this._canvas_ext.getEventCenter().addEventListener('action_cancel', on_event_callback);
 		this._action_data = {
 			is_active: false,
-			start_position: null,
 			
-			// only after action finished
-			action_type: '', //	'click', 'drag', 'hold'
+			start_position: null,
+			start_time: 0,	//in second
 			end_position: null,
+			end_time: 0,
 			end_block: null,
 		};
 		
@@ -71,14 +71,12 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 				_this.update(delta_time);
 				return true;
 			}, 'mine_grid_update');
-			_this._update_data = {
-				is_active: false,
-				action_type: '', //	'click', 'drag', 'hold'
-				start_position: null,
-				end_position: null,
-				end_block: null,
-			};
 		});
+		
+		this._update_data = {
+			is_update_needed: true,
+			result_action_type: '', //	'click', 'drag', 'hold'
+		};
 		
 		this._block_size = this._image_store.getBlockImageSizeByType(this._block_type);
 		
@@ -112,9 +110,8 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 		this._visible_offset_left = Math.min(Math.max(this._visible_offset_left, this._visible_width - this._total_size.width), 0)
 		this._visible_offset_top = Math.min(Math.max(this._visible_offset_top, this._visible_height - this._total_size.height), 0)
 		
-		this._update_data.is_active = true;
-		if (this._update_data.is_active) {
-			
+		// this._update_data.is_update_needed = true;
+		if (this._update_data.is_update_needed) {
 			this._canvas_ext.clearCanvas();
 			//update map
 			
@@ -126,14 +123,19 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 				}
 			}
 			
-			this._update_data.is_active = false;
+			this._update_data.result_action_type = '';
+			this._update_data.result_action_type = '';
+			this._update_data.is_update_needed = false;
 		}
 	}
 	
 	Module.prototype.updateBlock = function (block) {
 		//update the block
 		
-		//??
+		if (block == this._update_data._selected_block) {
+			if (this._update_data.result_action_type == 'hold') block.toggleIsFlagged();
+			if (this._update_data.result_action_type == 'click') block.chainFlip();
+		}
 		
 		//position
 		var frag_position = Mine_Type.getFragPosition(this._block_type, block.getRow(), block.getCol())
@@ -167,17 +169,17 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 				break;
 		}
 		
-		var variant_type;
-		var tag_image_type;
-		switch(block.getSpecialType()) {
+		var variant_type = '';
+		var tag_image_type = '';
+		switch(block.getVisualType()) {
 			case Mine_Type.type.FlippedBlock:
 				variant_type = 'VARIANT_TYPE_FLIPPED';
-				tag_image_type = 'TAG_IMAGE_NUMBER_1';
+				if (block.getMineCount() > 0) tag_image_type = 'TAG_IMAGE_MARK_MINE';
+				if (block.getSurroundMineCount() > 0) tag_image_type = 'TAG_IMAGE_NUMBER_' + block.getSurroundMineCount();
 				break;
 			case Mine_Type.type.NormalBlock:
 				variant_type = 'VARIANT_TYPE_NORMAL';
-				//tag_image_type = 'TAG_IMAGE_MARK_FLAG';
-				tag_image_type = '';
+				if (block.getIsFlagged()) tag_image_type = 'TAG_IMAGE_MARK_FLAG';
 				break;
 			case Mine_Type.type.EmptyBlock:
 				variant_type = 'VARIANT_TYPE_FLIPPED';
@@ -192,39 +194,41 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 				break;
 		}
 		
-		if (block == this._selected_block) {
-			variant_type = 'VARIANT_TYPE_PRESSED';
+		if (block == this._update_data._selected_block) {
+			if (this._action_data.is_active) variant_type = 'VARIANT_TYPE_PRESSED';
 		}
+		
+		
 		
 		var image_data_ext = this._image_store.getImageData(image_type, variant_type, tag_image_type, this._scale);
 		
 		image_data_ext.draw(this._canvas_ext.getMainContext(), x, y);
 	}
 	
-	Module.prototype.getBlockFromActionPosition = function (action) {
-		if (action.position_listener) {
-			var frag_x = (action.position_listener.x - this._visible_offset_left) / (this._frag_size.width * this._scale);
-			var frag_y = (action.position_listener.y - this._visible_offset_top) / (this._frag_size.height * this._scale);
-			if (frag_x >= 0 && frag_y >= 0) {
-				var location = Mine_Type.getBlockFromPosition(this._block_type, frag_x, frag_y);
-				var row = location[0];
-				var col = location[1];
-				return this._mine_map.getBlockFromLocation(row, col);
-			}
+	Module.prototype.getBlockAtPoint = function (point) {
+		var frag_x = (point.x - this._visible_offset_left) / (this._frag_size.width * this._scale);
+		var frag_y = (point.y - this._visible_offset_top) / (this._frag_size.height * this._scale);
+		if (frag_x >= 0 && frag_y >= 0) {
+			var location = Mine_Type.getBlockFromPosition(this._block_type, frag_x, frag_y);
+			var row = location[0];
+			var col = location[1];
+			return this._mine_map.getBlockFromLocation(row, col);
 		}
 		return;
+	}
+	
+	var get_dist = function (point_1, point_2) {
+		var dx = point_1.x - point_2.x;
+		var dy = point_1.y - point_2.y;
+		return Math.sqrt(dx * dx + dy * dy);
 	}
 	
 	Module.prototype.onAction = function (event_key, action) {
 		action.event.preventDefault();
 		
-		Dr.UpdateLoop.add(function (delta_time) { 
-			Dr.log('Get', event_key, action.position_listener);
-		});
-		
-		
-		this._selected_block = this.getBlockFromActionPosition(action);
-		
+		// Dr.UpdateLoop.add(function (delta_time) { 
+			// Dr.log('Get', event_key, action.position_listener);
+		// });
 		
 		switch(event_key) {
 			case 'action_move':
@@ -233,31 +237,49 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 					if (action.position_listener) {
 						this._visible_offset_left += action.position_listener.x - this._action_data.last_position.x;
 						this._visible_offset_top += action.position_listener.y - this._action_data.last_position.y;
+						
+						this._update_data.is_update_needed = true;
+						this._update_data.result_action_type = 'dragging';
 					}
 				}
 				break;
 			case 'action_start':
-				if (this._action_data.is_active) {
-					//update hover
-				}
-				else {
+				if (!this._action_data.is_active) {
 					this._action_data.is_active = true;
+					this._update_data.is_update_needed = true;
+					this._action_data.result_action_type = 'start';
 				}
 				break;
 			case 'action_end':
 				if (this._action_data.is_active) {
-					//check type and update block
-					this._update_data = {}
+					var delta_dist = get_dist(this._action_data.start_position, this._action_data.last_position);
+					var delta_time = Dr.now() - this._action_data.start_time;
+					if (delta_dist > Dr.devicePixelRatio * 5) {
+						this._update_data.result_action_type = 'drag';
+					}
+					else {
+						if (delta_time > 0.5) {
+							this._update_data.result_action_type = 'hold';
+						}
+						else {
+							this._update_data.result_action_type = 'click';
+						}
+					}
 					
+					this._update_data.is_update_needed = true;
 					this._action_data.is_active = false;
-				}
-				else {
-					//strange...
+					
+					this._action_data.start_time = 0;
+					this._action_data.start_position = null;
 				}
 				break;
 			case 'action_cancel':
 				if (this._action_data.is_active) {
+					Dr.log('Get action_cancel', this._action_data);
 					this._action_data.is_active = false;
+					
+					this._action_data.start_time = 0;
+					this._action_data.start_position = null;
 				}
 				else {
 					//strange...
@@ -267,20 +289,15 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 				break;
 		}
 		
-		this._action_status = {
-			is_active: false,
-			start_position: null,
-			
-			// only after action finished
-			action_type: '', //	'click', 'drag', 'hold'
-			end_position: null,
-			end_block: null,
-		};
 		
-		
-		//
 		if (action.position_listener) {
 			this._action_data.last_position = action.position_listener;
+			
+			if (this._action_data.is_active) {
+				if (!this._action_data.start_position) this._action_data.start_position = action.position_listener;
+				if (!this._action_data.start_time) this._action_data.start_time = Dr.now();
+			this._update_data._selected_block = this.getBlockAtPoint(action.position_listener);
+			}
 		}
 	}
 	

@@ -139,7 +139,7 @@ function init() {
 	
 	//test_map.init(block_type, row, col, mine_block_count, empty_block_count, lock_block_count)
 	test_map.init('TRI', 20, 40, 5, 10, 10);
-	test_grid.init(document.getElementById('Dr.Canvas'), test_map, 1);
+	test_grid.init(document.getElementById('Dr.Canvas'), test_map, 2);
 	
 	Dr.test_grid = test_grid;
 	Dr.test_map = test_map;

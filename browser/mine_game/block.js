@@ -11,13 +11,15 @@ Dr.Implement('Mine_Block', function (global, module_get) {
 	var Mine_Type = Dr.Get('Mine_Type');
 	Module.type = Mine_Type.type;
 	
-	Module.prototype.init = function (map, block_type, row, col, mine_count, special_type) {
+	Module.prototype.init = function (map, block_type, row, col, mine_count, visual_type) {
 		this._map = map;
 		this._block_type = block_type;
 		this._row = row;
 		this._col = col;
 		this._mine_count = mine_count;
-		this._special_type = special_type;
+		this._visual_type = visual_type;
+		
+		this._is_flagged = false;
 	}
 	
 	Module.prototype.initSurround = function () {
@@ -29,7 +31,10 @@ Dr.Implement('Mine_Block', function (global, module_get) {
 	Module.prototype.getCol = function () { return this._col; }
 	Module.prototype.getMineCount = function () { return this._mine_count; }
 	Module.prototype.getSurroundMineCount = function () { return this._surround_mine_count; }
-	Module.prototype.getSpecialType = function () { return this._special_type; }
+	Module.prototype.getVisualType = function () { return this._visual_type; }
+	Module.prototype.getIsFlagged = function () { return this._is_flagged; }
+	
+	Module.prototype.toggleIsFlagged = function () { this._is_flagged = !this._is_flagged; }
 	
 	Module.prototype.initSurroundList = function () {
 		// the block around this one
@@ -68,15 +73,24 @@ Dr.Implement('Mine_Block', function (global, module_get) {
 	}
 	
 	Module.prototype.flip = function () {
-		// TODO
-		// TODO
-		// TODO
-		// TODO
-		// TODO
-		// TODO
+		if (this._visual_type == Mine_Type.type.LockBlock || this._visual_type == Mine_Type.type.EmptyBlock) {
+			return false;
+		}
+		
+		if (this._mine_count > 0) {
+			alert('BOOM!');
+			return false;
+		}
+		
+		this._visual_type = Mine_Type.type.FlippedBlock;
+		return (this._surround_mine_count == 0);
 	}
 	
-	Module.prototype.chainOperation = function (chain_id, operation /* extra argument will be passed down */) {
+	Module.prototype.chainFlip = function () {
+		this.chainOperation('flip');
+	}
+	
+	Module.prototype.chainOperation = function (function_name, chain_id/* extra argument will be passed down */) {
 		var chain_id = chain_id || Dr.generateId();
 		
 		//loop prevent
@@ -84,7 +98,7 @@ Dr.Implement('Mine_Block', function (global, module_get) {
 		else { this._last_chain_id = chain_id; }
 		
 		//execute first
-		var is_chain_continue = this[operation].apply(this, Dr.getArgumentArray(arguments, 2));
+		var is_chain_continue = this[function_name].apply(this, Dr.getArgumentArray(arguments, 2));
 		
 		//continue
 		if (is_chain_continue) {
