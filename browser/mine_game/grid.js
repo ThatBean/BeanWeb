@@ -110,6 +110,11 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 		this._visible_offset_left = Math.min(Math.max(this._visible_offset_left, this._visible_width - this._total_size.width), 0)
 		this._visible_offset_top = Math.min(Math.max(this._visible_offset_top, this._visible_height - this._total_size.height), 0)
 		
+		if (this._update_data._selected_block) {
+			if (this._update_data.result_action_type == 'hold') this._update_data._selected_block.toggleIsFlagged();
+			if (this._update_data.result_action_type == 'click') this._update_data._selected_block.chainFlip();
+		}
+		
 		// this._update_data.is_update_needed = true;
 		if (this._update_data.is_update_needed) {
 			this._canvas_ext.clearCanvas();
@@ -132,10 +137,7 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 	Module.prototype.updateBlock = function (block) {
 		//update the block
 		
-		if (block == this._update_data._selected_block) {
-			if (this._update_data.result_action_type == 'hold') block.toggleIsFlagged();
-			if (this._update_data.result_action_type == 'click') block.chainFlip();
-		}
+		//
 		
 		//position
 		var frag_position = Mine_Type.getFragPosition(this._block_type, block.getRow(), block.getCol())

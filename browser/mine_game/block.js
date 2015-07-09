@@ -93,6 +93,8 @@ Dr.Implement('Mine_Block', function (global, module_get) {
 	Module.prototype.chainOperation = function (function_name, chain_id/* extra argument will be passed down */) {
 		var chain_id = chain_id || Dr.generateId();
 		
+		//Dr.log('chainOperation', chain_id, this._row, this._col)
+		
 		//loop prevent
 		if (this._last_chain_id == chain_id) { return; }
 		else { this._last_chain_id = chain_id; }
@@ -104,7 +106,12 @@ Dr.Implement('Mine_Block', function (global, module_get) {
 		if (is_chain_continue) {
 			for (index in this._chain_block_list) {
 				var chain_block = this._chain_block_list[index];
-				chain_block.chainOperation.apply(chain_block, arguments);
+				
+				var arg_array = Dr.getArgumentArray(arguments);
+				arg_array[0] = function_name;
+				arg_array[1] = chain_id;
+				
+				chain_block.chainOperation.apply(chain_block, arg_array);
 			}
 		}
 	}
