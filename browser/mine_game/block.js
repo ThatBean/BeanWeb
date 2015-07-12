@@ -11,11 +11,11 @@ Dr.Implement('Mine_Block', function (global, module_get) {
 	var Mine_Type = Dr.Get('Mine_Type');
 	Module.type = Mine_Type.type;
 	
-	Module.prototype.init = function (map, block_type, row, col, mine_count, visual_type) {
+	Module.prototype.init = function (map, block_type, x, y, mine_count, visual_type) {
 		this._map = map;
 		this._block_type = block_type;
-		this._row = row;
-		this._col = col;
+		this._x = x;
+		this._y = y;
 		this._mine_count = mine_count;
 		this._visual_type = visual_type;
 		
@@ -27,8 +27,8 @@ Dr.Implement('Mine_Block', function (global, module_get) {
 		this._surround_mine_count = this._mine_count > 0 ? 'X' : this.calcSurroundMineCount();
 	}
 	
-	Module.prototype.getRow = function () { return this._row; }
-	Module.prototype.getCol = function () { return this._col; }
+	Module.prototype.getX = function () { return this._x; }
+	Module.prototype.getY = function () { return this._y; }
 	Module.prototype.getMineCount = function () { return this._mine_count; }
 	Module.prototype.getSurroundMineCount = function () { return this._surround_mine_count; }
 	Module.prototype.getVisualType = function () { return this._visual_type; }
@@ -41,13 +41,13 @@ Dr.Implement('Mine_Block', function (global, module_get) {
 		this._surround_block_list = [];
 		this._chain_block_list = [];
 		
-		var surround_list = Mine_Type.getSurroundList(this._block_type, this._row, this._col);
+		var surround_list = Mine_Type.getSurroundList(this._block_type, this._y, this._x);
 		for (index in surround_list) {
-			var row = surround_list[index][0];
-			var col = surround_list[index][1];
+			var y = surround_list[index][0];
+			var x = surround_list[index][1];
 			var is_edge_connected = surround_list[index][2];
 			
-			var surround_block = this._map.getBlockFromLocation(row, col);
+			var surround_block = this._map.getBlockFromLocation(x, y);
 			if (surround_block) {
 				this._surround_block_list.push(surround_block);
 				
@@ -56,7 +56,7 @@ Dr.Implement('Mine_Block', function (global, module_get) {
 				}
 			}
 			else {
-				Dr.debug(5, 'no block at', row, col);
+				Dr.debug(5, 'no block at', x, y);
 			}
 		}
 	}
@@ -93,7 +93,7 @@ Dr.Implement('Mine_Block', function (global, module_get) {
 	Module.prototype.chainOperation = function (function_name, chain_id/* extra argument will be passed down */) {
 		var chain_id = chain_id || Dr.generateId();
 		
-		//Dr.log('chainOperation', chain_id, this._row, this._col)
+		//Dr.log('chainOperation', chain_id, this._x, this._y)
 		
 		//loop prevent
 		if (this._last_chain_id == chain_id) { return; }

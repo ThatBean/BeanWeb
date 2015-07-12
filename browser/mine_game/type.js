@@ -41,8 +41,8 @@ Dr.Implement('Mine_Type', function (global, module_get) {
 		TRI: 'TRI',
 		
 		//visual type
-		FlippedBlock: ' ',
-		NormalBlock: '?',
+		FlippedBlock: 'X',
+		NormalBlock: ' ',
 		EmptyBlock: 'E',
 		LockBlock: 'L',
 	}
@@ -59,21 +59,6 @@ Dr.Implement('Mine_Type', function (global, module_get) {
 		TRI: [1, 1],
 	}
 	
-	Module.sizeAdjustment = {	//for calculate condensed block size to map size
-		BOX: {
-			row: [1, 0],	//scale, add
-			col: [1, 0],
-		},
-		HEX: {
-			row: [1, 1 / 3],	//scale, add
-			col: [1, 1 / 2],
-		},
-		TRI: {
-			row: [1, 1 / 2],	//scale, add
-			col: [0.5, 0],
-		},
-	}
-	
 	Module.getFragSize = function (block_size, block_type) {
 		return {
 			width: block_size.width / Module.fragSizeBlock[block_type][0],
@@ -81,24 +66,25 @@ Dr.Implement('Mine_Type', function (global, module_get) {
 		};
 	}
 	
-	Module.getFragPosition = function (block_type, row, col) {
+	//map location to grid position
+	Module.getFragPosition = function (block_type, map_x, map_y) {
 		var condensed_block_x = Module.fragSizeCondensedBlock[block_type][0];
 		var condensed_block_y = Module.fragSizeCondensedBlock[block_type][1];
 		
 		switch (block_type) {
 			case Module.type.BOX:
-				var x = row * condensed_block_x;
-				var y = col * condensed_block_y;
+				var x = map_x * condensed_block_x;
+				var y = map_y * condensed_block_y;
 				return [x, y];
 				break;
 			case Module.type.HEX:
-				var x = row * condensed_block_x;
-				var y = col * condensed_block_y + ((row % 2) == 1 ? 1 : 0);
+				var x = map_x * condensed_block_x;
+				var y = map_y * condensed_block_y + ((map_x % 2) == 1 ? 1 : 0);
 				return [x, y];
 				break;
 			case Module.type.TRI:
-				var x = row * condensed_block_x * 2 + (((col % 4) == 1 || (col % 4) == 2) ? 1 : 0);
-				var y = Math.floor(col * 0.5) * condensed_block_y;
+				var x = map_x * condensed_block_x * 2 + (((map_y % 4) == 1 || (map_y % 4) == 2) ? 1 : 0);
+				var y = Math.floor(map_y * 0.5) * condensed_block_y;
 				return [x, y];
 				break;
 			default:
@@ -156,33 +142,33 @@ Dr.Implement('Mine_Type', function (global, module_get) {
 		var y_decimal = frag_y - y_integer;
 		switch (block_type) {
 			case Module.type.BOX:
-				var row = x_integer;
-				var col = y_integer;
-				return [row, col];
+				var map_x = x_integer;
+				var map_y = y_integer;
+				return [map_x, map_y];
 				break;
 			case Module.type.HEX:
 				var map_func = Module.mapCondensedBlock.HEX[y_integer % 2][x_integer % 6];
 				var location_mod = map_func(x_decimal, 1 - y_decimal);
 				
-				var row = (x_integer - x_integer % 6) / 3;
-				var col = (y_integer - y_integer % 2) / 2;
+				var map_x = (x_integer - x_integer % 6) / 3;
+				var map_y = (y_integer - y_integer % 2) / 2;
 				
-				row += location_mod[0];
-				col += location_mod[1];
+				map_x += location_mod[0];
+				map_y += location_mod[1];
 				
-				return [row, col];
+				return [map_x, map_y];
 				break;
 			case Module.type.TRI:
 				var map_func = Module.mapCondensedBlock.TRI[y_integer % 2][x_integer % 2];
 				var location_mod = map_func(x_decimal, 1 - y_decimal);
 				
-				var row = (x_integer - x_integer % 2) / 2;
-				var col = (y_integer - y_integer % 2) * 2;
+				var map_x = (x_integer - x_integer % 2) / 2;
+				var map_y = (y_integer - y_integer % 2) * 2;
 				
-				row += location_mod[0];
-				col += location_mod[1];
+				map_x += location_mod[0];
+				map_y += location_mod[1];
 				
-				return [row, col];
+				return [map_x, map_y];
 				break;
 			default:
 				Dr.log('[Mine_Map] error block_type:', block_type);
@@ -190,79 +176,81 @@ Dr.Implement('Mine_Type', function (global, module_get) {
 		}
 	}
 	
-	Module.getSurroundList = function (block_type, row, col) {
+	//x and y means map location
+	Module.getSurroundList = function (block_type, y, x) {
 		switch (block_type) {
 			case Module.type.BOX:
 				return [
-					//row		col		is_connected by edge (false = by vertex)
-					[row - 1, col - 1, false],
-					[row - 1, col    , true],
-					[row - 1, col + 1, false],
+					//y		x		is_connected by edge (false = by vertex)
+					[y - 1, x - 1, false],
+					[y - 1, x    , true],
+					[y - 1, x + 1, false],
 					
-					[row    , col - 1, true],
-					[row    , col + 1, true],
+					[y    , x - 1, true],
+					[y    , x + 1, true],
 					
-					[row + 1, col - 1, false],
-					[row + 1, col    , true],
-					[row + 1, col + 1, false],
+					[y + 1, x - 1, false],
+					[y + 1, x    , true],
+					[y + 1, x + 1, false],
 				];
 				break;
 			case Module.type.HEX:
-				//shift col down when the row is even
-				var shift_col = ((row % 2 == 0) ? 0 : 1);
+				//shift y as x
+				var shift_y = ((x % 2 == 0) ? -1 : 1);
 				return [
-					[row - 1, col - 1 + shift_col, true],
-					[row - 1, col     + shift_col, true],
-					[row    , col + 1, true],
-					[row    , col - 1, true],
-					[row + 1, col - 1 + shift_col, true],
-					[row + 1, col     + shift_col, true],
+					[y + shift_y, x - 1, true],
+					[y + shift_y, x + 1, true],
+					
+					[y - 1, x    , true],
+					[y    , x + 1, true],
+					[y    , x - 1, true],
+					[y + 1, x    , true],
 				];
 				
 				break;
 			case Module.type.TRI:
-				//shift col right when the col is (4n +1) or (4n + 2)
-				var shift_col = ((row % 4 == 0 || row % 4 == 3) ? 0 : 1);
-				if (row % 2 == 0) {
+				//shift x right when the x is (4n +1) or (4n + 2)
+				var shift_x = ((y % 4 == 0 || y % 4 == 3) ? 0 : 1);
+				if (y % 2 == 0) {
 					return [
-						[row - 2, col - 1 + shift_col, false],
-						[row - 2, col     + shift_col, false],
+						[y - 2, x - 1 + shift_x, false],
+						[y - 2, x     + shift_x, false],
 						
-						[row - 1, col - 1, false],
-						[row - 1, col    , true],
-						[row - 1, col + 1, false],
+						[y - 1, x - 1, false],
+						[y - 1, x    , true],
+						[y - 1, x + 1, false],
 						
-						[row    , col - 1, false],
-						[row    , col + 1, false],
+						[y    , x - 1, false],
+						[y    , x + 1, false],
 						
-						[row + 1, col - 1 + shift_col, true],
-						[row + 1, col     + shift_col, true],
+						[y + 1, x - 1 + shift_x, true],
+						[y + 1, x     + shift_x, true],
 						
-						[row + 2, col - 1 + shift_col, false],
-						[row + 2, col     + shift_col, false],
+						[y + 2, x - 1 + shift_x, false],
+						[y + 2, x     + shift_x, false],
 						
-						[row + 3, col    , false],
+						[y + 3, x    , false],
 					];
 				}
 				else {
 					return [
-						[row - 3, col    , false],
+						[y - 3, x    , false],
 						
-						[row - 2, col - 1 + shift_col, false],
-						[row - 2, col     + shift_col, false],
+						[y - 2, x - 1 + shift_x, false],
+						[y - 2, x     + shift_x, false],
 						
-						[row - 1, col - 1 + shift_col, true],
-						[row - 1, col     + shift_col, true],
+						[y - 1, x - 1 + shift_x, true],
+						[y - 1, x     + shift_x, true],
 						
-						[row    , col - 1, false],
-						[row    , col + 1, false],
+						[y    , x - 1, false],
+						[y    , x + 1, false],
 						
-						[row + 1, col - 1, false],
-						[row + 1, col    , true],
-						[row + 1, col + 1, false],
+						[y + 1, x - 1, false],
+						[y + 1, x    , true],
+						[y + 1, x + 1, false],
 						
-						[row + 2, col - 1 + shift_col, false],
-						[row + 2, col     + shift_col, false],
+						[y + 2, x - 1 + shift_x, false],
+						[y + 2, x     + shift_x, false],
 					];
 				}
 				break;

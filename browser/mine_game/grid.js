@@ -21,15 +21,12 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 	
 	
 	Module.prototype.init = function (canvas_element, mine_map, scale) {
-		this._scale = scale || 1;	//scale will be applied last
-		
-		
 		//Mine_Map
 		this._mine_map = mine_map;
 		
 		this._block_type = mine_map.block_type;
-		this._map_row_count = mine_map.row_count;
-		this._map_col_count = mine_map.col_count;
+		this._map_width = mine_map.width;
+		this._map_height = mine_map.height;
 		
 		
 		//CanvasExt
@@ -74,34 +71,46 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 		});
 		
 		this._update_data = {
-			is_update_needed: true,
+			is_update_needed: false,
 			result_action_type: '', //	'click', 'drag', 'hold'
 		};
 		
-		this._block_size = this._image_store.getBlockImageSizeByType(this._block_type);
+		this.resetScale(scale)
+	}
+	
+	Module.prototype.resetScale = function (scale) {
+		this._scale = scale || 1;	//scale will be applied last
 		
-		//this._block_size.width += 3;
-		//this._block_size.height += 1;
+		var block_size = this._image_store.getBlockImageSizeByType(this._block_type);
+		this._block_size = {
+			width: block_size.width * this._scale,
+			height: block_size.height * this._scale,
+		}
 		
-		this._frag_size = Mine_Type.getFragSize(this._block_size, this._block_type, this._map_row_count, this._map_col_count);
+		var frag_size = Mine_Type.getFragSize(block_size, this._block_type, this._map_width, this._map_height);
+		this._frag_size = {
+			width: frag_size.width * this._scale,
+			height: frag_size.height * this._scale,
+		}
 		
-		var bottom_right_frag_position = Mine_Type.getFragPosition(this._block_type, this._map_row_count - 1, this._map_col_count - 1);
-		
+		var bottom_right_frag_position = Mine_Type.getFragPosition(this._block_type, this._map_width - 1, this._map_height - 1);
 		switch(this._block_type) {
 			case 'HEX':
-				var row_check = (this._map_row_count - 1) % 2;
-				bottom_right_frag_position[1] += (row_check == 0) ? 1 : 0;
+				var x_check = (this._map_width - 1) % 2;
+				bottom_right_frag_position[1] += (x_check == 0) ? 1 : 0;
 				break;
 			case 'TRI':
-				var col_check = (this._map_col_count - 1) % 4;
-				bottom_right_frag_position[0] += (col_check == 0 || col_check == 3) ? 1 : 0;
+				var y_check = (this._map_height - 1) % 4;
+				bottom_right_frag_position[0] += (y_check == 0 || y_check == 3) ? 1 : 0;
 				break;
 		}
 		
 		this._total_size = {
-			width: Math.floor(bottom_right_frag_position[0] * this._frag_size.width + this._block_size.width) * this._scale,
-			height: Math.floor(bottom_right_frag_position[1] * this._frag_size.height + this._block_size.height) * this._scale,
+			width: Math.floor(bottom_right_frag_position[0] * this._frag_size.width + this._block_size.width),
+			height: Math.floor(bottom_right_frag_position[1] * this._frag_size.height + this._block_size.height),
 		}
+		
+		this._update_data.is_update_needed = true;
 	}
 	
 	Module.prototype.update = function (delta_time) {
@@ -121,9 +130,9 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 			//update map
 			
 			//update block
-			for (var col = 0; col < this._map_col_count; col++) {
-				for (var row = 0; row < this._map_row_count; row++) {
-					var block = this._mine_map.getBlockFromLocation(row, col);
+			for (var y = 0; y < this._map_height; y++) {
+				for (var x = 0; x < this._map_width; x++) {
+					var block = this._mine_map.getBlockFromLocation(x, y);
 					this.updateBlock(block);
 				}
 			}
@@ -140,15 +149,15 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 		//
 		
 		//position
-		var frag_position = Mine_Type.getFragPosition(this._block_type, block.getRow(), block.getCol())
-		var x = frag_position[0] * this._frag_size.width * this._scale + this._visible_offset_left;
-		var y = frag_position[1] * this._frag_size.height * this._scale + this._visible_offset_top;
+		var frag_position = Mine_Type.getFragPosition(this._block_type, block.getX(), block.getY())
+		var x = frag_position[0] * this._frag_size.width + this._visible_offset_left;
+		var y = frag_position[1] * this._frag_size.height + this._visible_offset_top;
 		
 		if (
 			x > this._visible_width
-			|| x < 0 - this._block_size.width * this._scale
+			|| x < 0 - this._block_size.width
 			|| y > this._visible_height
-			|| y < 0 - this._block_size.height * this._scale
+			|| y < 0 - this._block_size.height
 		) {
 			//out of canvas
 			return;
@@ -164,7 +173,7 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 				image_type = 'IMAGE_TYPE_HEX';
 				break;
 			case Mine_Type.type.TRI:
-				image_type = ((block.getCol() % 2) == 1) ? 'IMAGE_TYPE_TRI_UP' : 'IMAGE_TYPE_TRI_DOWN';
+				image_type = ((block.getY() % 2) == 1) ? 'IMAGE_TYPE_TRI_UP' : 'IMAGE_TYPE_TRI_DOWN';
 				break;
 			default:
 				debugger;
@@ -208,13 +217,13 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 	}
 	
 	Module.prototype.getBlockAtPoint = function (point) {
-		var frag_x = (point.x - this._visible_offset_left) / (this._frag_size.width * this._scale);
-		var frag_y = (point.y - this._visible_offset_top) / (this._frag_size.height * this._scale);
+		var frag_x = (point.x - this._visible_offset_left) / (this._frag_size.width);
+		var frag_y = (point.y - this._visible_offset_top) / (this._frag_size.height);
 		if (frag_x >= 0 && frag_y >= 0) {
-			var location = Mine_Type.getBlockFromPosition(this._block_type, frag_x, frag_y);
-			var row = location[0];
-			var col = location[1];
-			return this._mine_map.getBlockFromLocation(row, col);
+			var map_location = Mine_Type.getBlockFromPosition(this._block_type, frag_x, frag_y);
+			var map_x = map_location[0];
+			var map_y = map_location[1];
+			return this._mine_map.getBlockFromLocation(map_x, map_y);
 		}
 		return;
 	}
