@@ -30,12 +30,20 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 		VARIANT_TYPE_FLIPPED: 'VARIANT_TYPE_FLIPPED',
 	}
 	
-	Module.typeColor = {
+	Module.typeCenterColor = {
 		//color
 		VARIANT_TYPE_INDICATOR: [255, 255, 0],
 		VARIANT_TYPE_NORMAL: [200, 200, 200],
-		VARIANT_TYPE_PRESSED: [160, 160, 160],
+		VARIANT_TYPE_PRESSED: [160, 100, 100, 80],
 		VARIANT_TYPE_FLIPPED: [0, 0, 0],
+	}
+	
+	Module.typeBorderColor = {
+		//color
+		VARIANT_TYPE_INDICATOR: [50, 50, 50],
+		VARIANT_TYPE_NORMAL: [50, 50, 50],
+		VARIANT_TYPE_PRESSED: [255, 50, 50, 60],
+		VARIANT_TYPE_FLIPPED: [50, 50, 50],
 	}
 	
 	Module.sourceTagImage = {
@@ -170,10 +178,10 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 			}
 			
 			for (var variant_type in Module.typeImageVariant) {
-				var color = ImageDataExt.arrayToColor(Module.typeColor[variant_type]);
-				var background_color = {r: 50, g: 50, b: 50, a: 255};
+				var center_color = ImageDataExt.arrayToColor(Module.typeCenterColor[variant_type]);
+				var border_color = ImageDataExt.arrayToColor(Module.typeBorderColor[variant_type]);
 				
-				Dr.log('[generateImageData]', variant_type, color);
+				Dr.log('[generateImageData]', variant_type, center_color);
 				var generated_image_data_ext = ImageDataExt.create(ImageDataExt.type.CANVAS_ELEMENT, config.size[0], config.size[1]);
 				
 				//record
@@ -182,7 +190,7 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 				generated_image_data_ext.center_point = center_point;
 				
 				for (var index in draw_process_data) {
-					var apply_color = fade(color, background_color, (process_count - index - 1) / process_count);
+					var apply_color = fade(center_color, border_color, (process_count - index - 1) / process_count);
 					var point_list = draw_process_data[index];
 					
 					generated_image_data_ext.drawPixelLineList(point_list, apply_color, true);

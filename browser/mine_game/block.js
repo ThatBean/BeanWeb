@@ -73,7 +73,13 @@ Dr.Implement('Mine_Block', function (global, module_get) {
 	}
 	
 	Module.prototype.flip = function () {
-		if (this._visual_type == Mine_Type.type.LockBlock || this._visual_type == Mine_Type.type.EmptyBlock) {
+		if (this._is_flagged) {
+			this._is_flagged = false;
+			return false;
+		}
+		
+		if (this._visual_type == Mine_Type.type.LockBlock 
+			|| this._visual_type == Mine_Type.type.EmptyBlock) {
 			return false;
 		}
 		

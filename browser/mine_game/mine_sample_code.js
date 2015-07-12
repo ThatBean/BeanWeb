@@ -131,18 +131,35 @@ function init() {
 	*/
 	
 	
-	var Mine_Map = Dr.Get("Mine_Map");
-	var Mine_Grid = Dr.Get('Mine_Grid');
 	
-	var test_map = new Mine_Map;
-	var test_grid = new Mine_Grid;
+	Dr.ResetMineType = function (
+		block_type, 
+		width, height, 
+		mine_block_count, 
+		empty_block_count, 
+		lock_block_count
+	) {
+		var Mine_Map = Dr.Get("Mine_Map");
+		var Mine_Grid = Dr.Get('Mine_Grid');
+		var test_map = new Mine_Map;
+		var test_grid = new Mine_Grid;
+		
+		//test_map.init(block_type, width, height, mine_block_count, empty_block_count, lock_block_count)
+		test_map.init(
+			block_type, 
+			width, height, 
+			mine_block_count, 
+			empty_block_count, 
+			lock_block_count);
+		test_grid.init(document.getElementById('Dr.Canvas'), test_map, 1);
+		
+		Dr.test_grid = test_grid;
+		Dr.test_map = test_map;
+	}
+	Dr.ResetMineGridScale = function (scale) { Dr.test_grid.resetScale(scale); }
 	
-	//test_map.init(block_type, row, col, mine_block_count, empty_block_count, lock_block_count)
-	test_map.init('HEX', 20, 60, 50, 10, 10);
-	test_grid.init(document.getElementById('Dr.Canvas'), test_map, 1);
 	
-	Dr.test_grid = test_grid;
-	Dr.test_map = test_map;
+	Dr.ResetMineType('TRI', 20, 60, 50, 10, 10);
 	
 	Dr.test_map.print();
 	

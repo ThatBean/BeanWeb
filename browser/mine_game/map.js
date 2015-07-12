@@ -15,8 +15,11 @@ Dr.Implement('Mine_Map', function (global, module_get) {
 	Module.type = Mine_Type.type;
 	
 	Module.prototype.init = function (
-		block_type, width, height, 
-		mine_block_count, empty_block_count, lock_block_count
+		block_type, 
+		width, height, 
+		mine_block_count, 
+		empty_block_count, 
+		lock_block_count
 	) {
 		
 		switch (block_type) {
