@@ -237,15 +237,19 @@ else {
 	Dr.setPageHeaderFooterPadding = function (page_header, page_footer) {
 		var page_header = page_header || document.getElementById("page-header");
 		var page_footer = page_footer || document.getElementById("page-footer");
-		var padding_header = (page_header ? page_header.offsetHeight : 0) + "px";
-		var padding_footer = (page_footer ? page_footer.offsetHeight : 0) + "px";
-		
 		var body = Dr.getBody();
-		body.style.paddingTop = padding_header;
-		body.style.paddingBottom = padding_footer;
-		Dr.log("[setPageHeaderFooterPadding]", padding_header, padding_footer);
-		//add watch
-		Dr.Event.addEventListener('WINDOW_RESIZE', function () { Dr.setPageHeaderFooterPadding(page_header, page_footer); });
+		
+		var callback = function () { 
+			var padding_header = (page_header ? page_header.offsetHeight : 0) + "px";
+			var padding_footer = (page_footer ? page_footer.offsetHeight : 0) + "px";
+			
+			body.style.paddingTop = padding_header;
+			body.style.paddingBottom = padding_footer;
+			Dr.log("[setPageHeaderFooterPadding]", padding_header, padding_footer); 
+		}
+		
+		callback(); //run once
+		Dr.Event.addEventListener('WINDOW_RESIZE', callback); //add watch
 	}
 	
 	Dr.getViewportSize = function () {
