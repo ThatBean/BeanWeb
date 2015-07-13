@@ -72,24 +72,30 @@ Dr.Implement('Mine_Block', function (global, module_get) {
 		return count;
 	}
 	
+	Module.prototype.forceFlip = function () {
+		this._visual_type = Mine_Type.type.FlippedBlock;
+	}
+	
 	Module.prototype.flip = function () {
-		if (this._is_flagged) {
-			this._is_flagged = false;
-			return false;
-		}
-		
-		if (this._visual_type == Mine_Type.type.LockBlock 
+		if (this._is_flagged
+			|| this._visual_type == Mine_Type.type.LockBlock 
 			|| this._visual_type == Mine_Type.type.EmptyBlock) {
 			return false;
 		}
 		
 		if (this._mine_count > 0) {
-			alert('BOOM!');
+			//alert('BOOM!');
+			
+			this._map.notify('flip_mine_block', this);
+			
 			return false;
 		}
 		
 		this._visual_type = Mine_Type.type.FlippedBlock;
-		return (this._surround_mine_count == 0);
+		
+		var is_continue = (this._surround_mine_count == 0);
+		
+		return is_continue;
 	}
 	
 	Module.prototype.chainFlip = function () {

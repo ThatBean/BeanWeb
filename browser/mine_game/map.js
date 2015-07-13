@@ -15,13 +15,9 @@ Dr.Implement('Mine_Map', function (global, module_get) {
 	Module.type = Mine_Type.type;
 	
 	Module.prototype.init = function (
-		block_type, 
-		width, height, 
-		mine_block_count, 
-		empty_block_count, 
-		lock_block_count
+		block_type, width, height, 
+		mine_block_count, empty_block_count, lock_block_count
 	) {
-		
 		switch (block_type) {
 			case Module.type.BOX:
 			case Module.type.HEX:
@@ -34,7 +30,7 @@ Dr.Implement('Mine_Map', function (global, module_get) {
 		}
 		
 		if (width * height < (mine_block_count + empty_block_count + lock_block_count)) {
-			Dr.log('[Mine_Map] error count:', width * height, (mine_block_count + empty_block_count + lock_block_count), 'input:', width, height, mine_block_count, empty_block_count, lock_block_count);
+			Dr.log('[Mine_Map] Error! count overflow:', width * height, (mine_block_count + empty_block_count + lock_block_count), 'input:', width, height, mine_block_count, empty_block_count, lock_block_count);
 			return;
 		}
 		
@@ -42,7 +38,6 @@ Dr.Implement('Mine_Map', function (global, module_get) {
 		this.block_type = block_type;
 		this.width = width;
 		this.height = height;
-		
 		
 		//should not access(private)
 		this._block_type = block_type;
@@ -53,20 +48,31 @@ Dr.Implement('Mine_Map', function (global, module_get) {
 		this._empty_block_count = empty_block_count;
 		this._lock_block_count = lock_block_count;
 		
-		this._map_mine_data = [];
-		this._map_visual_data = [];
-		this._map_block = [];
-		
 		this.initMapData();
-		
 		this.initBlock();
 	}
 	
 	Module.prototype.checkLocationValid = function (x, y) {
-		return x >= 0 
-			&& y >= 0 
-			&& x < this._width 
-			&& y < this._height;
+		return x >= 0 && x < this._width && y >= 0 && y < this._height;
+	}
+	
+	Module.prototype.forEachXY = function (process_func) {
+		for (var y = 0; y < this._height; y++) {
+			for (var x = 0; x < this._width; x++) {
+				process_func(x, y);
+			}
+		}
+	}
+	
+	Module.prototype.getArrayYX = function (process_func) {
+		var array_y_x = [];
+		for (var y = 0; y < this._height; y++) {
+			array_y_x[y] = [];
+			for (var x = 0; x < this._width; x++) {
+				array_y_x[y][x] = process_func(x, y);
+			}
+		}
+		return array_y_x;
 	}
 	
 	Module.prototype.initMapData = function () {
@@ -75,7 +81,7 @@ Dr.Implement('Mine_Map', function (global, module_get) {
 		var block_id_pool = [];
 		for (var i = 0; i < block_count; i++) block_id_pool[i] = i;
 		
-		var get_id_list = function (block_id_pool, id_count) {
+		var random_pick_id_list = function (block_id_pool, id_count) {
 			var id_list = [];
 			var block_index_list = Dr.getRandomIntMulti(0, block_id_pool.length - 1, id_count);
 			for (var i = id_count - 1; i >= 0; i--) {
@@ -85,67 +91,39 @@ Dr.Implement('Mine_Map', function (global, module_get) {
 			return id_list;
 		}
 		
-		var mine_block_id_list = get_id_list(block_id_pool, this._mine_block_count);
-		var empty_block_id_list = get_id_list(block_id_pool, this._empty_block_count);
-		var lock_block_id_list = get_id_list(block_id_pool, this._lock_block_count);
+		var mine_block_id_list = random_pick_id_list(block_id_pool, this._mine_block_count);
+		var empty_block_id_list = random_pick_id_list(block_id_pool, this._empty_block_count);
+		var lock_block_id_list = random_pick_id_list(block_id_pool, this._lock_block_count);
 		
-		this._map_mine_data = [];
-		this._map_visual_data = [];
+		//init data, game will use block data directly
+		this._map_init_mine_data = this.getArrayYX(function (x, y) { return 0; });
+		this._map_init_visual_data = this.getArrayYX(function (x, y) { return Module.type.NormalBlock; });
 		
-		for (var y = 0; y < this._height; y++) {
-			var row_mine_data = [];
-			var row_visual_data = [];
-			for (var x = 0; x < this._width; x++) {
-				row_mine_data[x] = 0;
-				row_visual_data[x] = Module.type.NormalBlock;
-			}
-			this._map_mine_data[y] = row_mine_data;
-			this._map_visual_data[y] = row_visual_data;
-		}
-		
-		var apply_data = function (map_data, width, id_list, apply_symbol) {
+		var quick_apply_data = function (map_data, width, id_list, apply_symbol) {
 			for (var index in id_list) {
 				var id = id_list[index];
 				var y = Math.floor(id / width);
 				var x = id % width;
-				
 				//Dr.log(id, x, y, '|', map_data, width, id_list, apply_symbol);
-				
 				map_data[y][x] = apply_symbol;
 			}
 		}
 		
-		apply_data(this._map_mine_data, this._width, mine_block_id_list, 1/*Dr.getRandomInt(1, 9)*/);	//currently set mine count to 1, could any though
-		apply_data(this._map_visual_data, this._width, empty_block_id_list, Module.type.EmptyBlock);
-		apply_data(this._map_visual_data, this._width, lock_block_id_list, Module.type.LockBlock);
+		quick_apply_data(this._map_init_mine_data, this._width, mine_block_id_list, 1/*Dr.getRandomInt(1, 9)*/);	//currently set mine count to 1, could any though
+		quick_apply_data(this._map_init_visual_data, this._width, empty_block_id_list, Module.type.EmptyBlock);
+		quick_apply_data(this._map_init_visual_data, this._width, lock_block_id_list, Module.type.LockBlock);
 	}
 	
 	Module.prototype.initBlock = function () {
-		this._map_block = [];
-		
-		for (var y = 0; y < this._height; y++) {
-			var row_block = [];
-			for (var x = 0; x < this._width; x++) {
-				var block = new Mine_Block;
-				block.init(
-					this, 
-					this._block_type, 
-					x, y, 
-					this._map_mine_data[y][x], 
-					this._map_visual_data[y][x]
-				);
-				row_block[x] = block;
-			}
-			this._map_block[y] = row_block;
-		}
+		var _this = this;
+		this._map_block = this.getArrayYX(function (x, y) { 
+			var block = new Mine_Block;
+			block.init(_this, _this._block_type, x, y, _this._map_init_mine_data[y][x], _this._map_init_visual_data[y][x]);
+			return block;
+		});
 		
 		//after all is created...
-		for (var y = 0; y < this._height; y++) {
-			for (var x = 0; x < this._width; x++) {
-				var block = this._map_block[y][x];
-				block.initSurround();
-			}
-		}
+		this.forEachXY(function (x, y) { _this.getBlockFromLocation(x, y).initSurround(); });
 	}
 	
 	
@@ -154,32 +132,48 @@ Dr.Implement('Mine_Map', function (global, module_get) {
 			return this._map_block[y][x];
 		}
 		else {
-			Dr.debug(5, '[getBlockFromLocation] checkLocationValid', x, y);
+			Dr.debug(5, '[getBlockFromLocation] checkLocationValid failed:', x, y);
 			return;
 		}
 	}
 	
+	Module.prototype.notify = function (event_type) {
+		var extra_arg_list = Dr.getArgumentArray(arguments, 1);
+		switch (event_type) {
+			case 'flip_mine_block':
+				this.onFilpMineBlock.apply(this, extra_arg_list);
+				break;
+		}
+	}
+	
+	Module.prototype.onFilpMineBlock = function (block) {
+		Dr.log('[onFilpMineBlock] get block at:', block.getX(), block.getY(), 'mine_count:', block.getMineCount());
+		
+		var _this = this;
+		this.forEachXY(function (x, y) { _this.getBlockFromLocation(x, y).forceFlip(); });
+		
+	}
+	
 	Module.prototype.print = function () {
+		var _this = this;
+		var mine_map = this.getArrayYX(function (x, y) { return _this.getBlockFromLocation(x, y).getMineCount(); });
+		var visual_map = this.getArrayYX(function (x, y) { return _this.getBlockFromLocation(x, y).getVisualType(); });
+		var surround_mine_map = this.getArrayYX(function (x, y) { return _this.getBlockFromLocation(x, y).getSurroundMineCount(); });
+		
 		var mine_map_text = '';
 		var visual_map_text = '';
-		
 		var surround_mine_map_text = '';
-		
 		for (var y = 0; y < this._height; y++) {
-			mine_map_text += this._map_mine_data[y].join(' ') + '\n';
-			visual_map_text += this._map_visual_data[y].join(' ') + '\n';
-			
-			var surround_mine_count_row = [];
-			for (var x = 0; x < this._width; x++) {
-				var block = this._map_block[y][x];
-				surround_mine_count_row.push(block.getSurroundMineCount());
-			}
-			surround_mine_map_text += surround_mine_count_row.join(' ') + '\n';
+			mine_map_text += mine_map[y].join(' ') + '\n';
+			visual_map_text += visual_map[y].join(' ') + '\n';
+			surround_mine_map_text += surround_mine_map[y].join(' ') + '\n';
 		}
 		
-		Dr.log('Notice the map is filpped');
+		Dr.log('[Mine Map]');
 		Dr.log(mine_map_text);
+		Dr.log('[Visual Map]');
 		Dr.log(visual_map_text);
+		Dr.log('[Surround Mine Map]');
 		Dr.log(surround_mine_map_text);
 	}
 	
