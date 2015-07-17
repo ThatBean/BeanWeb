@@ -209,6 +209,8 @@ Dr.Implement('ImageDataFont', function (global, module_get) {
 	
 	//will use default_font_attribute
 	Module.prototype.getTextImageData = function (text, scale_ratio, format_width, font_config) {
+		if (!text) return;
+		
 		var scale_ratio = scale_ratio || 1;
 		var format_width = format_width || 0;
 		var font_config = font_config || this._default_font_config;

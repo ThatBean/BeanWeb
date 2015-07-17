@@ -58,22 +58,26 @@ else {
 	Dr.document = document;	//normally document, always in fact
 	Dr.devicePixelRatio = Dr.window.devicePixelRatio || 1;
 
-	Dr.document.onkeydown = function (event) {
-		Dr.log("[document.onkeydown]", event.keyCode, event.which, Dr.getKeyDefination(event.keyCode || event.which));
+	Dr.document.addEventListener("keydown", function (event) {
+		Dr.log("[KEY_DOWN]", event.keyCode, event.which, Dr.getKeyDefination(event.keyCode || event.which));
 		Dr.Event.emit("KEY_DOWN", event, Dr.getKeyDefination(event.keyCode || event.which));
-	};
-	Dr.document.onkeyup = function (event) {
-		Dr.log("[document.onkeyup]", event.keyCode, event.which, Dr.getKeyDefination(event.keyCode || event.which));
+	});
+	Dr.document.addEventListener("keyup", function (event) {
+		Dr.log("[KEY_UP]", event.keyCode, event.which, Dr.getKeyDefination(event.keyCode || event.which));
 		Dr.Event.emit("KEY_UP", event, Dr.getKeyDefination(event.keyCode || event.which));
-	};
-	Dr.document.onpaste = function (event) {
+	});
+	Dr.document.addEventListener("keypress", function (event) {
+		Dr.log("[KEY_PRESS]", event.keyCode, event.which, Dr.getKeyDefination(event.keyCode || event.which));
+		Dr.Event.emit("KEY_PRESS", event, (event.keyCode || event.which)); //this is combined Unicode
+	});
+	Dr.document.addEventListener("paste", function (event) {
 		//get content
 		var content;
 		if (event.clipboardData) content = (event.originalEvent || event).clipboardData.getData('text/plain');
 		else if (window.clipboardData) content = window.clipboardData.getData('Text');
 		//pass on
 		Dr.Event.emit("PASTE", event, content);
-	};
+	});
 	
 	Dr.window.addEventListener("resize", function (event) {
 		Dr.Event.emit('WINDOW_RESIZE', event);

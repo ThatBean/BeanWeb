@@ -307,6 +307,13 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 		var scale_y = scale_y || scale_x;
 		Dr.debug(5, 'scale:', scale_x, scale_y);
 		
+		if (canvas_element.width == 0 || canvas_element.height == 0) {
+			//nothing to process
+			canvas_element.width *= scale_x;
+			canvas_element.height *= scale_y;
+			return canvas_element;
+		}
+		
 		//get source
 		var source_canvas_image_data = canvas_element.getContext('2d').getImageData(0, 0, canvas_element.width, canvas_element.height);
 		var source_pixel_array = source_canvas_image_data.data;

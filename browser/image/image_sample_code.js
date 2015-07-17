@@ -198,10 +198,36 @@ function init() {
 	var test_image_data_font = new ImageDataFont;
 	test_image_data_font.init();
 	var text = '|\n!0, f\nyjl\tLasfas\rdfdfdsf\nsdfs ff\naadsfggsdfdsfasfsdfsdaf';
-	var font_config = test_image_data_font.getFontConfig(12, 15, 'normal', '', '#FF00FF'); //font_size, line_height, font_style, font_family, fill_style
+	var font_config = test_image_data_font.getFontConfig(12, 15, 'normal', 'monospace', '#F00'); //font_size, line_height, font_style, font_family, fill_style
 	var result_image_data_font = test_image_data_font.getTextImageData(text, 2, 300, font_config);
 	result_image_data_font.draw(test_font_context, 10, 10);
 	
+	
+	var text_value = '';
+	
+	var key_func = function (event_key, event, key_type) {
+		
+		
+		var key_code = event.keyCode || event.which;
+		
+		if (event_key == 'KEY_DOWN') {
+			if (key_type == 'K_BACKSPACE') text_value = text_value.slice(0, -1);
+		}
+		else {
+			event.preventDefault();
+			var new_char = String.fromCharCode(key_code);
+			text_value = text_value + new_char;
+		}
+		
+		test_font_canvas.width += 0;
+		
+		var text = text_value + '|';
+		var font_config = test_image_data_font.getFontConfig(12, 15, 'normal', 'monospace', '#F00'); //font_size, line_height, font_style, font_family, fill_style
+		var result_image_data_font = test_image_data_font.getTextImageData(text, 2, 300, font_config);
+		result_image_data_font.draw(test_font_context, 10, 10);
+	};
+	Dr.Event.addEventListener('KEY_DOWN', key_func);
+	Dr.Event.addEventListener('KEY_PRESS', key_func);
 	
 	// Dr.image_data_canvas.drawPixelLine({x:1,y:3}, {x:150,y:45}, {r:200,g:30,b:0,a:100});
 	// Dr.image_data_canvas.draw(Dr.main_context, 10, 10);
