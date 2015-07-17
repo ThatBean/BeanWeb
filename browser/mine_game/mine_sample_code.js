@@ -167,15 +167,6 @@ function init() {
 	Dr.log(Dr.Get('Mine_Type').getSurroundList('BOX', 2, 3));
 	Dr.log(Dr.Get('Mine_Type').getSurroundList('HEX', 2, 3));
 	Dr.log(Dr.Get('Mine_Type').getSurroundList('TRI', 2, 3));
-	
-	
-	
-	
-	var d = Dr.Get('ImageDataFont');
-	var dd = new d;
-	dd.init();
-	var ddd = dd.getTextImageData('AfyQtest');
-	ddd.draw(document.getElementById('Dr.Canvas2').getContext('2d'), 100, 100);
 }
 
 Dr.afterWindowLoaded(init);
