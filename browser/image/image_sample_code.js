@@ -201,6 +201,10 @@ function init() {
 	var test_font_canvas = document.getElementById('test_font');
 	var test_font_context = test_font_canvas.getContext('2d');
 	
+	var ImageDataExt = Dr.Get('ImageDataExt');
+	var test_image_data_cursor = ImageDataExt.create(ImageDataExt.type.CANVAS_ELEMENT, 5, 15 * 2);
+	test_image_data_cursor.floodFill({x:0, y:0}, {r:255, g:0, b:0, a:255});
+	
 	var ImageDataFont = Dr.Get('ImageDataFont');
 	var test_image_data_font = new ImageDataFont;
 	test_image_data_font.init();
@@ -213,18 +217,22 @@ function init() {
 	var text_value = '';
 	
 	var key_func = function (event_key, event, key_type) {
-		var key_code = event.keyCode || event.which;
-		
 		if (event_key == 'KEY_DOWN') {
 			if (key_type == 'K_BACKSPACE') {
 				text_value = text_value.slice(0, -1);
+			}
+			else if (key_type == 'K_TAB') {
+				text_value = text_value = text_value + '\t';
 			}
 			else {
 				return;
 			}
 		}
 		if (event_key == 'KEY_PRESS') {
-			text_value = text_value + String.fromCharCode(key_code);
+			text_value = text_value + String.fromCharCode(key_type);
+		}
+		if (event_key == 'TEXT_CONTENT') {
+			text_value = text_value + key_type;
 		}
 		
 		event.preventDefault();
@@ -237,11 +245,24 @@ function init() {
 		
 		result_image_data_font.draw(test_font_context, 10, 10);
 		
-		
+		test_image_data_cursor.draw(test_font_context, 10 + result_image_data_font.text_end_position.x, 10 + result_image_data_font.text_end_position.y);
 		
 	};
 	Dr.Event.addEventListener('KEY_DOWN', key_func);
 	Dr.Event.addEventListener('KEY_PRESS', key_func);
+	Dr.Event.addEventListener('TEXT_CONTENT', key_func);
+	
+	var test_input_input = document.getElementById('test_input');
+	test_input_input.addEventListener('change',  function (event) {
+		event.preventDefault();
+		event.stopPropagation();
+		
+		
+		Dr.log('TEXT_CONTENT', event, test_input_input.value);
+		
+		Dr.Event.emit('TEXT_CONTENT', event, test_input_input.value);
+		test_input_input.value = '';
+	});
 	
 	// Dr.image_data_canvas.drawPixelLine({x:1,y:3}, {x:150,y:45}, {r:200,g:30,b:0,a:100});
 	// Dr.image_data_canvas.draw(Dr.main_context, 10, 10);
