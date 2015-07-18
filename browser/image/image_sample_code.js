@@ -191,13 +191,20 @@ function init() {
 	Dr.test_canvas = test_canvas;
 	
 	
+	
+	
+	
+	
+	//tset font
+	
+	
 	var test_font_canvas = document.getElementById('test_font');
 	var test_font_context = test_font_canvas.getContext('2d');
 	
 	var ImageDataFont = Dr.Get('ImageDataFont');
 	var test_image_data_font = new ImageDataFont;
 	test_image_data_font.init();
-	var text = '|\n!0, f\nyjl\tLasfas\rdfdfdsf\nsdfs ff\naadsfggsdfdsfasfsdfsdaf';
+	var text = 'You can input by tapping some key';
 	var font_config = test_image_data_font.getFontConfig(12, 15, 'normal', 'monospace', '#F00'); //font_size, line_height, font_style, font_family, fill_style
 	var result_image_data_font = test_image_data_font.getTextImageData(text, 2, 300, font_config);
 	result_image_data_font.draw(test_font_context, 10, 10);
@@ -206,25 +213,32 @@ function init() {
 	var text_value = '';
 	
 	var key_func = function (event_key, event, key_type) {
-		
-		
 		var key_code = event.keyCode || event.which;
 		
 		if (event_key == 'KEY_DOWN') {
-			if (key_type == 'K_BACKSPACE') text_value = text_value.slice(0, -1);
+			if (key_type == 'K_BACKSPACE') {
+				text_value = text_value.slice(0, -1);
+			}
+			else {
+				return;
+			}
 		}
-		else {
-			event.preventDefault();
-			var new_char = String.fromCharCode(key_code);
-			text_value = text_value + new_char;
+		if (event_key == 'KEY_PRESS') {
+			text_value = text_value + String.fromCharCode(key_code);
 		}
+		
+		event.preventDefault();
+		
+		var text = text_value;
+		
+		var result_image_data_font = test_image_data_font.getTextImageData(text, 2, 300, font_config);
 		
 		test_font_canvas.width += 0;
 		
-		var text = text_value + '|';
-		var font_config = test_image_data_font.getFontConfig(12, 15, 'normal', 'monospace', '#F00'); //font_size, line_height, font_style, font_family, fill_style
-		var result_image_data_font = test_image_data_font.getTextImageData(text, 2, 300, font_config);
 		result_image_data_font.draw(test_font_context, 10, 10);
+		
+		
+		
 	};
 	Dr.Event.addEventListener('KEY_DOWN', key_func);
 	Dr.Event.addEventListener('KEY_PRESS', key_func);

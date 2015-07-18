@@ -180,6 +180,12 @@ Dr.Implement('ImageDataFont', function (global, module_get) {
 					break;
 			}
 		}
+		
+		//stops at
+		return {
+			x: current_x,
+			y: current_y,
+		};
 	}
 	
 	
@@ -205,12 +211,7 @@ Dr.Implement('ImageDataFont', function (global, module_get) {
 	}
 	
 	
-	
-	
-	//will use default_font_attribute
 	Module.prototype.getTextImageData = function (text, scale_ratio, format_width, font_config) {
-		if (!text) return;
-		
 		var scale_ratio = scale_ratio || 1;
 		var format_width = format_width || 0;
 		var font_config = font_config || this._default_font_config;
@@ -222,9 +223,10 @@ Dr.Implement('ImageDataFont', function (global, module_get) {
 		var context = text_image_data_ext.data.getContext('2d');
 		
 		//draw symbol
-		this.autoMapping(text, scale_ratio, format_width, font_config, function (index, symbol, symbol_image_data, current_x, current_y) {
+		text_image_data_ext.text_end_position = this.autoMapping(text, scale_ratio, format_width, font_config, function (index, symbol, symbol_image_data, current_x, current_y) {
 			symbol_image_data.draw(context, current_x, current_y);
 		})
+		
 		return text_image_data_ext;
 	}
 	
