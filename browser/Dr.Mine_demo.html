@@ -17,9 +17,13 @@
 	<script type="text/javascript">
 		Dr.loadLocalScript('Dr.browser.js', function () {
 			Dr.loadScriptByList([
-				//image
-				'image/image.js',
-				'image/image_data_font.js',
+				//graphic
+				'graphic/canvas_ext.js',
+				'graphic/graphic_operation.js',
+				'graphic/image_data_ext.js',
+				'graphic/image_data_font.js',
+				'graphic/math/vector.js',
+				'graphic/math/color.js',
 				//game
 				'mine_game/type.js',
 				'mine_game/block.js',
@@ -59,9 +63,11 @@
 				Dr.autoProcess = function autoProcess(data_url_text, callback) {
 					Dr.loadImage(data_url_text, function (image_element) {
 						var ImageDataExt = Dr.Get("ImageDataExt");
+						var GraphicOperation = Dr.Get("GraphicOperation");
 						var image_data_ext = new ImageDataExt;
 						image_data_ext.init('local', image_element, ImageDataExt.type.IMAGE_ELEMENT);
-						image_data_ext.replaceColor(function (r, g, b, a) { if (r == 255 && g == 255 && b == 255) return {r:0,g:0,b:0,a:0}; });
+						image_data_ext.toCanvasImageData();
+						GraphicOperation.replaceColor(image_data_ext.data, function (r, g, b, a) { if (r == 255 && g == 255 && b == 255) return {r:0,g:0,b:0,a:0}; });
 						image_data_ext.crop(function (r, g, b, a) { if (a == 0) return true; });
 						image_data_ext.toCanvas();
 						callback(image_data_ext.data.toDataURL());

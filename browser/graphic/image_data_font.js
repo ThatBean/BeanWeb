@@ -7,20 +7,13 @@ Dr.Implement('ImageDataFont', function (global, module_get) {
 	}
 	
 	var ImageDataExt = Dr.Get('ImageDataExt');
-	
-	Module.type = {
-		IMAGE_ELEMENT: 'IMAGE_ELEMENT',	//fast, but not editable
-		CANVAS_ELEMENT: 'CANVAS_ELEMENT',	//fast, with vector graph edit API(recommend to use)
-		CANVAS_IMAGE_DATA: 'CANVAS_IMAGE_DATA',	//slow, but with pixel manipulation
-	}
+	var GraphicOperation = Dr.Get('GraphicOperation');
 	
 	Module.prototype.init = function () {
 		this.cached = {};
 		this.generated = {};
 		this.setDefaultAttribute(8, 15, 'normal', 'consolas,monaco,monospace', '#000000');
 	}
-	
-	
 	
 	Module.prototype.setDefaultAttribute = function (font_size, line_height, font_style, font_family, fill_style) {
 		this._default_font_size = font_size;
@@ -56,7 +49,7 @@ Dr.Implement('ImageDataFont', function (global, module_get) {
 	
 	
 	Module.prototype.getTextMeasureData = function (text, font_config) {
-		var quick_context = ImageDataExt.getQuickContext();
+		var quick_context = GraphicOperation.getQuickContext();
 		quick_context.font = font_config.attribute;
 		var measured_width = quick_context.measureText(text).width;
 		

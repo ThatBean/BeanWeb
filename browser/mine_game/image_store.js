@@ -1,16 +1,18 @@
 //image generator
 
 Dr.Declare('Mine_ImageStore', 'class');
-Dr.Require('Mine_ImageStore', 'Mine_Type');
 Dr.Require('Mine_ImageStore', 'ImageDataExt');
+Dr.Require('Mine_ImageStore', 'GraphicOperation');
+Dr.Require('Mine_ImageStore', 'Mine_Type');
 Dr.Implement('Mine_ImageStore', function (global, module_get) {
 	
 	var Module = function () {
 		//
 	}
 	
-	var Mine_Type = Dr.Get('Mine_Type');
 	var ImageDataExt = Dr.Get('ImageDataExt');
+	var GraphicOperation = Dr.Get('GraphicOperation');
+	var Mine_Type = Dr.Get('Mine_Type');
 	
 	Module.type = Mine_Type.type;
 	
@@ -152,6 +154,27 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 		};
 	}
 	
+	function arrayToPoint (array) {
+		return {
+			x: array[0], 
+			y: array[1],
+		};
+	}
+	function arrayToSize (array) {
+		return {
+			width: array[0], 
+			height: array[1],
+		};
+	}
+	function arrayToColor (array) {
+		return {
+			r: array[0], 
+			g: array[1],
+			b: array[2],
+			a: array[3] == undefined ? 255 : array[3],
+		};
+	}
+	
 	Module.prototype.generateImageData = function () {
 		var generated = {};
 		
@@ -173,13 +196,13 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 			
 			for (var i = 0; i < process_count; i ++) {
 				var point_list = [];
-				for (var index in config.point_list) point_list.push(approach(ImageDataExt.arrayToPoint(config.point_list[index]), center_point, i));
+				for (var index in config.point_list) point_list.push(approach(arrayToPoint(config.point_list[index]), center_point, i));
 				draw_process_data.push(point_list);
 			}
 			
 			for (var variant_type in Module.typeImageVariant) {
-				var center_color = ImageDataExt.arrayToColor(Module.typeCenterColor[variant_type]);
-				var border_color = ImageDataExt.arrayToColor(Module.typeBorderColor[variant_type]);
+				var center_color = arrayToColor(Module.typeCenterColor[variant_type]);
+				var border_color = arrayToColor(Module.typeBorderColor[variant_type]);
 				
 				Dr.log('[generateImageData]', variant_type, center_color);
 				var generated_image_data_ext = ImageDataExt.create(ImageDataExt.type.CANVAS_ELEMENT, config.size[0], config.size[1]);
@@ -193,8 +216,10 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 					var apply_color = fade(center_color, border_color, (process_count - index - 1) / process_count);
 					var point_list = draw_process_data[index];
 					
-					generated_image_data_ext.drawPixelLineList(point_list, apply_color, true);
-					generated_image_data_ext.floodFill(center_point, apply_color);
+					generated_image_data_ext.toCanvasImageData();
+					
+					GraphicOperation.drawPixelLineList(generated_image_data_ext.data, point_list, apply_color, true);
+					GraphicOperation.floodFill(generated_image_data_ext.data, center_point, apply_color);
 				}
 				
 				//important! canvas will mix alpha 
@@ -271,13 +296,13 @@ Dr.Implement('Mine_ImageStore', function (global, module_get) {
 	Module.prototype.getBlockImageSizeByType = function (block_type) {
 		switch (block_type) {
 			case Module.type.BOX:
-				return ImageDataExt.arrayToSize(Module.configImageGenerate.IMAGE_TYPE_BOX.size);
+				return arrayToSize(Module.configImageGenerate.IMAGE_TYPE_BOX.size);
 				break;
 			case Module.type.HEX:
-				return ImageDataExt.arrayToSize(Module.configImageGenerate.IMAGE_TYPE_HEX.size);
+				return arrayToSize(Module.configImageGenerate.IMAGE_TYPE_HEX.size);
 				break;
 			case Module.type.TRI:
-				return ImageDataExt.arrayToSize(Module.configImageGenerate.IMAGE_TYPE_TRI_UP.size);
+				return arrayToSize(Module.configImageGenerate.IMAGE_TYPE_TRI_UP.size);
 				break;
 			default:
 				Dr.assert(false, '[getBlockImageSizeByType] error type', block_type);

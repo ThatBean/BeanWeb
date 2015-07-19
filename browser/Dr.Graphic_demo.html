@@ -3,7 +3,7 @@
 <head>
 	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
 	
-	<title>Dr.Image Demo Page</title>
+	<title>Dr.Graphic Demo Page</title>
 	
 	<style>
 		#page-header td, #page-footer td { text-align: left; padding: 0.1em; border-left: 1em solid #222; border-right: 1em solid #222; }
@@ -17,11 +17,11 @@
 	<script type="text/javascript">
 		Dr.loadLocalScript('Dr.browser.js', function () {
 			Dr.loadScriptByList([
-				'image/image.js',
-				'image/image_data_font.js',
-				'image/resource_loader.js',
-				'image/bitmapfont.js',
-				'image/image_sample_code.js'
+				'graphic/canvas_ext.js',
+				'graphic/image_data_ext.js',
+				'graphic/image_data_font.js',
+				'graphic/graphic_operation.js',
+				'graphic/graphic_sample_code.js'
 			], function () {
 				Dr.log("All script loaded");
 				
@@ -62,7 +62,7 @@
 </head>
 <body>
 	<div id="page-header" class="fix-top">
-		<p class="text-center">The Demo Html of Dr.Image</p>
+		<p class="text-center">The Demo Html of Dr.Graphic</p>
 	</div>
 	
 	<div id="page-footer" class="fix-bottom">
@@ -81,7 +81,7 @@
 	</div>
 	
 	<div id="page-content" class="align-center text-center">
-		<div><p>This page is for <b>Dr.Image develop</b> use</p></div>
+		<div><p>This page is for <b>Dr.Graphic develop</b> use</p></div>
 		
 		<div>
 			<button onclick="Dr.Event.emit('KEY_UP', null, 'K_LEFT')">[Left]</button>

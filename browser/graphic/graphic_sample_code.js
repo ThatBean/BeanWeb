@@ -176,7 +176,6 @@ function init() {
 				return false;	//once
 			}, 'test_canvas_draw_touch_position')
 			
-			
 			tag_log.Log([event_key, action.position_listener.x.toFixed(4), action.position_listener.y.toFixed(4)].join(' '));
 		}
 		else {
@@ -195,8 +194,7 @@ function init() {
 	
 	
 	
-	//tset font
-	
+	//test font
 	
 	var test_font_canvas = document.getElementById('test_font');
 	var test_font_context = test_font_canvas.getContext('2d');
@@ -257,15 +255,10 @@ function init() {
 		event.preventDefault();
 		event.stopPropagation();
 		
-		
 		Dr.log('TEXT_CONTENT', event, test_input_input.value);
-		
 		Dr.Event.emit('TEXT_CONTENT', event, test_input_input.value);
 		test_input_input.value = '';
 	});
-	
-	// Dr.image_data_canvas.drawPixelLine({x:1,y:3}, {x:150,y:45}, {r:200,g:30,b:0,a:100});
-	// Dr.image_data_canvas.draw(Dr.main_context, 10, 10);
 }
 
 Dr.afterWindowLoaded(init);
