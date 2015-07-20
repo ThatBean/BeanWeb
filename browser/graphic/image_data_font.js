@@ -44,6 +44,8 @@ Dr.Implement('ImageDataFont', function (global, module_get) {
 			font_family: font_family,
 			fill_style: fill_style,
 			attribute: font_style + ' ' + font_size + 'px/' + line_height + 'px ' + font_family,
+			
+			cache_tag: font_style + '|' + font_size + '|' + line_height + '|' + font_family + '|' + fill_style,
 		}
 	}
 	
@@ -94,8 +96,8 @@ Dr.Implement('ImageDataFont', function (global, module_get) {
 	
 	
 	Module.prototype.getGeneratedTextImageData = function (text, font_config) {
-		if (this.generated[text] && this.generated[text][font_config.attribute]) {
-			return this.generated[text][font_config.attribute];
+		if (this.generated[text] && this.generated[text][font_config.cache_tag]) {
+			return this.generated[text][font_config.cache_tag];
 		}
 		else {
 			return this.generateTextImageData(this.getTextMeasureData(text, font_config));
@@ -104,7 +106,7 @@ Dr.Implement('ImageDataFont', function (global, module_get) {
 	
 	Module.prototype.getCachedTextImageData = function (text, scale_ratio, font_config) {
 		var font_config = font_config || this._default_font_config;
-		var cache_key = text + '|' + font_config.attribute + '|' + scale_ratio;
+		var cache_key = text + '|' + font_config.cache_tag + '|' + scale_ratio;
 		
 		if (!this.cached[cache_key]) {
 			Dr.debug(5, 'cache add', cache_key);

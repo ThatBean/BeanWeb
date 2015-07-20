@@ -144,6 +144,8 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 				this.drawBlock(this._update_data.selected_block, 'VARIANT_TYPE_PRESSED', '');
 			}
 			
+			Dr.Event.emit('MineGridUpdate', this, this._canvas_ext);
+			
 			this._update_data.is_update_needed = false;
 		}
 		

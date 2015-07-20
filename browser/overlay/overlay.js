@@ -215,6 +215,7 @@ Dr.Implement('OverlayCursor', function (global, module_get) {
 			+ '<br />[To Menu]<br />Just Click(You know)'
 			+ '<br />'
 			+ '<br /><button>Close Menu</button>'
+			+ '<br /><button>Back</button> | <button>Next</button>'
 			+ '<br /><button>Exit Mouse</button>'
 			+ '<br />'
 			+ '<br /><b>ThatBean.com</b><sup>ver 6.0</sup>'
@@ -402,13 +403,23 @@ Dr.Implement('OverlayCursor', function (global, module_get) {
 			return _this.calculate_position();
 		}
 		
+		function _action_menu_back (event) {
+			event.preventDefault();
+			event.stopPropagation();
+			window.history.back();
+		}
+		function _action_menu_next (event) {
+			event.preventDefault();
+			event.stopPropagation();
+			window.history.next();
+		}
 		function _action_menu_close (event) {
 			event.preventDefault();
 			event.stopPropagation();
 			_this.element_map.ELEMENT_MENU.style.display = 'none';
 		}
 		
-		function _action_menu_exit (event) {
+		function _action_menu_self_clear (event) {
 			event.preventDefault();
 			event.stopPropagation();
 			_this.clear();
@@ -429,7 +440,9 @@ Dr.Implement('OverlayCursor', function (global, module_get) {
 		//body.addEventListener('mouseout', _action_reset, false);	//fires too often(cross elements), cause error...
 		
 		this.element_map.ELEMENT_MENU.getElementsByTagName('button')[0].addEventListener('click', _action_menu_close, false);
-		this.element_map.ELEMENT_MENU.getElementsByTagName('button')[1].addEventListener('click', _action_menu_exit, false);
+		this.element_map.ELEMENT_MENU.getElementsByTagName('button')[1].addEventListener('click', _action_menu_back, false);
+		this.element_map.ELEMENT_MENU.getElementsByTagName('button')[2].addEventListener('click', _action_menu_next, false);
+		this.element_map.ELEMENT_MENU.getElementsByTagName('button')[3].addEventListener('click', _action_menu_self_clear, false);
 		
 		Dr.Event.addEventListener('WINDOW_RESIZE', _calculate_position);
 	}

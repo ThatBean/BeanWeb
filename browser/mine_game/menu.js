@@ -1,16 +1,14 @@
-//map data and logic, receive user operation and send to block
+//menu action and logic, receive user operation and send to grid
 
-Dr.Declare('Mine_Map', 'class');
-Dr.Require('Mine_Map', 'Mine_Type');
-Dr.Require('Mine_Map', 'Mine_Block');
-Dr.Implement('Mine_Map', function (global, module_get) {
+Dr.Declare('Mine_Menu', 'class');
+Dr.Require('Mine_Menu', 'Mine_Type');
+Dr.Implement('Mine_Menu', function (global, module_get) {
 	
 	var Module = function () {
 		//
 	}
 	
 	var Mine_Type = Dr.Get('Mine_Type');
-	var Mine_Block = Dr.Get('Mine_Block');
 	
 	Module.type = Mine_Type.type;
 	
@@ -24,13 +22,13 @@ Dr.Implement('Mine_Map', function (global, module_get) {
 			case Module.type.TRI:
 				break;
 			default:
-				Dr.log('[Mine_Map] error block_type:', block_type);
+				Dr.log('[Mine_Menu] error block_type:', block_type);
 				return;
 				break;
 		}
 		
 		if (width * height < (mine_block_count + empty_block_count + lock_block_count)) {
-			Dr.log('[Mine_Map] Error! count overflow:', width * height, (mine_block_count + empty_block_count + lock_block_count), 'input:', width, height, mine_block_count, empty_block_count, lock_block_count);
+			Dr.log('[Mine_Menu] Error! count overflow:', width * height, (mine_block_count + empty_block_count + lock_block_count), 'input:', width, height, mine_block_count, empty_block_count, lock_block_count);
 			return;
 		}
 		
@@ -189,25 +187,25 @@ Dr.Implement('Mine_Map', function (global, module_get) {
 	
 	Module.prototype.print = function () {
 		var _this = this;
-		var mine_map = this.getArrayYX(function (x, y) { return _this.getBlockFromLocation(x, y).getMineCount(); });
+		var Mine_Menu = this.getArrayYX(function (x, y) { return _this.getBlockFromLocation(x, y).getMineCount(); });
 		var visual_map = this.getArrayYX(function (x, y) { return _this.getBlockFromLocation(x, y).getVisualType(); });
-		var surround_mine_map = this.getArrayYX(function (x, y) { return _this.getBlockFromLocation(x, y).getSurroundMineCount(); });
+		var surround_Mine_Menu = this.getArrayYX(function (x, y) { return _this.getBlockFromLocation(x, y).getSurroundMineCount(); });
 		
-		var mine_map_text = '';
+		var Mine_Menu_text = '';
 		var visual_map_text = '';
-		var surround_mine_map_text = '';
+		var surround_Mine_Menu_text = '';
 		for (var y = 0; y < this._height; y++) {
-			mine_map_text += mine_map[y].join(' ') + '\n';
+			Mine_Menu_text += Mine_Menu[y].join(' ') + '\n';
 			visual_map_text += visual_map[y].join(' ') + '\n';
-			surround_mine_map_text += surround_mine_map[y].join(' ') + '\n';
+			surround_Mine_Menu_text += surround_Mine_Menu[y].join(' ') + '\n';
 		}
 		
 		Dr.log('[Mine Map]');
-		Dr.log(mine_map_text);
+		Dr.log(Mine_Menu_text);
 		Dr.log('[Visual Map]');
 		Dr.log(visual_map_text);
 		Dr.log('[Surround Mine Map]');
-		Dr.log(surround_mine_map_text);
+		Dr.log(surround_Mine_Menu_text);
 	}
 	
 	return Module;
