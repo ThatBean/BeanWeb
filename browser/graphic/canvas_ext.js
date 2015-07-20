@@ -29,8 +29,8 @@ Dr.Implement('CanvasExt', function (global, module_get) {
 		}
 		
 		
-		this._width = canvas.width;
-		this._height = canvas.height;
+		this.width = canvas.width;
+		this.height = canvas.height;
 		//canvas.style.cursor = 'default';	//prevent selection
 		
 		this._buffer_list = [];
@@ -55,14 +55,18 @@ Dr.Implement('CanvasExt', function (global, module_get) {
 		this.applyBuffer(buffer_index);
 	}
 	
-	Module.prototype.getWidth = function () { return this._width; }
-	Module.prototype.getHeight = function () { return this._height; }
 	Module.prototype.getMainCanvas = function () { return this._main_canvas; }
 	Module.prototype.getMainContext = function () { return this._main_context; }
 	Module.prototype.getEventCenter = function () { return this._event_center; }
 	
 	Module.prototype.clearCanvas = function () { this._main_canvas.width += 0; }
-	Module.prototype.drawImageData = function (image_data, x, y) { this._event_center.emit(Module.event.DRAW); }
+	//Module.prototype.drawImageData = function (image_data, x, y) { this._event_center.emit(Module.event.DRAW); }
+	
+	
+	
+	
+	
+	
 	
 	
 	// TODO: replace with ImageDataExt and separate
@@ -90,8 +94,8 @@ Dr.Implement('CanvasExt', function (global, module_get) {
 		var buffer = this._buffer_list[buffer_index];
 		
 		//keep buffer if we can
-		if (buffer.canvas.width != buffer_width) buffer.canvas.width = (buffer_width != undefined ? buffer_width : this._width);
-		if (buffer.canvas.height != buffer_height) buffer.canvas.height = (buffer_height != undefined ? buffer_height : this._height);
+		if (buffer.canvas.width != buffer_width) buffer.canvas.width = (buffer_width != undefined ? buffer_width : this.width);
+		if (buffer.canvas.height != buffer_height) buffer.canvas.height = (buffer_height != undefined ? buffer_height : this.height);
 		
 		this._buffer_list[buffer_index] = {
 			index: buffer_index,
@@ -104,8 +108,8 @@ Dr.Implement('CanvasExt', function (global, module_get) {
 			y: (y != undefined ? y : (buffer.y || 0)),
 			clip_x: (clip_x != undefined ? clip_x : (buffer.clip_x || 0)),
 			clip_y: (clip_y != undefined ? clip_y : (buffer.clip_y || 0)),
-			clip_width: (clip_width != undefined ? clip_width : (buffer.clip_width || this._width)),
-			clip_height: (clip_height != undefined ? clip_height : (buffer.clip_height || this._height)),
+			clip_width: (clip_width != undefined ? clip_width : (buffer.clip_width || this.width)),
+			clip_height: (clip_height != undefined ? clip_height : (buffer.clip_height || this.height)),
 		};
 	}
 	

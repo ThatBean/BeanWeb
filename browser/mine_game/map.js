@@ -164,25 +164,27 @@ Dr.Implement('Mine_Map', function (global, module_get) {
 		
 		
 		var callback_func = function (key, mine_grid, canvas_ext) {
+			var text = 'Game Over';
+			//var text = '游戏结束';
 			var dist = 3;
-			var result_image_data_font_bg = test_image_data_font.getTextImageData('Game Over', 6, 0, font_config_bg);
+			var result_image_data_font_bg = test_image_data_font.getTextImageData(text, 5, 0, font_config_bg);
 			result_image_data_font_bg.draw(canvas_ext.getMainContext(), 
-				(canvas_ext.getWidth() - result_image_data_font_bg.width) * 0.5 - dist, 
-				(canvas_ext.getHeight() - result_image_data_font_bg.height) * 0.5 - dist);
+				(canvas_ext.width - result_image_data_font_bg.width) * 0.5 - dist, 
+				(canvas_ext.height - result_image_data_font_bg.height) * 0.5 - dist);
 			result_image_data_font_bg.draw(canvas_ext.getMainContext(), 
-				(canvas_ext.getWidth() - result_image_data_font_bg.width) * 0.5 - dist, 
-				(canvas_ext.getHeight() - result_image_data_font_bg.height) * 0.5 + dist);
+				(canvas_ext.width - result_image_data_font_bg.width) * 0.5 - dist, 
+				(canvas_ext.height - result_image_data_font_bg.height) * 0.5 + dist);
 			result_image_data_font_bg.draw(canvas_ext.getMainContext(), 
-				(canvas_ext.getWidth() - result_image_data_font_bg.width) * 0.5 + dist, 
-				(canvas_ext.getHeight() - result_image_data_font_bg.height) * 0.5 - dist);
+				(canvas_ext.width - result_image_data_font_bg.width) * 0.5 + dist, 
+				(canvas_ext.height - result_image_data_font_bg.height) * 0.5 - dist);
 			result_image_data_font_bg.draw(canvas_ext.getMainContext(), 
-				(canvas_ext.getWidth() - result_image_data_font_bg.width) * 0.5 + dist, 
-				(canvas_ext.getHeight() - result_image_data_font_bg.height) * 0.5 + dist);
+				(canvas_ext.width - result_image_data_font_bg.width) * 0.5 + dist, 
+				(canvas_ext.height - result_image_data_font_bg.height) * 0.5 + dist);
 			
-			var result_image_data_font = test_image_data_font.getTextImageData('Game Over', 6, 0, font_config);
+			var result_image_data_font = test_image_data_font.getTextImageData(text, 5, 0, font_config);
 			result_image_data_font.draw(canvas_ext.getMainContext(), 
-				(canvas_ext.getWidth() - result_image_data_font.width) * 0.5, 
-				(canvas_ext.getHeight() - result_image_data_font.height) * 0.5);
+				(canvas_ext.width - result_image_data_font.width) * 0.5, 
+				(canvas_ext.height - result_image_data_font.height) * 0.5);
 		};
 		Dr.Event.addEventListener('MineGridUpdate', callback_func);
 	}

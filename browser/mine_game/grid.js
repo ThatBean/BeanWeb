@@ -33,8 +33,8 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 		this._canvas_ext = new CanvasExt;
 		this._canvas_ext.init(canvas_element);
 		
-		this._visible_width = this._canvas_ext.getWidth();
-		this._visible_height = this._canvas_ext.getHeight();
+		this._visible_width = this._canvas_ext.width;
+		this._visible_height = this._canvas_ext.height;
 		
 		// top left == (0 ,0), for scroll/drag
 		this._visible_offset_top = 0;
