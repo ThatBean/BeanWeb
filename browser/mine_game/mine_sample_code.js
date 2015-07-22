@@ -151,7 +151,7 @@ function init() {
 			mine_block_count, 
 			empty_block_count, 
 			lock_block_count);
-		test_grid.init(document.getElementById('Dr.Canvas'), test_map, 1);
+		test_grid.init(document.getElementById('MineGridCanvas'), test_map, 1);
 		
 		Dr.test_grid = test_grid;
 		Dr.test_map = test_map;

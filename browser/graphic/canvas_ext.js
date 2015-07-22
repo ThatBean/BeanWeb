@@ -38,14 +38,95 @@ Dr.Implement('CanvasExt', function (global, module_get) {
 		//event
 		this._event_center = event_center || Dr.GetNew('EventProto');
 		
+		//action
 		var _this = this;
 		Dr.applyActionListener(canvas, function (action) { _this.onAction(action); });
+		this._action_data = {
+			is_active: false,
+			
+			start_position: null,
+			end_position: null,
+			
+			start_time: 0,	//in second
+			end_time: 0,
+		};
 	}
 	
 	
 	Module.prototype.onAction = function (action) {
 		this._event_center.emit(action.action_type, action);
 		//Dr.log('[CanvasExt][onAction] get', action.action_type, action);
+		
+		Dr.log('Get', event_key, action.position_listener);
+		
+		var result_action_type = '';
+		
+		switch(event_key) {
+			case 'action_move':
+				if (this._action_data.is_active) {
+					//update hover
+					if (action.position_listener) {
+						result_action_type = 'dragging';
+					}
+				}
+				break;
+			case 'action_start':
+				if (!this._action_data.is_active) {
+					this._action_data.is_active = true;
+					result_action_type = 'start';
+				}
+				else {
+					Dr.log('strange', this._action_data)
+				}
+				break;
+			case 'action_end':
+				if (this._action_data.is_active) {
+					var delta_dist = get_dist(this._action_data.start_position, this._action_data.last_position);
+					var delta_time = Dr.now() - this._action_data.start_time;
+					if (delta_dist > Dr.devicePixelRatio * 5) {
+						result_action_type = 'drag';
+					}
+					else {
+						if (delta_time > 0.5) {
+							result_action_type = 'hold';
+						}
+						else {
+							result_action_type = 'click';
+						}
+					}
+					
+					Dr.log('result_action_type', result_action_type, this._action_data.start_time)
+					
+					this._action_data.is_active = false;
+				}
+				break;
+			case 'action_cancel':
+				if (this._action_data.is_active) {
+					Dr.log('Get action_cancel', this._action_data);
+					this._action_data.is_active = false;
+				}
+				break;
+			default:
+				break;
+		}
+		
+		
+		if (action.position_listener) {
+			this._action_data.last_position = action.position_listener;
+		}
+		
+		if (this._action_data.is_active) {
+			if (!this._action_data.start_position) this._action_data.start_position = this._action_data.last_position;
+			if (!this._action_data.start_time) this._action_data.start_time = Dr.now();
+			
+			this._update_data.selected_block = this.getBlockAtPoint(this._action_data.last_position);
+		}
+		else {
+			Dr.log('flush');
+			this._action_data.start_time = 0;
+			this._action_data.start_position = null;
+		}
+		
 	}
 	
 	Module.prototype.update = function (delta_time, buffer_index) {
