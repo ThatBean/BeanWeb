@@ -89,9 +89,7 @@ Dr.Implement('Mine_Block', function (global, module_get) {
 		
 		if (this._mine_count > 0) {
 			//alert('BOOM!');
-			
 			this._map.notify('flip_mine_block', this);
-			
 			return false;
 		}
 		

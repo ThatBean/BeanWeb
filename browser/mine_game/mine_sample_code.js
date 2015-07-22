@@ -167,6 +167,14 @@ function init() {
 	Dr.log(Dr.Get('Mine_Type').getSurroundList('BOX', 2, 3));
 	Dr.log(Dr.Get('Mine_Type').getSurroundList('HEX', 2, 3));
 	Dr.log(Dr.Get('Mine_Type').getSurroundList('TRI', 2, 3));
+	
+	
+	
+	var Mine_Menu = Dr.Get('Mine_Menu');
+	var test_menu = new Mine_Menu;
+	
+	test_menu.init(document.getElementById('MineMenuCanvas'));
+	Dr.test_menu = test_menu;
 }
 
 Dr.afterWindowLoaded(init);

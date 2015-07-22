@@ -13,6 +13,12 @@ Dr.Implement('CanvasExt', function (global, module_get) {
 	Module.event = {
 		DRAW: 'DRAW',
 		UPDATE: 'UPDATE',
+		
+		EXT_ACTION_DRAGGING: 'EXT_ACTION_DRAGGING',
+		EXT_ACTION_DRAG: 'EXT_ACTION_DRAG',
+		EXT_ACTION_HOLD: 'EXT_ACTION_HOLD',
+		EXT_ACTION_CLICK: 'EXT_ACTION_CLICK',
+		EXT_ACTION_START: 'EXT_ACTION_START',
 	}
 	
 	Module.prototype.init = function (canvas, event_center) {
@@ -49,34 +55,36 @@ Dr.Implement('CanvasExt', function (global, module_get) {
 			
 			start_time: 0,	//in second
 			end_time: 0,
+			
+			ext_action_type: null,
 		};
 	}
 	
+	var get_dist = function (point_1, point_2) {
+		var dx = point_1.x - point_2.x;
+		var dy = point_1.y - point_2.y;
+		return Math.sqrt(dx * dx + dy * dy);
+	}
 	
 	Module.prototype.onAction = function (action) {
-		this._event_center.emit(action.action_type, action);
-		//Dr.log('[CanvasExt][onAction] get', action.action_type, action);
+		//simple and basic
+		this._event_center.emit(action.action_type, action, this._action_data);
 		
-		Dr.log('Get', event_key, action.position_listener);
+		action.ext_action_type = null;
 		
-		var result_action_type = '';
-		
-		switch(event_key) {
+		switch(action.action_type) {
 			case 'action_move':
 				if (this._action_data.is_active) {
 					//update hover
 					if (action.position_listener) {
-						result_action_type = 'dragging';
+						action.ext_action_type = Module.event.EXT_ACTION_DRAGGING;
 					}
 				}
 				break;
 			case 'action_start':
 				if (!this._action_data.is_active) {
 					this._action_data.is_active = true;
-					result_action_type = 'start';
-				}
-				else {
-					Dr.log('strange', this._action_data)
+					action.ext_action_type = Module.event.EXT_ACTION_START;
 				}
 				break;
 			case 'action_end':
@@ -84,25 +92,25 @@ Dr.Implement('CanvasExt', function (global, module_get) {
 					var delta_dist = get_dist(this._action_data.start_position, this._action_data.last_position);
 					var delta_time = Dr.now() - this._action_data.start_time;
 					if (delta_dist > Dr.devicePixelRatio * 5) {
-						result_action_type = 'drag';
+						action.ext_action_type = Module.event.EXT_ACTION_DRAG;
 					}
 					else {
 						if (delta_time > 0.5) {
-							result_action_type = 'hold';
+							action.ext_action_type = Module.event.EXT_ACTION_HOLD;
 						}
 						else {
-							result_action_type = 'click';
+							action.ext_action_type = Module.event.EXT_ACTION_CLICK;
 						}
 					}
 					
-					Dr.log('result_action_type', result_action_type, this._action_data.start_time)
+					//Dr.log('action.ext_action_type', action.ext_action_type, this._action_data.start_time)
 					
 					this._action_data.is_active = false;
 				}
 				break;
 			case 'action_cancel':
 				if (this._action_data.is_active) {
-					Dr.log('Get action_cancel', this._action_data);
+					//Dr.log('Get action_cancel', this._action_data);
 					this._action_data.is_active = false;
 				}
 				break;
@@ -111,20 +119,22 @@ Dr.Implement('CanvasExt', function (global, module_get) {
 		}
 		
 		
-		if (action.position_listener) {
-			this._action_data.last_position = action.position_listener;
-		}
-		
 		if (this._action_data.is_active) {
-			if (!this._action_data.start_position) this._action_data.start_position = this._action_data.last_position;
+			if (!this._action_data.start_position) this._action_data.start_position = action.position_listener;
 			if (!this._action_data.start_time) this._action_data.start_time = Dr.now();
-			
-			this._update_data.selected_block = this.getBlockAtPoint(this._action_data.last_position);
 		}
 		else {
-			Dr.log('flush');
 			this._action_data.start_time = 0;
 			this._action_data.start_position = null;
+		}
+		
+		//better for result
+		this._event_center.emit(action.ext_action_type, action, this._action_data);
+		//Dr.log('[CanvasExt][onAction] get', action.action_type, action);
+		
+		
+		if (action.position_listener) {
+			this._action_data.last_position = action.position_listener;
 		}
 		
 	}

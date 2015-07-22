@@ -41,20 +41,12 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 		this._visible_offset_left = 0;
 		
 		var _this = this;
-		var on_event_callback =  function (event_key, action) { _this.onAction(event_key, action); };
-		this._canvas_ext.getEventCenter().addEventListener('action_move', on_event_callback);
-		this._canvas_ext.getEventCenter().addEventListener('action_start', on_event_callback);
-		this._canvas_ext.getEventCenter().addEventListener('action_end', on_event_callback);
-		this._canvas_ext.getEventCenter().addEventListener('action_cancel', on_event_callback);
-		this._action_data = {
-			is_active: false,
-			
-			start_position: null,
-			start_time: 0,	//in second
-			end_position: null,
-			end_time: 0,
-			end_block: null,
-		};
+		var on_event_callback =  function (event_key, action, action_data) { _this.onExtAction(event_key, action, action_data); };
+		this._canvas_ext.getEventCenter().addEventListener(CanvasExt.event.EXT_ACTION_DRAGGING, on_event_callback);
+		this._canvas_ext.getEventCenter().addEventListener(CanvasExt.event.EXT_ACTION_DRAG, on_event_callback);
+		this._canvas_ext.getEventCenter().addEventListener(CanvasExt.event.EXT_ACTION_HOLD, on_event_callback);
+		this._canvas_ext.getEventCenter().addEventListener(CanvasExt.event.EXT_ACTION_CLICK, on_event_callback);
+		this._canvas_ext.getEventCenter().addEventListener(CanvasExt.event.EXT_ACTION_START, on_event_callback);
 		
 		
 		var _this = this;
@@ -72,7 +64,8 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 		
 		this._update_data = {
 			is_update_needed: false,
-			result_action_type: '', //	'click', 'drag', 'hold'
+			result_action_type: '',
+			selected_block: null,
 		};
 		
 		this.resetScale(scale)
@@ -116,16 +109,15 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 	Module.prototype.update = function (delta_time) {
 		//update the whole grid, if needed
 		
-		
 		// this._update_data.is_update_needed = true;
 		if (this._update_data.is_update_needed) {
 			this._visible_offset_left = Math.min(Math.max(this._visible_offset_left, this._visible_width - this._total_size.width), 0)
 			this._visible_offset_top = Math.min(Math.max(this._visible_offset_top, this._visible_height - this._total_size.height), 0)
 			
 			if (this._update_data.selected_block) {
-				Dr.log('update result_action_type', this._update_data.result_action_type)
-				if (this._update_data.result_action_type == 'hold') this._update_data.selected_block.toggleIsFlagged();
-				if (this._update_data.result_action_type == 'click') this._update_data.selected_block.chainFlip();
+				//Dr.log('update result_action_type', this._update_data.result_action_type)
+				if (this._update_data.result_action_type == CanvasExt.event.EXT_ACTION_HOLD) this._update_data.selected_block.toggleIsFlagged();
+				if (this._update_data.result_action_type == CanvasExt.event.EXT_ACTION_CLICK) this._update_data.selected_block.chainFlip();
 			}
 			
 			this._canvas_ext.clearCanvas();
@@ -140,7 +132,9 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 			}
 			
 			//update selected block
-			if (this._update_data.selected_block && this._action_data.is_active) {
+			if (this._update_data.selected_block && 
+				(this._update_data.result_action_type == CanvasExt.event.EXT_ACTION_DRAGGING
+				|| this._update_data.result_action_type == CanvasExt.event.EXT_ACTION_START)) {
 				this.drawBlock(this._update_data.selected_block, 'VARIANT_TYPE_PRESSED', '');
 			}
 			
@@ -148,8 +142,6 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 			
 			this._update_data.is_update_needed = false;
 		}
-		
-		
 		
 	}
 	
@@ -234,92 +226,28 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 		return;
 	}
 	
-	var get_dist = function (point_1, point_2) {
-		var dx = point_1.x - point_2.x;
-		var dy = point_1.y - point_2.y;
-		return Math.sqrt(dx * dx + dy * dy);
-	}
-	
-	Module.prototype.onAction = function (event_key, action) {
+	Module.prototype.onExtAction = function (event_key, action, action_data) {
 		action.event.preventDefault();
 		
-		Dr.log('Get', event_key, action.position_listener);
-		
-		// Dr.UpdateLoop.add(function (delta_time) { 
-			// Dr.log('Get', event_key, action.position_listener);
-		// });
+		//Dr.log('Get', event_key, action.position_listener);
 		
 		switch(event_key) {
-			case 'action_move':
-				if (this._action_data.is_active) {
-					//update hover
-					if (action.position_listener) {
-						this._visible_offset_left += action.position_listener.x - this._action_data.last_position.x;
-						this._visible_offset_top += action.position_listener.y - this._action_data.last_position.y;
-						
-						this._update_data.is_update_needed = true;
-						this._update_data.result_action_type = 'dragging';
-					}
-				}
+			case CanvasExt.event.EXT_ACTION_DRAGGING:
+				this._visible_offset_left += action.position_listener.x - action_data.last_position.x;
+				this._visible_offset_top += action.position_listener.y - action_data.last_position.y;
 				break;
-			case 'action_start':
-				if (!this._action_data.is_active) {
-					this._action_data.is_active = true;
-					this._update_data.is_update_needed = true;
-					this._update_data.result_action_type = 'start';
-				}
-				else {
-					Dr.log('strange', this._action_data)
-				}
-				break;
-			case 'action_end':
-				if (this._action_data.is_active) {
-					var delta_dist = get_dist(this._action_data.start_position, this._action_data.last_position);
-					var delta_time = Dr.now() - this._action_data.start_time;
-					if (delta_dist > Dr.devicePixelRatio * 5) {
-						this._update_data.result_action_type = 'drag';
-					}
-					else {
-						if (delta_time > 0.5) {
-							this._update_data.result_action_type = 'hold';
-						}
-						else {
-							this._update_data.result_action_type = 'click';
-						}
-					}
-					
-					Dr.log('result_action_type', this._update_data.result_action_type, this._action_data.start_time)
-					
-					this._update_data.is_update_needed = true;
-					this._action_data.is_active = false;
-				}
-				break;
-			case 'action_cancel':
-				if (this._action_data.is_active) {
-					Dr.log('Get action_cancel', this._action_data);
-					this._action_data.is_active = false;
-				}
-				break;
+			case CanvasExt.event.EXT_ACTION_DRAG:
+			case CanvasExt.event.EXT_ACTION_HOLD:
+			case CanvasExt.event.EXT_ACTION_CLICK:
+			case CanvasExt.event.EXT_ACTION_START:
 			default:
 				break;
 		}
 		
+		this._update_data.is_update_needed = true;
+		this._update_data.result_action_type = event_key;
 		
-		if (action.position_listener) {
-			this._action_data.last_position = action.position_listener;
-		}
-		
-		if (this._action_data.is_active) {
-			if (!this._action_data.start_position) this._action_data.start_position = this._action_data.last_position;
-			if (!this._action_data.start_time) this._action_data.start_time = Dr.now();
-			
-			this._update_data.selected_block = this.getBlockAtPoint(this._action_data.last_position);
-		}
-		else {
-			Dr.log('flush');
-			this._action_data.start_time = 0;
-			this._action_data.start_position = null;
-		}
+		if (action_data.is_active) this._update_data.selected_block = this.getBlockAtPoint(action_data.last_position);
 	}
 	
 	return Module;
