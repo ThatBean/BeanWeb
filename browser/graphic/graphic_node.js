@@ -1,10 +1,10 @@
-// Extended ImageData
+// Tree
 // merge multiple accessible image holder class
 // provide common operation function
 
-Dr.Declare('ImageDataExt', 'class');
-Dr.Require('ImageDataExt', 'GraphicOperation');
-Dr.Implement('ImageDataExt', function (global, module_get) {
+Dr.Declare('GraphicNode', 'class');
+Dr.Require('GraphicNode', 'GraphicOperation');
+Dr.Implement('GraphicNode', function (global, module_get) {
 	
 	var GraphicOperation = Dr.Get('GraphicOperation');
 	
@@ -19,15 +19,6 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 		
 		var instance = new Module;
 		instance.init('create', data, type);
-		return instance;
-	}
-	
-	Module.copy = function (image_data_ext) {
-		var data = GraphicOperation.createData(Module.type.CANVAS_ELEMENT, image_data_ext.width, image_data_ext.height);
-		image_data_ext.draw(data.getContext('2d'), 0, 0);
-		
-		var instance = new Module;
-		instance.init('copy', data, Module.type.CANVAS_ELEMENT);
 		return instance;
 	}
 	
@@ -49,7 +40,7 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 				this.drawClip = this.drawImageDataClip;
 				break;
 			default:
-				Dr.log('[ImageDataExt][init] error type:', type, source);
+				Dr.log('[GraphicNode][init] error type:', type, source);
 				break;
 		}
 		
@@ -106,7 +97,7 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 			case Module.type.CANVAS_ELEMENT:
 				break;
 			default:
-				Dr.log('[ImageDataExt][toCanvas] error type:', this.type, this._source);
+				Dr.log('[GraphicNode][toCanvas] error type:', this.type, this._source);
 				break;
 		}
 	}
@@ -131,7 +122,7 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 			case Module.type.CANVAS_IMAGE_DATA:
 				break;
 			default:
-				Dr.log('[ImageDataExt][toCanvasImageData] error type:', this.type, this._source);
+				Dr.log('[GraphicNode][toCanvasImageData] error type:', this.type, this._source);
 				break;
 		}
 	}

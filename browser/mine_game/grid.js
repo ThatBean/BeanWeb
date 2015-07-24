@@ -247,7 +247,7 @@ Dr.Implement('Mine_Grid', function (global, module_get) {
 		this._update_data.is_update_needed = true;
 		this._update_data.result_action_type = event_key;
 		
-		if (action_data.is_active) this._update_data.selected_block = this.getBlockAtPoint(action_data.last_position);
+		if (action_data.is_active && action.position_listener) this._update_data.selected_block = this.getBlockAtPoint(action.position_listener);
 	}
 	
 	return Module;
