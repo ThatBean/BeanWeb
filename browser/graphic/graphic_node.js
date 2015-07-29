@@ -4,13 +4,20 @@
 
 Dr.Declare('GraphicNode', 'class');
 Dr.Require('GraphicNode', 'GraphicOperation');
+Dr.Require('GraphicNode', 'DataTreeNode');
+Dr.Require('GraphicNode', 'ActionBox');
 Dr.Implement('GraphicNode', function (global, module_get) {
 	
 	var GraphicOperation = Dr.Get('GraphicOperation');
+	var DataTreeNode = Dr.Get('DataTreeNode');
+	var ActionBox = Dr.Get('ActionBox');
 	
 	var Module = function () {
 		//
 	}
+	
+	Module.prototype = new DataTreeNode;
+	Module.proto = DataTreeNode;
 	
 	Module.type = GraphicOperation.type;
 	
@@ -22,133 +29,67 @@ Dr.Implement('GraphicNode', function (global, module_get) {
 		return instance;
 	}
 	
-	Module.prototype.init = function (source, data, type) {
-		switch (type) {
-			case Module.type.IMAGE_ELEMENT:
-				this._editable = false;
-				this.draw = this.drawImage;
-				this.drawClip = this.drawImageClip;
-				break;
-			case Module.type.CANVAS_ELEMENT:
-				this._editable = true;
-				this.draw = this.drawImage;
-				this.drawClip = this.drawImageClip;
-				break;
-			case Module.type.CANVAS_IMAGE_DATA:
-				this._editable = true;
-				this.draw = this.drawImageData;
-				this.drawClip = this.drawImageDataClip;
-				break;
-			default:
-				Dr.log('[GraphicNode][init] error type:', type, source);
-				break;
-		}
+	Module.prototype.init = function (canvas_element) {
+		//CanvasExt
+		this._canvas_ext = new CanvasExt;
+		this._canvas_ext.init(canvas_element);
 		
-		//all directly accessible(public)
-		this.type = type;
-		this.data = this._editable ? data : null;
+		this._action_box = new ActionBox;
 		
-		this.width = data.width;
-		this.height = data.height;
+		var _this = this;
+		var on_event_callback =  function (event_key, action, action_data) { _this.onExtAction(event_key, action, action_data); };
+		this._canvas_ext.getEventCenter().addEventListener(CanvasExt.event.EXT_ACTION_DRAGGING, on_event_callback);
+		this._canvas_ext.getEventCenter().addEventListener(CanvasExt.event.EXT_ACTION_DRAG, on_event_callback);
+		this._canvas_ext.getEventCenter().addEventListener(CanvasExt.event.EXT_ACTION_HOLD, on_event_callback);
+		this._canvas_ext.getEventCenter().addEventListener(CanvasExt.event.EXT_ACTION_CLICK, on_event_callback);
+		this._canvas_ext.getEventCenter().addEventListener(CanvasExt.event.EXT_ACTION_START, on_event_callback);
 		
-		//should not access(private)
-		this._source = source;
-		this._data = data;
+		this._update_data = {
+			is_update_needed: false,
+			result_action_type: '', //	'click', 'drag', 'hold'
+			selected_action_box: null,
+		};
+		
+		//update
+		Dr.UpdateLoop.add(function (delta_time) { 
+			_this.update(delta_time);
+			return true;
+		}, 'mine_menu_update');
 	}
 	
-	//for IMAGE_ELEMENT, CANVAS_ELEMENT
-	Module.prototype.drawImage = function (context, x, y) {
-		context.drawImage(this._data, x, y);
-	}
-	Module.prototype.drawImageClip = function (context, x, y, clip_x, clip_y, clip_width, clip_height) {
-		//context.drawImage(image, dx, dy);
-		//context.drawImage(image, dx, dy, dWidth, dHeight);
-		//context.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
-		//this function is capable of scale as well, but 
-		var clip_width = Math.min(clip_width, this.width - clip_x);
-		var clip_height = Math.min(clip_height, this.height - clip_y);
-		context.drawImage(this._data, clip_x, clip_y, clip_width, clip_height, x, y, clip_width, clip_height);
-	}
 	
-	//for CANVAS_IMAGE_DATA
-	Module.prototype.drawImageData = function (context, x, y) {
-		context.putImageData(this._data, x, y);
-	}
-	Module.prototype.drawImageDataClip = function (context, x, y, clip_x, clip_y, clip_width, clip_height) {
-		// context.putImageData(imagedata, dx, dy);
-		// context.putImageData(imagedata, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight);
-		var x = clip_x ? x - clip_x : x;	// adjust the dirty rect origin to (0, 0)
-		var y = clip_y ? y - clip_y : y;
-		var dirty_width = Math.min(clip_width, this.width - clip_x);
-		var dirty_height = Math.min(clip_height, this.height - clip_y);
-		context.putImageData(this._data, x, y, clip_x, clip_y, dirty_width, dirty_height);
-	}
-	
-	Module.prototype.toCanvas = function () {
-		switch (this.type) {
-			case Module.type.IMAGE_ELEMENT:
-			case Module.type.CANVAS_IMAGE_DATA:
-				var canvas_element = Dr.document.createElement('canvas');
-				canvas_element.width = this.width;
-				canvas_element.height = this.height;
-				this.draw(canvas_element.getContext('2d'), 0, 0);
-				this.init(this._source, canvas_element, Module.type.CANVAS_ELEMENT);
-				break;
-			case Module.type.CANVAS_ELEMENT:
-				break;
-			default:
-				Dr.log('[GraphicNode][toCanvas] error type:', this.type, this._source);
-				break;
+	Module.prototype.update = function (delta_time) {
+		
+		// this._update_data.is_update_needed = true;
+		if (this._update_data.is_update_needed) {
+			
+			//this._canvas_ext.clearCanvas();
+			//update map
+			
+			this._update_data.is_update_needed = false;
 		}
 	}
 	
-	Module.prototype.toCanvasImageData = function () {
-		switch (this.type) {
-			case Module.type.IMAGE_ELEMENT:
-				var canvas_element = Dr.document.createElement('canvas');
-				canvas_element.width = this.width;
-				canvas_element.height = this.height;
-				var canvas_context = canvas_element.getContext('2d');
-				this.draw(canvas_context, 0, 0);
-				var canvas_image_data = canvas_context.getImageData(0, 0, canvas_element.width, canvas_element.height);
-				this.init(this._source, canvas_image_data, Module.type.CANVAS_IMAGE_DATA);
-				break;
-			case Module.type.CANVAS_ELEMENT:
-				var canvas_element = this._data;
-				var canvas_context = canvas_element.getContext('2d');
-				var canvas_image_data = canvas_context.getImageData(0, 0, canvas_element.width, canvas_element.height);
-				this.init(this._source, canvas_image_data, Module.type.CANVAS_IMAGE_DATA);
-				break;
-			case Module.type.CANVAS_IMAGE_DATA:
-				break;
+	Module.prototype.onExtAction = function (event_key, action, action_data) {
+		action.event.preventDefault();
+		//Dr.log('Get', event_key, action.position_listener);
+		switch(event_key) {
+			case CanvasExt.event.EXT_ACTION_DRAGGING:
+			case CanvasExt.event.EXT_ACTION_DRAG:
+			case CanvasExt.event.EXT_ACTION_HOLD:
+			case CanvasExt.event.EXT_ACTION_CLICK:
+			case CanvasExt.event.EXT_ACTION_START:
 			default:
-				Dr.log('[GraphicNode][toCanvasImageData] error type:', this.type, this._source);
 				break;
 		}
+		
+		this._update_data.is_update_needed = true;
+		this._update_data.result_action_type = event_key;
+		
+		if (action_data.is_active) {
+			this._update_data.selected_action_box = this._action_box.checkAction(action);
+		}
 	}
-	
-	
-	//link to GraphicOperation
-	Module.prototype.scale = function (scale_x, scale_y) {
-		this.toCanvas();
-		var canvas_element = GraphicOperation.scaleCanvas(this._data, scale_x, scale_y);
-		this.init(this._source, canvas_element, Module.type.CANVAS_ELEMENT);
-		return this;
-	}
-	
-	Module.prototype.crop = function (crop_func) {
-		this.toCanvas();
-		var canvas_element = GraphicOperation.cropCanvas(this._data, crop_func);
-		this.init(this._source, canvas_element, Module.type.CANVAS_ELEMENT);
-		return this;
-	};
-	
-	Module.prototype.floodFill = function (start_point, fill_color) {
-		this.toCanvasImageData();
-		GraphicOperation.floodFill(this._data, start_point, fill_color);
-		this.toCanvas();
-		return this;
-	};
 	
 	
 	return Module;
