@@ -1,0 +1,40 @@
+apt-get install git apache2 --yes
+
+
+
+
+Debian / Ubuntu:
+	apt-get install python-pip --yes
+	pip install shadowsocks
+
+CentOS:
+	yum install python-setuptools && easy_install pip
+	pip install shadowsocks
+
+	
+
+cd /var/www/
+git clone https://github.com/ThatBean/BeanWeb.git
+mv BeanWeb root
+apache2ctl restart
+
+
+
+cd /etc/apache2/sites-enabled/
+
+
+
+
+
+
+
+Setup with Ubuntu:
+	curl --silent --location https://deb.nodesource.com/setup_0.12 | sudo bash -
+Then install with Ubuntu:
+	sudo apt-get install --yes nodejs
+
+Setup with Debian (as root):
+	apt-get install curl
+	curl --silent --location https://deb.nodesource.com/setup_0.12 | bash -
+Then install with Debian (as root):
+	apt-get install --yes nodejs

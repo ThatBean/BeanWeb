@@ -1,0 +1,8 @@
+{
+    "server":"118.193.230.180",
+    "server_port":8888,
+    "password":"18273645",
+    "timeout":300,
+    "method":"rc4-md5",
+    "fast_open": false
+}
