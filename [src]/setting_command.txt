@@ -1,3 +1,8 @@
+apt-get install git apache2 nodejs --yes
+
+
+
+
 apt-get install git apache2 --yes
 
 
