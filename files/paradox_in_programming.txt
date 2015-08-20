@@ -1,0 +1,78 @@
+Need to Write
+	Doc - Code
+
+Structure Forming Time
+	Pre-Define - Runtime-Require
+
+Logic Distribution
+	Sync-Update - Async-Callback
+
+Event Handle
+	Instant-Emit - Pool-DataMark
+	
+Design Pattern
+	Deep-ClassInherent - Wide-Component
+	
+
+	
+	
+	
+A program, for user is a interactable black box.
+User Action is received, Work is done.
+To accomplish that, we programmers need to provide Method and Data, for a certain Logic.
+
+A Class is a combination of some related Method and Data for specific Logic.
+
+We can arrange the code based on the Data or the Procedure.
+
+But if we just don't?
+
+We just provide the Method and Data, and write the Logic to Require them, and let some Auto-Bot to glue them up to struct/class/singleton or else.
+
+While the program is running, the Data is changing but the Function is not.
+
+So we write:
+	Method Function - process data
+	Data Operation Function	- data CRUD
+	Logic Function - describe the logic
+	
+All these is provided to the Auto-Bot, a OS-like thing.
+
+
+
+The program timeline(verbose)
+
+	Main:
+		Coding -> (Compling) -> Running
+
+	Coding:
+		1. Define -> Define -> Call -> Call
+		2. Require -> Call -> Require -> Call
+		What if: Call -> Find -> Load -> Call -> Find -> Load
+
+
+
+What's different?
+
+In C-like compile needed code, we include All files of Method and Data before we use it.
+In JS-like Script code, we require Selected Method and Data before we use it.
+
+Why before?
+Why Class is so important?
+Why design all the thing?
+
+What if we start with a worker, asking us What to do?
+then How to do?
+then Where to find something for this job?
+
+then we watch how he do it, and may find a better way of Logic.
+then we just tell him to change.
+better if he can improve this himself.
+
+
+Why the code only know Error?
+can't it know How to Find, How to Ask?
+
+
+
+We write the Logic Function first, then provide necessary Method & Data Operation Function
