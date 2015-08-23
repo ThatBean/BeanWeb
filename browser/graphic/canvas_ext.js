@@ -31,7 +31,9 @@ Dr.Implement('CanvasExt', function (global, module_get) {
 		
 		if ((canvas.style.width && canvas.width != parseInt(canvas.style.width)) 
 			|| (canvas.style.height && canvas.height != parseInt(canvas.style.height))) {
-			Dr.log('Get canvas size style mismatch:', 'size:', canvas.width, canvas.height, 'style:', canvas.style.width, canvas.style.height);
+			Dr.log('Get canvas size style mismatch:', 
+				'size:', canvas.width, canvas.height, 
+				'style:', canvas.style.width, canvas.style.height);
 		}
 		
 		

@@ -76,3 +76,4 @@ can't it know How to Find, How to Ask?
 
 
 We write the Logic Function first, then provide necessary Method & Data Operation Function
+Or reverse, stock the Method & Data Operation Function, and add Logic on the go

@@ -171,7 +171,10 @@ var Dr = (
 			}
 			
 			var _this = this;	//for module get closure
-			var module = module_data.implement_func(Dr.global, function (module_name) { return _this._module_get(module_name); });
+			var module = module_data.implement_func(
+				Dr.global, //access global (where Dr init runs in)
+				function (module_name) { return _this._module_get(module_name); });	//packed module_get for access Required module
+			
 			this._module_set(module_name, module);
 			Dr.log('[load] loaded', module_name);
 			return this._module_get(module_name);
@@ -212,6 +215,7 @@ var Dr = (
 		return Module;
 	})()
 	
+	//quick access
 	Dr.ModuleManager = new Dr.ModuleManagerProto;
 	Dr.Declare = function (module_name, module_type) { Dr.ModuleManager.declare(module_name, module_type); }
 	Dr.Require = function (module_name, required_module_name) { Dr.ModuleManager.require(module_name, required_module_name); }

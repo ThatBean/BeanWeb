@@ -3,14 +3,14 @@
 // provide common operation function
 
 Dr.Declare('GraphicNode', 'class');
+Dr.Require('GraphicNode', 'CanvasExt');
 Dr.Require('GraphicNode', 'GraphicOperation');
 Dr.Require('GraphicNode', 'DataTreeNode');
-Dr.Require('GraphicNode', 'ActionBox');
 Dr.Implement('GraphicNode', function (global, module_get) {
 	
+	var CanvasExt = Dr.Get('CanvasExt');
 	var GraphicOperation = Dr.Get('GraphicOperation');
 	var DataTreeNode = Dr.Get('DataTreeNode');
-	var ActionBox = Dr.Get('ActionBox');
 	
 	var Module = function () {
 		//
@@ -21,23 +21,13 @@ Dr.Implement('GraphicNode', function (global, module_get) {
 	
 	Module.type = GraphicOperation.type;
 	
-	Module.create = function (type, width, height) {
-		var data = GraphicOperation.createData(type, width, height);
-		
-		var instance = new Module;
-		instance.init('create', data, type);
-		return instance;
-	}
-	
 	Module.prototype.init = function (canvas_element) {
 		//CanvasExt
 		this._canvas_ext = new CanvasExt;
 		this._canvas_ext.init(canvas_element);
 		
-		this._action_box = new ActionBox;
-		
 		var _this = this;
-		var on_event_callback =  function (event_key, action, action_data) { _this.onExtAction(event_key, action, action_data); };
+		var on_event_callback =  function (event_key, action, action_data) { _this.onAction(event_key, action, action_data); };
 		this._canvas_ext.getEventCenter().addEventListener(CanvasExt.event.EXT_ACTION_DRAGGING, on_event_callback);
 		this._canvas_ext.getEventCenter().addEventListener(CanvasExt.event.EXT_ACTION_DRAG, on_event_callback);
 		this._canvas_ext.getEventCenter().addEventListener(CanvasExt.event.EXT_ACTION_HOLD, on_event_callback);
@@ -70,8 +60,8 @@ Dr.Implement('GraphicNode', function (global, module_get) {
 		}
 	}
 	
-	Module.prototype.onExtAction = function (event_key, action, action_data) {
-		action.event.preventDefault();
+	Module.prototype.onAction = function (event_key, action, action_data) {
+		//action.event.preventDefault();
 		//Dr.log('Get', event_key, action.position_listener);
 		switch(event_key) {
 			case CanvasExt.event.EXT_ACTION_DRAGGING:
@@ -86,9 +76,8 @@ Dr.Implement('GraphicNode', function (global, module_get) {
 		this._update_data.is_update_needed = true;
 		this._update_data.result_action_type = event_key;
 		
-		if (action_data.is_active) {
-			this._update_data.selected_action_box = this._action_box.checkAction(action);
-		}
+		
+		
 	}
 	
 	

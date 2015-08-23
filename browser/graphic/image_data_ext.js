@@ -73,7 +73,7 @@ Dr.Implement('ImageDataExt', function (global, module_get) {
 		//context.drawImage(image, dx, dy);
 		//context.drawImage(image, dx, dy, dWidth, dHeight);
 		//context.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
-		//this function is capable of scale as well, but 
+		//this function is capable of scale as well, but the scale is smoothed, not pixel-sharp
 		var clip_width = Math.min(clip_width, this.width - clip_x);
 		var clip_height = Math.min(clip_height, this.height - clip_y);
 		context.drawImage(this._data, clip_x, clip_y, clip_width, clip_height, x, y, clip_width, clip_height);
