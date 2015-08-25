@@ -2,9 +2,13 @@ Dr.Declare('DataTreeNode', 'class');
 Dr.Implement('DataTreeNode', function (global, module_get) {
 	
 	var Module = function () {
+		//
+	}
+	
+	Module.prototype.init = function () {
 		this.parent = null;
 		this.children = [];
-	}
+	};
 	
 	Module.prototype.setParent = function (node) {
 		this.parent = node;
@@ -51,6 +55,12 @@ Dr.Implement('DataTreeNode', function (global, module_get) {
 				this.removeChildById(id);
 				//break;	//will not break for multi remove
 			}
+		}
+	};
+	
+	Module.prototype.traverseDirectChild = function (callback) {
+		for (var i = 0, l = this.children.length; i < l; i ++) {
+			callback(this.children[i]);
 		}
 	};
 	

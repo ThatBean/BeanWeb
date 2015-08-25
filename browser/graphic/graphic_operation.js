@@ -20,15 +20,14 @@ Dr.Implement('GraphicOperation', function (global, module_get) {
 		return Module._quick_context;
 	}
 	
-	
 	Module.createData = function  (type, width, height) {
 		var data;
 		switch (type) {
 			case Module.type.IMAGE_ELEMENT: 
-				data = document.createElement('img');
+				data = Dr.document.createElement('img');
 				break;
 			case Module.type.CANVAS_ELEMENT: 
-				data = document.createElement('canvas');
+				data = Dr.document.createElement('canvas');
 				break;
 			case Module.type.CANVAS_IMAGE_DATA: 
 				data = Module.getQuickContext().createImageData(width, height);
@@ -43,11 +42,28 @@ Dr.Implement('GraphicOperation', function (global, module_get) {
 		return data;
 	}
 	
-	
-	
-	Module.getImageDataFromCanvas = function (canvas_element) {
+	//transform type
+	Module.imageToCanvas = function (image_element) {
+		var canvas_element = Dr.document.createElement('canvas');
+		canvas_element.width = image_element.width;
+		canvas_element.height = image_element.height;
+		canvas_element.getContext('2d').drawImage(image_element, 0, 0);
+		return canvas_element;
+	}
+	Module.canvasImageDataToCanvas = function (canvas_image_data) {
+		var canvas_element = Dr.document.createElement('canvas');
+		canvas_element.width = canvas_image_data.width;
+		canvas_element.height = canvas_image_data.height;
+		canvas_element.getContext('2d').putImageData(canvas_image_data, 0, 0);
+		return canvas_element;
+	}
+	Module.canvasToCanvasImageData = function (canvas_element) {
 		return canvas_element.getContext('2d').getImageData(0, 0, canvas_element.width, canvas_element.height);
 	}
+	Module.imageToCanvasImageData = function (image_element) {
+		return Module.canvasToCanvasImageData(Module.imageToCanvas(image_element));
+	}
+	
 	
 	Module.scaleCanvas = function (canvas_element, scale_x, scale_y) {
 		var scale_y = scale_y || scale_x;
@@ -60,7 +76,7 @@ Dr.Implement('GraphicOperation', function (global, module_get) {
 			return canvas_element;
 		}
 		
-		var source_image_data = Module.getImageDataFromCanvas(canvas_element);
+		var source_image_data = Module.canvasToCanvasImageData(canvas_element);
 		var scaled_image_data = Module.scaleImageData(source_image_data, scale_x, scale_y);
 		
 		canvas_element.width = scaled_image_data.width;

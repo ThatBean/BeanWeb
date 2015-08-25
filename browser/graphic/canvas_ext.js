@@ -40,7 +40,7 @@ Dr.Implement('CanvasExt', function (global, module_get) {
 		this.width = canvas.width;
 		this.height = canvas.height;
 		//canvas.style.cursor = 'default';	//prevent selection
-				
+			
 		//event
 		this._event_center = event_center || Dr.GetNew('EventProto');
 		

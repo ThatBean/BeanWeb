@@ -2,84 +2,62 @@
 // merge multiple accessible image holder class
 // provide common operation function
 
-Dr.Declare('GraphicNode', 'class');
-Dr.Require('GraphicNode', 'CanvasExt');
-Dr.Require('GraphicNode', 'GraphicOperation');
-Dr.Require('GraphicNode', 'DataTreeNode');
-Dr.Implement('GraphicNode', function (global, module_get) {
+Dr.Declare('GraphicNode2D', 'class');
+Dr.Require('GraphicNode2D', 'DataTreeNode');
+Dr.Require('GraphicNode2D', 'EventProto');
+Dr.Require('GraphicNode2D', 'ImageDataExt');
+Dr.Implement('GraphicNode2D', function (global, module_get) {
 	
-	var CanvasExt = Dr.Get('CanvasExt');
-	var GraphicOperation = Dr.Get('GraphicOperation');
+	var ImageDataExt = Dr.Get('ImageDataExt');
 	var DataTreeNode = Dr.Get('DataTreeNode');
 	
 	var Module = function () {
 		//
 	}
 	
-	Module.prototype = new DataTreeNode;
+	Module.type = {
+		UPDATE: "UPDATE",
+	};
+	
 	Module.proto = DataTreeNode;
+	Module.prototype = new DataTreeNode;
+	Module.prototype.proto_init = DataTreeNode.prototype.init;
 	
-	Module.type = GraphicOperation.type;
-	
-	Module.prototype.init = function (canvas_element) {
-		//CanvasExt
-		this._canvas_ext = new CanvasExt;
-		this._canvas_ext.init(canvas_element);
+	Module.prototype.init = function (width, height) {
+		this.proto_init();
 		
-		var _this = this;
-		var on_event_callback =  function (event_key, action, action_data) { _this.onAction(event_key, action, action_data); };
-		this._canvas_ext.getEventCenter().addEventListener(CanvasExt.event.EXT_ACTION_DRAGGING, on_event_callback);
-		this._canvas_ext.getEventCenter().addEventListener(CanvasExt.event.EXT_ACTION_DRAG, on_event_callback);
-		this._canvas_ext.getEventCenter().addEventListener(CanvasExt.event.EXT_ACTION_HOLD, on_event_callback);
-		this._canvas_ext.getEventCenter().addEventListener(CanvasExt.event.EXT_ACTION_CLICK, on_event_callback);
-		this._canvas_ext.getEventCenter().addEventListener(CanvasExt.event.EXT_ACTION_START, on_event_callback);
+		//ImageDataExt
+		this._data = ImageDataExt.create(ImageDataExt.type.CANVAS_ELEMENT, width, height);
 		
-		this._update_data = {
-			is_update_needed: false,
-			result_action_type: '', //	'click', 'drag', 'hold'
-			selected_action_box: null,
+		//EventProto
+		this._event_center = event_center || Dr.GetNew('EventProto');
+		
+		//position
+		this._position = {
+			x: 0, 
+			y: 0,
 		};
-		
-		//update
-		Dr.UpdateLoop.add(function (delta_time) { 
-			_this.update(delta_time);
-			return true;
-		}, 'mine_menu_update');
 	}
 	
 	
+	Module.prototype.getEventCenter = function () { return this._event_center; }
+	Module.prototype.getImageDataExt = function () { return this._data; }
+	
 	Module.prototype.update = function (delta_time) {
+		this._event_center.emit(UPDATE);
 		
-		// this._update_data.is_update_needed = true;
-		if (this._update_data.is_update_needed) {
-			
-			//this._canvas_ext.clearCanvas();
-			//update map
-			
-			this._update_data.is_update_needed = false;
-		}
+		traverseDirectChild(function (child_node) {
+			child_node.update(delta_time);
+		});
 	}
 	
 	Module.prototype.onAction = function (event_key, action, action_data) {
-		//action.event.preventDefault();
-		//Dr.log('Get', event_key, action.position_listener);
-		switch(event_key) {
-			case CanvasExt.event.EXT_ACTION_DRAGGING:
-			case CanvasExt.event.EXT_ACTION_DRAG:
-			case CanvasExt.event.EXT_ACTION_HOLD:
-			case CanvasExt.event.EXT_ACTION_CLICK:
-			case CanvasExt.event.EXT_ACTION_START:
-			default:
-				break;
-		}
+		this._event_center.emit(event_key, action, action_data);
 		
-		this._update_data.is_update_needed = true;
-		this._update_data.result_action_type = event_key;
-		
-		
-		
+		traverseDirectChild(function (child_node) {
+			child_node.onAction(event_key, action, action_data);
+		});
 	}
-	
 	
 	return Module;
 });
