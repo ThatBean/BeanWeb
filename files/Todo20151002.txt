@@ -1,0 +1,49 @@
+TODO list:
+
+sort previous code and pick useful code/idea from it
+
+finish 2d/3d pixel block model + bone animation  + model making tool, 
+use JS, the data struct, data flow, and higher update logic is what matters this time
+it has no direct game logic, but can change to a game base code.
+need to check the run speed
+actual visual effect
+content making complexity level
+
+
+
+
+the future game will be custom pixel + advice based ai + pixel 2d ui, all in JS(should work at 20~30fps)
+client will need feature mixing
+sound is not considered yet
+
+
+
+
+fast prototyping rule:
+	the total structure may be just wrong, so keep data & logic seperate and organized
+
+
+
+
+some specifics:
+	pixel:
+		pixel box: now 8 x 8 size
+		default character: 3 x 2 x 2 pixel box size == 24 x 16 x 16 pixel
+		default ground: 1 x 1 x 1 pixel box
+		item: n x n x n pixel box
+	
+	graphic:
+		designed FPS: 24 or more
+		screen pixel: 
+			600 x 400 (table screen)
+			300 x 200 (phone)
+			
+	game play:
+		both turned and action
+		
+	skill system:
+		RPG basic
+		
+	element system:
+		color: RGB(0, 255)
+		dark(0), light(255)
