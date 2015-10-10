@@ -1,13 +1,18 @@
-Dr.Declare('PixCorModel', 'class');
-Dr.Require('PixCorModel', 'DataTreeNode');
-Dr.Implement('PixCorModel', function (global, module_get) {
+
+
+Dr.Declare('PixCorWorld', 'class');
+Dr.Require('PixCorWorld', 'PixCorModel');
+Dr.Implement('PixCorWorld', function (global, module_get) {
 	
-	var DataTreeNode = Dr.Get('DataTreeNode');	//for loop and lookup
+	var PixCorModel = Dr.Get('PixCorModel');	//basic pixel model
 	
 	var Module = function () {
 		this.id = Dr.generateId();
 		
-		this.parts = [];	//PixCorPart list
+		this.root_model = null;
+		
+		this.actors = [];
+		
 		
 		
 		//TODO:
@@ -15,6 +20,9 @@ Dr.Implement('PixCorModel', function (global, module_get) {
 		//physics data here
 		//speed
 		//inertia
+		
+		
+		
 		
 		//motion will be applied from outside
 	}
