@@ -1,8 +1,8 @@
 
 
-Dr.Declare('PixCorWorld', 'class');
-Dr.Require('PixCorWorld', 'PixCorModel');
-Dr.Implement('PixCorWorld', function (global, module_get) {
+Dr.Declare('PixCorActor', 'class');
+Dr.Require('PixCorActor', 'PixCorModel');
+Dr.Implement('PixCorActor', function (global, module_get) {
 	
 	var PixCorModel = Dr.Get('PixCorModel');	//basic pixel model
 	
@@ -11,13 +11,20 @@ Dr.Implement('PixCorWorld', function (global, module_get) {
 		
 		this.root_model = null;
 		
-		this.actors = [];
-		
-		
-		
 		//TODO:
 		
+		//physics data here
+		//speed
+		//inertia
+		
 		//event here
+		
+		//logic here
+		//advice(AI)
+		//item
+		//skill
+		//attribute
+		
 	}
 	
 	//inhert method

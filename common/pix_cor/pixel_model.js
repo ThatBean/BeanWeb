@@ -21,12 +21,6 @@ Dr.Implement('PixCorModel', function (global, module_get) {
 		this.parts = [];	//PixCorPart list
 		
 		
-		//TODO:
-		
-		//physics data here
-		//speed
-		//inertia
-		
 		//motion will be applied from outside
 	}
 	
