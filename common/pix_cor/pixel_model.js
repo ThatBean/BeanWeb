@@ -9,16 +9,16 @@
 */
 
 
-Dr.Declare('PixCorModel', 'class');
-Dr.Require('PixCorModel', 'DataTreeNode');
-Dr.Implement('PixCorModel', function (global, module_get) {
+Dr.Declare('PixelModel', 'class');
+Dr.Require('PixelModel', 'DataTreeNode');
+Dr.Implement('PixelModel', function (global, module_get) {
 	
 	var DataTreeNode = Dr.Get('DataTreeNode');	//for loop and lookup
 	
 	var Module = function () {
 		this.id = Dr.generateId();
 		
-		this.parts = [];	//PixCorPart list
+		this.parts = [];	//PixelPart list
 		
 		
 		//motion will be applied from outside

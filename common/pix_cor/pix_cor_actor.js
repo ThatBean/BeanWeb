@@ -1,15 +1,15 @@
 
 
 Dr.Declare('PixCorActor', 'class');
-Dr.Require('PixCorActor', 'PixCorModel');
+Dr.Require('PixCorActor', 'PixelModel');
 Dr.Implement('PixCorActor', function (global, module_get) {
 	
-	var PixCorModel = Dr.Get('PixCorModel');	//basic pixel model
+	var PixelModel = Dr.Get('PixelModel');	//basic pixel model
 	
 	var Module = function () {
 		this.id = Dr.generateId();
 		
-		this.root_model = null;
+		this.root_model = null;	//root PixelModel
 		
 		//TODO:
 		
@@ -24,11 +24,10 @@ Dr.Implement('PixCorActor', function (global, module_get) {
 		//item
 		//skill
 		//attribute
-		
 	}
 	
 	//inhert method
-	//Module.prototype = Object.create(PixCorModel.prototype);
+	//Module.prototype = Object.create(PixelModel.prototype);
 	
 	//add method
 	Module.prototype.getId = function () {

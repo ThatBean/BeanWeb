@@ -1,10 +1,10 @@
 
 
 Dr.Declare('PixCorWorld', 'class');
-Dr.Require('PixCorWorld', 'PixCorModel');
+Dr.Require('PixCorWorld', 'PixelModel');
 Dr.Implement('PixCorWorld', function (global, module_get) {
 	
-	var PixCorModel = Dr.Get('PixCorModel');	//basic pixel model
+	var PixelModel = Dr.Get('PixelModel');	//basic pixel model
 	
 	var Module = function () {
 		this.id = Dr.generateId();
@@ -21,7 +21,7 @@ Dr.Implement('PixCorWorld', function (global, module_get) {
 	}
 	
 	//inhert method
-	//Module.prototype = Object.create(PixCorModel.prototype);
+	//Module.prototype = Object.create(PixelModel.prototype);
 	
 	//add method
 	Module.prototype.getId = function () {
