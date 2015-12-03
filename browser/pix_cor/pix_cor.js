@@ -36,3 +36,30 @@ Dr.Implement('PixCor', function (global, module_get) {
 	
 	return Module;
 });
+
+
+
+
+function init() {
+	Dr.LoadAll();
+	Dr.UpdateLoop.start();
+	
+	
+	var FPS = Dr.Get("FPS");
+	var fps = new FPS(function (averageFPS, currentFPS) {
+		document.getElementById("FPS").innerHTML = "AvgFPS:" + averageFPS.toFixed(2) + ", CurFPS:" + currentFPS.toFixed(2);
+	})
+	Dr.UpdateLoop.add(function (delta_time) { 
+		fps.FPS(); 
+		return true;
+	})
+
+	var TagLog = Dr.Get("TagLog");
+	var tag_log = new TagLog(function (log_text) {
+		document.getElementById("Log").innerHTML = log_text;
+	})
+	tag_log.Log("init log " + Dr.now()); 
+	tag_log.listMax = 50; 
+}
+
+Dr.afterWindowLoaded(init);

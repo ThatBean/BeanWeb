@@ -13,7 +13,7 @@ Dr.Implement('PixelBone', function (global, module_get) {
 		
 		this.pixel_part = null;	//attaching PixelPart
 		
-		this.render_method = null;	//default = null(pixel), can set as block, block-frame a
+		this.render_method = null;	//default = null(pixel), can set as block, block-frame
 	}
 	
 	Module.prototype.getId = function () {
