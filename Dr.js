@@ -552,14 +552,14 @@ var Dr = (
 			this._last_update_clock = current_update_clock;
 			
 			var next_update_list = [];
-			for (index in this._update_list) {
+			for (var index in this._update_list) {
 				var is_keep_for_next_update = this._update_list[index](delta_sec);
 				if (is_keep_for_next_update) next_update_list.push(this._update_list[index]);
 			}
 			this._update_list = next_update_list;
 			
 			var next_update_map = {};
-			for (key in this._update_map) {
+			for (var key in this._update_map) {
 				var is_keep_for_next_update = this._update_map[key](delta_sec);
 				if (is_keep_for_next_update) next_update_map[key] = this._update_map[key];
 			}

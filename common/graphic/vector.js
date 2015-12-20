@@ -402,9 +402,62 @@ Dr.Implement('PixelVector3', function (global, module_get) {
 	};
 	
 	
-	Module.prototype.pixelize = function () {
-		return new Module(Math.round(this.x), Math.round(this.y), Math.round(this.z));
+	Module.FromArray = function (array, offset) {
+		if (!offset) {
+			offset = 0;
+		}
+		return new Module(array[offset], array[offset + 1], array[offset + 2]);
 	};
+	Module.Zero = function () {
+		return new Module(0, 0, 0);
+	};
+	Module.Up = function () {
+		return new Module(0, 1.0, 0);
+	};
+	Module.Copy = function (source) {
+		return new Module(source.x, source.y, source.z);
+	};
+	Module.Dot = function (left, right) {
+		return (left.x * right.x + left.y * right.y + left.z * right.z);
+	};
+	Module.Cross = function (left, right) {
+		var x = left.y * right.z - left.z * right.y;
+		var y = left.z * right.x - left.x * right.z;
+		var z = left.x * right.y - left.y * right.x;
+		return new Module(x, y, z);
+	};
+	Module.Normalize = function (vector) {
+		var newVector = Module.Copy(vector);
+		newVector.normalize();
+		return newVector;
+	};
+	Module.Distance = function (value1, value2) {
+		return Math.sqrt(Module.DistanceSquared(value1, value2));
+	};
+	Module.DistanceSquared = function (value1, value2) {
+		var x = value1.x - value2.x;
+		var y = value1.y - value2.y;
+		var z = value1.z - value2.z;
+		return (x * x) + (y * y) + (z * z);
+	};
+	//check matrix
+	Module.TransformCoordinates = function (vector, transformation) {
+		var x = (vector.x * transformation.m[0]) + (vector.y * transformation.m[4]) + (vector.z * transformation.m[8]) + transformation.m[12];
+		var y = (vector.x * transformation.m[1]) + (vector.y * transformation.m[5]) + (vector.z * transformation.m[9]) + transformation.m[13];
+		var z = (vector.x * transformation.m[2]) + (vector.y * transformation.m[6]) + (vector.z * transformation.m[10]) + transformation.m[14];
+		var w = (vector.x * transformation.m[3]) + (vector.y * transformation.m[7]) + (vector.z * transformation.m[11]) + transformation.m[15];
+		return new Module(x / w, y / w, z / w);
+	};
+	Module.TransformNormal = function (vector, transformation) {
+		var x = (vector.x * transformation.m[0]) + (vector.y * transformation.m[4]) + (vector.z * transformation.m[8]);
+		var y = (vector.x * transformation.m[1]) + (vector.y * transformation.m[5]) + (vector.z * transformation.m[9]);
+		var z = (vector.x * transformation.m[2]) + (vector.y * transformation.m[6]) + (vector.z * transformation.m[10]);
+		return new Module(x, y, z);
+	};
+	
+	
+	
+	
 	
 	
 	/*
@@ -527,6 +580,10 @@ Dr.Implement('PixelVector3', function (global, module_get) {
 		return new Module(Math.round(x), Math.round(y), Math.round(z));
 	};
 	
+	Module.prototype.pixelize = function () {
+		return new Module(Math.round(this.x), Math.round(this.y), Math.round(this.z));
+	};
+	
 	/*
 	Dr.log('should get [5, 5]', _pixel_rotate_by_axis(0.5, 5, 5, 0));
 	Dr.log('should get [5, -5]', _pixel_rotate_by_axis(-0.5, 5, 5, 0));
@@ -543,57 +600,7 @@ Dr.Implement('PixelVector3', function (global, module_get) {
 	Dr.log('test_2', test_2.pixelRotate(center_vec, rotate_vec));
 	
 	*/
-	Module.FromArray = function (array, offset) {
-		if (!offset) {
-			offset = 0;
-		}
-		return new Module(array[offset], array[offset + 1], array[offset + 2]);
-	};
-	Module.Zero = function () {
-		return new Module(0, 0, 0);
-	};
-	Module.Up = function () {
-		return new Module(0, 1.0, 0);
-	};
-	Module.Copy = function (source) {
-		return new Module(source.x, source.y, source.z);
-	};
-	Module.Dot = function (left, right) {
-		return (left.x * right.x + left.y * right.y + left.z * right.z);
-	};
-	Module.Cross = function (left, right) {
-		var x = left.y * right.z - left.z * right.y;
-		var y = left.z * right.x - left.x * right.z;
-		var z = left.x * right.y - left.y * right.x;
-		return new Module(x, y, z);
-	};
-	Module.Normalize = function (vector) {
-		var newVector = Module.Copy(vector);
-		newVector.normalize();
-		return newVector;
-	};
-	Module.Distance = function (value1, value2) {
-		return Math.sqrt(Module.DistanceSquared(value1, value2));
-	};
-	Module.DistanceSquared = function (value1, value2) {
-		var x = value1.x - value2.x;
-		var y = value1.y - value2.y;
-		var z = value1.z - value2.z;
-		return (x * x) + (y * y) + (z * z);
-	};
-	//check matrix
-	Module.TransformCoordinates = function (vector, transformation) {
-		var x = (vector.x * transformation.m[0]) + (vector.y * transformation.m[4]) + (vector.z * transformation.m[8]) + transformation.m[12];
-		var y = (vector.x * transformation.m[1]) + (vector.y * transformation.m[5]) + (vector.z * transformation.m[9]) + transformation.m[13];
-		var z = (vector.x * transformation.m[2]) + (vector.y * transformation.m[6]) + (vector.z * transformation.m[10]) + transformation.m[14];
-		var w = (vector.x * transformation.m[3]) + (vector.y * transformation.m[7]) + (vector.z * transformation.m[11]) + transformation.m[15];
-		return new Module(x / w, y / w, z / w);
-	};
-	Module.TransformNormal = function (vector, transformation) {
-		var x = (vector.x * transformation.m[0]) + (vector.y * transformation.m[4]) + (vector.z * transformation.m[8]);
-		var y = (vector.x * transformation.m[1]) + (vector.y * transformation.m[5]) + (vector.z * transformation.m[9]);
-		var z = (vector.x * transformation.m[2]) + (vector.y * transformation.m[6]) + (vector.z * transformation.m[10]);
-		return new Module(x, y, z);
-	};
+	
+	
 	return Module;
 });

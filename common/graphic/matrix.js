@@ -1,5 +1,9 @@
 Dr.Declare('Matrix4', 'class');
+Dr.Require('Matrix4', 'Vector3');
 Dr.Implement('Matrix4', function (global, module_get) {
+	
+	var Vector3 = Dr.Get('Vector3');	//
+	
 	var Module = function () {
 		this.m = [];
 	}
@@ -263,7 +267,7 @@ Dr.Implement('Matrix4', function (global, module_get) {
 	*/
 	Module.OrthographicLH = function (width, height, zoom) {
 		var matrix = Module.Zero();
-		var wh=zoom * Math.sqrt(width * height);
+		var wh = zoom * Math.sqrt(width * height);
 		matrix.m[0] = wh / width;
 		matrix.m[5] = wh / height;
 		matrix.m[10] = 1;

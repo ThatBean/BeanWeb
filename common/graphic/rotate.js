@@ -2,8 +2,8 @@
 
 // with axis and rotate value (right handed, in Radians (Pi, not 180))
 
-Dr.Declare('PixelRotate3', 'class');
-Dr.Implement('PixelRotate3', function (global, module_get) {
+Dr.Declare('PixelRotate4', 'class');
+Dr.Implement('PixelRotate4', function (global, module_get) {
 	
 	var Module = function (x, y, z, r) {
 		this.x = x;

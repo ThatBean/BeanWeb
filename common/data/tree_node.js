@@ -2,13 +2,9 @@ Dr.Declare('DataTreeNode', 'class');
 Dr.Implement('DataTreeNode', function (global, module_get) {
 	
 	var Module = function () {
-		//
-	}
-	
-	Module.prototype.init = function () {
 		this.parent = null;
 		this.children = [];
-	};
+	}
 	
 	Module.prototype.setParent = function (node) {
 		this.parent = node;
