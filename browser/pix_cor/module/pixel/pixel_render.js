@@ -101,10 +101,9 @@ Dr.Implement('PixelRender', function (global, module_get) {
 		this.resize(pixel_scale, width, height);
 		
 		//Dr.log output
-		Dr.log("PixelRender Init:"
-			+ "<br /> | pixel_scale: " + this.pixel_scale
-			+ "<br /> | output_size: " + this.output_width + " x " + this.output_height
-			+ "<br /> | working_size: " + this.working_width + " x " + this.working_height
+		Dr.log("[PixelRender][Init] pixel_scale: " + this.pixel_scale
+			+ " | output_size: " + this.output_width + " x " + this.output_height
+			+ " | working_size: " + this.working_width + " x " + this.working_height
 		);
 	};
 	

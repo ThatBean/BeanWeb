@@ -11,7 +11,7 @@ Dr.Implement('PixelBone', function (global, module_get) {
 	
 	var Module = function () {
 		this.position = new PixelVector3();
-		this.rotation = new PixelVector3();
+		this.rotation = new PixelRotate4();
 		
 		this.pixel_part_name = null;	//attaching PixelPart NAME
 		this.pixel_part = null;	//attaching PixelPart
@@ -71,6 +71,60 @@ Dr.Implement('PixelBone', function (global, module_get) {
 		return loaded_pixel_bone;
 	};
 	
+	
+	return Module;
+});
+
+
+
+
+
+
+Dr.Declare('PixelBoneMixerBuffer', 'class');
+Dr.Require('PixelBoneMixerBuffer', 'PixelMixMethod');
+Dr.Require('PixelBoneMixerBuffer', 'PixelBone');
+Dr.Implement('PixelBoneMixerBuffer', function (global, module_get) {
+	
+	var PixelMixMethod = Dr.Get('PixelMixMethod');	//
+	var PixelBone = Dr.Get('PixelBone');	//
+	
+	var Module = function () {
+		this.mix_data_from = null;	//
+		this.mix_data_to = null;	//
+		
+		this.mix_buffer_bone = null;
+	}
+	
+	Module.prototype.clear = function () {
+		this.mix_data_from = null;	//
+		this.mix_data_to = null;	//
+		
+		this.mix_buffer_bone = null;
+	};
+	
+	Module.prototype.setMixData = function (mix_data_from, mix_data_to) {
+		this.mix_data_from = mix_data_from;
+		this.mix_data_to = mix_data_to;
+		
+		this.mix_buffer_bone = new PixelBone;
+		
+		//copy key data
+		this.mix_buffer_bone.pixel_part_name = this.mix_data_from.pixel_part_name;
+		this.mix_buffer_bone.pixel_part = this.mix_data_from.pixel_part;
+		this.mix_buffer_bone.render_pixel_part = this.mix_data_from.render_pixel_part;
+	};
+	
+	Module.prototype.getMixedData = function () {
+		
+		return this.mix_buffer_bone;
+	};
+	
+	Module.prototype.mix = function (mix_progress) {
+		//should implement mix logic here
+		
+		PixelMixMethod.mixPixelVector3(this.mix_buffer_bone.position, this.mix_data_from.position, this.mix_data_to.position, mix_progress);
+		PixelMixMethod.mixPixelRotation4(this.mix_buffer_bone.rotation, this.mix_data_from.rotation, this.mix_data_to.rotation, mix_progress);
+	};
 	
 	return Module;
 });

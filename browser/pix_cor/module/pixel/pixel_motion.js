@@ -1,5 +1,5 @@
 /*
-	Combine PixelBone - PixelPart and PixelKeyFrame data, 
+	Combine PixelBone - PixelPart and PixelFrame data, 
 	receive delta_time and generate corresponding PixelModel(Different Morph for PixelParts)
 	
 	For game purpose, will add some physics related logic to Frame Generation
@@ -8,14 +8,16 @@
 Dr.Declare('PixelMotion', 'class');
 Dr.Require('PixelMotion', 'DataTreeNode');
 Dr.Require('PixelMotion', 'PixelModel');
-Dr.Require('PixelMotion', 'PixelKeyFrame');
-Dr.Require('PixelMotion', 'PixelFrameMixer');
+Dr.Require('PixelMotion', 'PixelFrame');
+Dr.Require('PixelMotion', 'PixelMixer');
+Dr.Require('PixelMotion', 'PixelFrameMixerBuffer');
 Dr.Implement('PixelMotion', function (global, module_get) {
 	
 	var DataTreeNode = Dr.Get('DataTreeNode');	//
 	var PixelModel = Dr.Get('PixelModel');	//
-	var PixelKeyFrame = Dr.Get('PixelKeyFrame');	//
-	var PixelFrameMixer = Dr.Get('PixelFrameMixer');	//
+	var PixelFrame = Dr.Get('PixelFrame');	//
+	var PixelMixer = Dr.Get('PixelMixer');	//
+	var PixelFrameMixerBuffer = Dr.Get('PixelFrameMixerBuffer');	//
 	
 	
 	var Module = function () {
@@ -27,7 +29,7 @@ Dr.Implement('PixelMotion', function (global, module_get) {
 		this.key_frames = [];	//all key_frames here
 		this.total_frame_count = 0;
 		
-		this.frame_mixer = new PixelFrameMixer();
+		this.pixel_mixer = new PixelMixer(new PixelFrameMixerBuffer);
 		
 		this.pixel_model = null;	//attached model
 		this.position = null;
@@ -95,11 +97,11 @@ Dr.Implement('PixelMotion', function (global, module_get) {
 	
 	
 	Module.prototype.nextFrame = function () {
-		this.current_frame = this.frame_mixer.nextFrame();	//generate next frame, null if current mix ended
+		this.current_frame = this.pixel_mixer.next(1);	//generate next frame, null if current mix ended
 		
 		if (!this.current_frame) {
 			this.current_frame = this.getKeyFrame(this.current_frame_id);
-			this.frame_mixer.setMixFrame(this.current_frame, this.current_frame.next_frame);
+			this.pixel_mixer.setMixBuffer(this.current_frame, this.current_frame.next_frame, this.current_frame.frame_count);
 		}
 	};
 	
@@ -172,9 +174,9 @@ Dr.Implement('PixelMotion', function (global, module_get) {
 		sample_pixel_motion_data = {
 			'FRAME_FPS' : 30,	//only for frame switching speed, not play FPS
 			'pixel_frame_list' : [
-				<pixel_frame_data>,	//check in PixelKeyFrame
-				<pixel_frame_data>,	//check in PixelKeyFrame
-				<pixel_frame_data>,	//check in PixelKeyFrame
+				<pixel_frame_data>,	//check in PixelFrame
+				<pixel_frame_data>,	//check in PixelFrame
+				<pixel_frame_data>,	//check in PixelFrame
 			],
 		}
 	*/
@@ -185,7 +187,7 @@ Dr.Implement('PixelMotion', function (global, module_get) {
 		
 		this.key_frames = [];
 		for (var index = 0; index < pixel_motion_data.pixel_frame_list.length; index ++) {
-			this.key_frames.push(PixelKeyFrame.loadData(pixel_motion_data.pixel_frame_list[index]));
+			this.key_frames.push(PixelFrame.loadData(pixel_motion_data.pixel_frame_list[index]));
 		}
 	};
 	

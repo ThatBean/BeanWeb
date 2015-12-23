@@ -118,8 +118,26 @@ var pix_cor_init = function () {
 						// 'XYZR' : [0, 0, 0, 0],
 					// },
 				],
-			},{
-				'ID' : 3, // number, starts from 0
+			},
+			{
+				'ID' : 100, // number, starts from 0
+				'XYZ' : [0, 0, 0],
+				'XYZR' : [0, 0, 0, 0],
+				'pixel_bone_list' : [
+					{
+						'PART_NAME' : "A",	//string, attaching PixelPart NAME
+						'XYZ' : [10, 10, 0],
+						'XYZR' : [0, 0, 0, 0],
+					},
+					// {
+						// 'PART_NAME' : "B",	//string, attaching PixelPart NAME
+						// 'XYZ' : [2, 0, 0],
+						// 'XYZR' : [0, 0, 0, 0],
+					// },
+				],
+			},
+			{
+				'ID' : 300, // number, starts from 0
 				'XYZ' : [0, 0, 0],
 				'XYZR' : [0, 0, 0, 0],
 				'pixel_bone_list' : [
@@ -188,6 +206,8 @@ var pix_cor_init = function () {
 	Dr.UpdateLoop.add(function (delta_time) { 
 		Dr.pixel_motion.update(delta_time);
 		
+		Dr.pixel_render.clearBuffer();
+		
 		Dr.pixel_render.render(
 			zoom, 
 			Dr.pixel_camera,
@@ -219,10 +239,11 @@ Dr.afterWindowLoaded(function () {
 		
 		__PATH_PIX_COR + 'module/pixel/pixel_model.js',
 		__PATH_PIX_COR + 'module/pixel/pixel_part.js',
+		
 		__PATH_PIX_COR + 'module/pixel/pixel_motion.js',
 		__PATH_PIX_COR + 'module/pixel/pixel_frame.js',
 		__PATH_PIX_COR + 'module/pixel/pixel_bone.js',
-		__PATH_PIX_COR + 'module/pixel/pixel_frame_mixer.js',
+		__PATH_PIX_COR + 'module/pixel/pixel_mixer.js',
 		
 		__PATH_PIX_COR + 'module/pixel/pixel_render.js',
 		
@@ -247,6 +268,7 @@ Dr.afterWindowLoaded(function () {
 		})
 		tag_log.Log("init log " + Dr.now()); 
 		tag_log.listMax = 50; 
+		
 		
 		//real logic
 		pix_cor_init();

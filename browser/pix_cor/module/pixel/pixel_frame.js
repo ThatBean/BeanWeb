@@ -1,12 +1,12 @@
 /*
 	A state (key frame) for all PixelBone in a PixelMotion,
-	frames between PixelKeyFrame are auto generated (slop + time)
+	frames between PixelFrame are auto generated (slop + time)
 */
-Dr.Declare('PixelKeyFrame', 'class');
-Dr.Require('PixelKeyFrame', 'PixelVector3');
-Dr.Require('PixelKeyFrame', 'PixelRotate4');
-Dr.Require('PixelKeyFrame', 'PixelBone');
-Dr.Implement('PixelKeyFrame', function (global, module_get) {
+Dr.Declare('PixelFrame', 'class');
+Dr.Require('PixelFrame', 'PixelVector3');
+Dr.Require('PixelFrame', 'PixelRotate4');
+Dr.Require('PixelFrame', 'PixelBone');
+Dr.Implement('PixelFrame', function (global, module_get) {
 	
 	var PixelVector3 = Dr.Get('PixelVector3');	//for position
 	var PixelRotate4 = Dr.Get('PixelRotate4');	//for rotation
@@ -14,7 +14,7 @@ Dr.Implement('PixelKeyFrame', function (global, module_get) {
 	
 	var Module = function () {
 		this.position = new PixelVector3();
-		this.rotation = new PixelVector3();
+		this.rotation = new PixelRotate4();
 		
 		this.frame_id = 0;	//id for play
 		this.frame_count = 0;
@@ -110,40 +110,76 @@ Dr.Implement('PixelKeyFrame', function (global, module_get) {
 
 
 
-/*
-	A state (key frame) for all PixelBone in a PixelMotion,
-	frames between PixelKeyFrame, auto generated (slop + time), check PixelFrameMixer
-*/
-Dr.Declare('PixelAutoFrame', 'class');
-Dr.Require('PixelAutoFrame', 'PixelVector3');
-Dr.Require('PixelAutoFrame', 'PixelRotate4');
-Dr.Require('PixelAutoFrame', 'PixelBone');
-Dr.Implement('PixelAutoFrame', function (global, module_get) {
+Dr.Declare('PixelFrameMixerBuffer', 'class');
+Dr.Require('PixelFrameMixerBuffer', 'PixelMixMethod');
+Dr.Require('PixelFrameMixerBuffer', 'PixelFrame');
+Dr.Require('PixelFrameMixerBuffer', 'PixelBoneMixerBuffer');
+Dr.Implement('PixelFrameMixerBuffer', function (global, module_get) {
 	
-	var PixelVector3 = Dr.Get('PixelVector3');	//for position
-	var PixelRotate4 = Dr.Get('PixelRotate4');	//for rotation
-	var PixelBone = Dr.Get('PixelBone');	//
+	var PixelMixMethod = Dr.Get('PixelMixMethod');	//
+	var PixelFrame = Dr.Get('PixelFrame');	//
+	var PixelBoneMixerBuffer = Dr.Get('PixelBoneMixerBuffer');	//
 	
 	var Module = function () {
-		this.position = new PixelVector3();
-		this.rotation = new PixelVector3();
+		this.mix_data_from = null;	//
+		this.mix_data_to = null;	//
 		
-		this.frame_id = 0;	//id for play
-		this.frame_count = 0;
-		
-		this.frame_index = 0;	//index in motion.frames array
-		this.next_frame = null;
-		
-		
-		this.pixel_model = null;
-		this.bones = [];	//attaching PixelPart
+		this.mix_buffer_frame = null;
+		this.sub_mix_buffer_bone_list = [];
 	}
 	
-	Module.prototype.getId = function () {
-		return this.id;
+	Module.prototype.clear = function () {
+		this.mix_data_from = null;	//
+		this.mix_data_to = null;	//
+		
+		this.mix_buffer_frame = null;
+		this.sub_mix_buffer_bone_list = [];
 	};
 	
+	Module.prototype.setMixData = function (mix_data_from, mix_data_to) {
+		this.mix_data_from = mix_data_from;
+		this.mix_data_to = mix_data_to;
+		
+		this.mix_buffer_frame = new PixelFrame;
+		
+		//copy key data
+		this.mix_buffer_frame.frame_count = this.mix_data_from.frame_count;
+		this.mix_buffer_frame.next_frame = this.mix_data_from.next_frame;
+		
+		
+		this.sub_mix_buffer_bone_list = [];
+		for (var index in this.mix_data_from.bones) {
+			var mix_buffer_bone = new PixelBoneMixerBuffer;
+			mix_buffer_bone.setMixData(this.mix_data_from.bones[index], this.mix_data_to.bones[index]);
+			this.sub_mix_buffer_bone_list[index] = mix_buffer_bone;
+		}
+	};
 	
+	Module.prototype.getMixedData = function () {
+		var bones = [];
+		
+		for (var index in this.sub_mix_buffer_bone_list) {
+			var mix_buffer_bone = this.sub_mix_buffer_bone_list[index];
+			bones[index] = mix_buffer_bone.getMixedData();
+		}
+		
+		this.mix_buffer_frame.bones = bones;
+		
+		return this.mix_buffer_frame;
+	};
+	
+	Module.prototype.mix = function (mix_progress) {
+		//should implement mix logic here
+		
+		PixelMixMethod.mixPixelVector3(this.mix_buffer_frame.position, this.mix_data_from.position, this.mix_data_to.position, mix_progress);
+		PixelMixMethod.mixPixelRotation4(this.mix_buffer_frame.rotation, this.mix_data_from.rotation, this.mix_data_to.rotation, mix_progress);
+		
+		//bones
+		for (var index in this.sub_mix_buffer_bone_list) {
+			this.sub_mix_buffer_bone_list[index].mix(mix_progress);
+		}
+	};
 	
 	return Module;
 });
+
