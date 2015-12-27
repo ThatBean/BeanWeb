@@ -1,8 +1,8 @@
-Dr.Declare('Action', 'class');
+Dr.Declare('Action', 'function_pack');
 Dr.Implement('Action', function (global, module_get) {
 	
 	var Module = function () {
-		//
+		Dr.assert(false, 'this is a function pack');
 	}
 	
 	//map event type to merged action type

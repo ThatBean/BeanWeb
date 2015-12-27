@@ -127,7 +127,7 @@ var pix_cor_init = function () {
 					{
 						'PART_NAME' : "A",	//string, attaching PixelPart NAME
 						'XYZ' : [10, 10, 0],
-						'XYZR' : [0, 0, 0, 0],
+						'XYZR' : [9, 9, 0, 0],
 					},
 					// {
 						// 'PART_NAME' : "B",	//string, attaching PixelPart NAME
@@ -191,10 +191,11 @@ var pix_cor_init = function () {
 	);
 	
 	
+	
 	var zoom = 1.0 * pixel_scale / render_width;
 	var render_data = {
-		// data_tree_root : Dr.pixel_model,
-		data_tree_root : Dr.pixel_motion,
+		data_tree_root : Dr.pixel_model,
+		// data_tree_root : Dr.pixel_motion,
 		global_light_pack : [],
 		dot_light_pack : [],
 	};
@@ -218,6 +219,24 @@ var pix_cor_init = function () {
 		Dr.pixel_render.applyBuffer();
 		return true;
 	})
+	
+	
+	
+	var Action = Dr.Get("Action");
+	Action.applyActionListener(render_canvas, function(action_event) {
+		Dr.pixel_render.raytracing(
+			zoom, 
+			Dr.pixel_camera,
+			render_data,
+			action_event.positions.target.x, 
+			action_event.positions.target.y, 
+			100
+		);
+	});
+	
+	
+	
+	
 }
 
 
@@ -228,6 +247,7 @@ var pix_cor_init = function () {
 Dr.afterWindowLoaded(function () {
 	var __PATH_COMMON = '../common/';
 	var __PATH_PIX_COR = './pix_cor/';
+	var __PATH_GRAPHIC = './graphic/';
 	
 	Dr.loadScriptByList([
 		__PATH_COMMON + 'data/tree_node.js',
@@ -249,6 +269,8 @@ Dr.afterWindowLoaded(function () {
 		
 		__PATH_PIX_COR + 'module/pix_cor_actor.js',
 		__PATH_PIX_COR + 'module/pix_cor_world.js',
+		
+		__PATH_GRAPHIC + 'action.js',
 	], function () {
 		Dr.LoadAll();
 		Dr.UpdateLoop.start();

@@ -446,5 +446,93 @@ Dr.Implement('PixelRender', function (global, module_get) {
 	};
 	
 	
+	
+	Module.prototype.raytracing = function (zoom, camera, render_data, screen_x, screen_y, depth) {
+		
+		var output_index = Math.floor(screen_y) * this.output_width + Math.floor(screen_x);
+		var working_index = this.quick_output_working_index_map[output_index] >> 2;
+		
+		var working_x = working_index % this.working_width; // - this.working_width * 0.5;
+		var working_y = Math.floor(working_index / this.working_width); // - this.working_height * 0.5;
+		var working_z = depth;
+		
+		
+		this.putPixel(
+			working_x,
+			working_y,
+			working_z,
+			new Color4(0, 0, 0, 255)
+		);
+		
+		
+		
+		var min_distance_sqrt = Infinity; //Number.POSITIVE_INFINITY;
+		var result_node = null;
+		var result_part = null;
+		var result_pixel = null;
+		
+		//calculate View, Projection Matrix
+		//process: Model --> World --> View(Camera) --> Projection(3D->2D)
+		var view_matrix = camera.getViewMatrix();
+		var projection_matrix = Matrix4.OrthographicLH(this.working_width, this.working_height, zoom); //Matrix4.PerspectiveFovLH(0.78, this.working_width / this.working_height, 0.01, 1.0);
+		
+		var data_tree_root = render_data.data_tree_root;
+		
+		var _this = this;
+		
+		//render each node(PixelModel or PixelMotion)
+		data_tree_root.traverseDown(function (node) {
+			
+			var node_position = node.position; //node.CalcRenderPosition();
+			var node_rotation = node.rotation; //node.CalcRenderRotation();
+			
+			//draw PixelPart
+			var pixel_part_map = node.getRenderPixelPartMap();
+			for (var name_pixel_part in pixel_part_map) {
+				var pixel_part = pixel_part_map[name_pixel_part];
+				
+				var part_position = node_position.add(pixel_part.position);
+				var part_rotation = pixel_part.rotation; //node_rotation.add(pixel_part.rotation);
+				
+				//Calc Model to World matrix
+				var world_matrix = Matrix4.RotationYawPitchRoll(
+					part_rotation.y, part_rotation.x, part_rotation.z
+				).multiply(
+					Matrix4.Translation(
+						part_position.x, part_position.y, part_position.z
+					)
+				);
+				
+				//Calc applys World+View+Projection in order
+				var world_view_matrix = world_matrix.multiply(view_matrix);
+				var transform_matrix = world_view_matrix.multiply(projection_matrix);
+				
+				var working_position = _this.deProject(working_x, working_y, working_z, transform_matrix);
+				
+				//draw PixelPixel
+				var pixel_pixel_list = pixel_part.pixels;
+				for (var index_pixel_pixel = 0; index_pixel_pixel < pixel_pixel_list.length; index_pixel_pixel++) {
+					var pixel_pixel = pixel_pixel_list[index_pixel_pixel];
+					
+					var pixel_position = pixel_pixel.position;
+					
+					var distance_sqrt = PixelVector3.DistanceSquared(pixel_position, working_position);
+					
+					if (distance_sqrt < min_distance_sqrt) {
+						min_distance_sqrt = distance_sqrt;
+						
+						result_node = node;
+						result_part = pixel_part;
+						result_pixel = pixel_pixel;
+					}
+				}
+			}
+		});
+		
+		// Dr.log(min_distance_sqrt, result_node, result_part, result_pixel);
+		if (result_pixel) {
+			result_pixel.color = new Color4(255, 0, 0, 255);
+		}
+	};
 	return Module;
 });
