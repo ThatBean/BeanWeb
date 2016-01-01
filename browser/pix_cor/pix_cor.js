@@ -170,9 +170,9 @@ var pix_cor_init = function () {
 	var PixelCamera = Dr.Get("PixelCamera");
 	Dr.pixel_camera = new PixelCamera();
 	
-	var PixelVector3 = Dr.Get("PixelVector3");
-	Dr.pixel_camera.position = new PixelVector3(0, 0, -100);
-	Dr.pixel_camera.target_position = new PixelVector3(0, 0, 0);
+	var Vector3 = Dr.Get("Vector3");
+	Dr.pixel_camera.position = new Vector3(0, 0, -100);
+	Dr.pixel_camera.target_position = new Vector3(0, 0, 0);
 	
 	
 	
@@ -194,8 +194,8 @@ var pix_cor_init = function () {
 	
 	var zoom = 1.0 * pixel_scale / render_width;
 	var render_data = {
-		data_tree_root : Dr.pixel_model,
-		// data_tree_root : Dr.pixel_motion,
+		// data_tree_root : Dr.pixel_model,
+		data_tree_root : Dr.pixel_motion,
 		global_light_pack : [],
 		dot_light_pack : [],
 	};
@@ -256,6 +256,7 @@ Dr.afterWindowLoaded(function () {
 		__PATH_COMMON + 'graphic/rotate.js',
 		__PATH_COMMON + 'graphic/matrix.js',
 		__PATH_COMMON + 'graphic/color.js',
+		__PATH_COMMON + 'graphic/ray.js',
 		
 		__PATH_PIX_COR + 'module/pixel/pixel_model.js',
 		__PATH_PIX_COR + 'module/pixel/pixel_part.js',

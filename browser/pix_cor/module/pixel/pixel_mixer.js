@@ -8,13 +8,13 @@
 	Interpolation(from_data, to_data, ratio_progress)
 */
 Dr.Declare('PixelMixer', 'class');
-Dr.Require('PixelMixer', 'PixelVector3');
-Dr.Require('PixelMixer', 'PixelRotate4');
+Dr.Require('PixelMixer', 'Vector3');
+Dr.Require('PixelMixer', 'Rotate4');
 Dr.Require('PixelMixer', 'PixelMixerBuffer');
 Dr.Implement('PixelMixer', function (global, module_get) {
 	
-	var PixelVector3 = Dr.Get('PixelVector3');	//for position
-	var PixelRotate4 = Dr.Get('PixelRotate4');	//for rotation
+	var Vector3 = Dr.Get('Vector3');	//for position
+	var Rotate4 = Dr.Get('Rotate4');	//for rotation
 	var PixelMixerBuffer = Dr.Get('PixelMixerBuffer');	//for rotation
 	
 	var Module = function (mix_buffer) {
@@ -127,7 +127,7 @@ Dr.Implement('PixelMixMethod', function (global, module_get) {
 	
 	//mix___ use 4 arguments: result, from, to, mix_progress
 	// note result must be an object or the argument is passed by value
-	Module.mixPixelVector3 = function (result, from, to, mix_progress) {
+	Module.mixVector3 = function (result, from, to, mix_progress) {
 		result.x = Module.getMixedNumber(from.x, to.x, mix_progress);
 		result.y = Module.getMixedNumber(from.y, to.y, mix_progress);
 		result.z = Module.getMixedNumber(from.z, to.z, mix_progress);

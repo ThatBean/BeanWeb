@@ -1,17 +1,17 @@
 
 Dr.Declare('PixelBone', 'class');
-Dr.Require('PixelBone', 'PixelVector3');
-Dr.Require('PixelBone', 'PixelRotate4');
+Dr.Require('PixelBone', 'Vector3');
+Dr.Require('PixelBone', 'Rotate4');
 Dr.Require('PixelBone', 'PixelPart');
 Dr.Implement('PixelBone', function (global, module_get) {
 	
-	var PixelVector3 = Dr.Get('PixelVector3');	//for position
-	var PixelRotate4 = Dr.Get('PixelRotate4');	//for rotation
+	var Vector3 = Dr.Get('Vector3');	//for position
+	var Rotate4 = Dr.Get('Rotate4');	//for rotation
 	var PixelPart = Dr.Get('PixelPart');	//for rotation
 	
 	var Module = function () {
-		this.position = new PixelVector3();
-		this.rotation = new PixelRotate4();
+		this.position = new Vector3();
+		this.rotation = new Rotate4();
 		
 		this.pixel_part_name = null;	//attaching PixelPart NAME
 		this.pixel_part = null;	//attaching PixelPart
@@ -58,8 +58,8 @@ Dr.Implement('PixelBone', function (global, module_get) {
 	Module.prototype.applyData = function (pixel_bone_data) {
 		//data apply logic
 		this.pixel_part_name = pixel_bone_data.PART_NAME;
-		this.position = PixelVector3.FromArray(pixel_bone_data.XYZ);
-		this.rotation = PixelRotate4.FromArray(pixel_bone_data.XYZR);
+		this.position = Vector3.FromArray(pixel_bone_data.XYZ);
+		this.rotation = Rotate4.FromArray(pixel_bone_data.XYZR);
 	};
 	
 	
@@ -122,7 +122,7 @@ Dr.Implement('PixelBoneMixerBuffer', function (global, module_get) {
 	Module.prototype.mix = function (mix_progress) {
 		//should implement mix logic here
 		
-		PixelMixMethod.mixPixelVector3(this.mix_buffer_bone.position, this.mix_data_from.position, this.mix_data_to.position, mix_progress);
+		PixelMixMethod.mixVector3(this.mix_buffer_bone.position, this.mix_data_from.position, this.mix_data_to.position, mix_progress);
 		PixelMixMethod.mixPixelRotation4(this.mix_buffer_bone.rotation, this.mix_data_from.rotation, this.mix_data_to.rotation, mix_progress);
 	};
 	

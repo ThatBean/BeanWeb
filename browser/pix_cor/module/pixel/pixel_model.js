@@ -11,14 +11,14 @@
 
 Dr.Declare('PixelModel', 'class');
 Dr.Require('PixelModel', 'DataTreeNode');
-Dr.Require('PixelModel', 'PixelVector3');
-Dr.Require('PixelModel', 'PixelRotate4');
+Dr.Require('PixelModel', 'Vector3');
+Dr.Require('PixelModel', 'Rotate4');
 Dr.Require('PixelModel', 'PixelPart');
 Dr.Implement('PixelModel', function (global, module_get) {
 	
 	var DataTreeNode = Dr.Get('DataTreeNode');	//for loop and lookup
-	var PixelVector3 = Dr.Get('PixelVector3');	//for position
-	var PixelRotate4 = Dr.Get('PixelRotate4');	//for rotation
+	var Vector3 = Dr.Get('Vector3');	//for position
+	var Rotate4 = Dr.Get('Rotate4');	//for rotation
 	var PixelPart = Dr.Get('PixelPart');
 	
 	var Module = function () {
@@ -26,8 +26,8 @@ Dr.Implement('PixelModel', function (global, module_get) {
 		
 		this.id = Dr.generateId();
 		
-		this.position = new PixelVector3();
-		this.rotation = new PixelRotate4();
+		this.position = new Vector3();
+		this.rotation = new Rotate4();
 		
 		this.parts = {};	//PixelPart map
 		
@@ -67,8 +67,8 @@ Dr.Implement('PixelModel', function (global, module_get) {
 	
 	Module.prototype.applyData = function (pixel_model_data) {
 		//data apply logic
-		this.position = PixelVector3.FromArray(pixel_model_data.XYZ);
-		this.rotation = PixelRotate4.FromArray(pixel_model_data.XYZR);
+		this.position = Vector3.FromArray(pixel_model_data.XYZ);
+		this.rotation = Rotate4.FromArray(pixel_model_data.XYZR);
 		
 		this.parts = {};
 		for (var index in pixel_model_data.pixel_part_list) {

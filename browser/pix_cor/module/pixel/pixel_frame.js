@@ -3,18 +3,18 @@
 	frames between PixelFrame are auto generated (slop + time)
 */
 Dr.Declare('PixelFrame', 'class');
-Dr.Require('PixelFrame', 'PixelVector3');
-Dr.Require('PixelFrame', 'PixelRotate4');
+Dr.Require('PixelFrame', 'Vector3');
+Dr.Require('PixelFrame', 'Rotate4');
 Dr.Require('PixelFrame', 'PixelBone');
 Dr.Implement('PixelFrame', function (global, module_get) {
 	
-	var PixelVector3 = Dr.Get('PixelVector3');	//for position
-	var PixelRotate4 = Dr.Get('PixelRotate4');	//for rotation
+	var Vector3 = Dr.Get('Vector3');	//for position
+	var Rotate4 = Dr.Get('Rotate4');	//for rotation
 	var PixelBone = Dr.Get('PixelBone');	//
 	
 	var Module = function () {
-		this.position = new PixelVector3();
-		this.rotation = new PixelRotate4();
+		this.position = new Vector3();
+		this.rotation = new Rotate4();
 		
 		this.frame_id = 0;	//id for play
 		this.frame_count = 0;
@@ -79,8 +79,8 @@ Dr.Implement('PixelFrame', function (global, module_get) {
 	Module.prototype.applyData = function (pixel_frame_data) {
 		//data apply logic
 		this.frame_id = pixel_frame_data.ID;
-		this.position = PixelVector3.FromArray(pixel_frame_data.XYZ);
-		this.rotation = PixelRotate4.FromArray(pixel_frame_data.XYZR);
+		this.position = Vector3.FromArray(pixel_frame_data.XYZ);
+		this.rotation = Rotate4.FromArray(pixel_frame_data.XYZR);
 		
 		this.bones = [];
 		for (var index in pixel_frame_data.pixel_bone_list) {
@@ -171,7 +171,7 @@ Dr.Implement('PixelFrameMixerBuffer', function (global, module_get) {
 	Module.prototype.mix = function (mix_progress) {
 		//should implement mix logic here
 		
-		PixelMixMethod.mixPixelVector3(this.mix_buffer_frame.position, this.mix_data_from.position, this.mix_data_to.position, mix_progress);
+		PixelMixMethod.mixVector3(this.mix_buffer_frame.position, this.mix_data_from.position, this.mix_data_to.position, mix_progress);
 		PixelMixMethod.mixPixelRotation4(this.mix_buffer_frame.rotation, this.mix_data_from.rotation, this.mix_data_to.rotation, mix_progress);
 		
 		//bones

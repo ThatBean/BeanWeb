@@ -12,15 +12,15 @@
 
 // a pixel/block/square simple data
 Dr.Declare('PixelPixel', 'class');
-Dr.Require('PixelPixel', 'PixelVector3');
+Dr.Require('PixelPixel', 'Vector3');
 Dr.Require('PixelPixel', 'Color4');
 Dr.Implement('PixelPixel', function (global, module_get) {
 	
-	var PixelVector3 = Dr.Get('PixelVector3');	//for position
+	var Vector3 = Dr.Get('Vector3');	//for position
 	var Color4 = Dr.Get('Color4');	//for color
 	
 	var Module = function () {
-		this.position = new PixelVector3();
+		this.position = new Vector3();
 		this.color = new Color4();
 		// this.visible = true;
 	}
@@ -38,7 +38,7 @@ Dr.Implement('PixelPixel', function (global, module_get) {
 	
 	Module.prototype.applyData = function (pixel_pixel_data) {
 		//data apply logic
-		this.position = PixelVector3.FromArray(pixel_pixel_data.XYZ);
+		this.position = Vector3.FromArray(pixel_pixel_data.XYZ);
 		this.color = Color4.FromArray(pixel_pixel_data.RGBA);
 	};
 	
@@ -62,18 +62,18 @@ Dr.Implement('PixelPixel', function (global, module_get) {
 
 
 Dr.Declare('PixelPart', 'class');
-Dr.Require('PixelPart', 'PixelVector3');
-Dr.Require('PixelPart', 'PixelRotate4');
+Dr.Require('PixelPart', 'Vector3');
+Dr.Require('PixelPart', 'Rotate4');
 Dr.Require('PixelPart', 'PixelPixel');
 Dr.Implement('PixelPart', function (global, module_get) {
 	
-	var PixelVector3 = Dr.Get('PixelVector3');	//for position
-	var PixelRotate4 = Dr.Get('PixelRotate4');	//for rotation
+	var Vector3 = Dr.Get('Vector3');	//for position
+	var Rotate4 = Dr.Get('Rotate4');	//for rotation
 	var PixelPixel = Dr.Get('PixelPixel');	//
 	
 	var Module = function () {
-		this.position = new PixelVector3();
-		this.rotation = new PixelRotate4();
+		this.position = new Vector3();
+		this.rotation = new Rotate4();
 		
 		this.name = '';	//PixelPart NAME
 		this.pixels = [];	//PixelPixel list
@@ -105,8 +105,8 @@ Dr.Implement('PixelPart', function (global, module_get) {
 	Module.prototype.applyData = function (pixel_part_data) {
 		//data apply logic
 		this.name = pixel_part_data.NAME;
-		this.position = PixelVector3.FromArray(pixel_part_data.XYZ);
-		this.rotation = PixelRotate4.FromArray(pixel_part_data.XYZR);
+		this.position = Vector3.FromArray(pixel_part_data.XYZ);
+		this.rotation = Rotate4.FromArray(pixel_part_data.XYZR);
 		
 		this.pixels = [];
 		for (var index in pixel_part_data.pixel_pixel_list) {

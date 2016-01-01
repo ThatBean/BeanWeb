@@ -1,16 +1,16 @@
 Dr.Declare('PixelCamera', 'class');
-Dr.Require('PixelCamera', 'PixelVector3');
-Dr.Require('PixelCamera', 'PixelRotate4');
+Dr.Require('PixelCamera', 'Vector3');
+Dr.Require('PixelCamera', 'Rotate4');
 Dr.Require('PixelCamera', 'Matrix4');
 Dr.Implement('PixelCamera', function (global, module_get) {
 	
-	var PixelVector3 = Dr.Get('PixelVector3');	//for position
-	var PixelRotate4 = Dr.Get('PixelRotate4');	//for rotation
+	var Vector3 = Dr.Get('Vector3');	//for position
+	var Rotate4 = Dr.Get('Rotate4');	//for rotation
 	var Matrix4 = Dr.Get('Matrix4');	//
 	
 	var Module = function () {
-		this.position = new PixelVector3();
-		this.target_position = new PixelVector3();
+		this.position = new Vector3();
+		this.target_position = new Vector3();
 		this.view_matrix = null;
 	}
 	
@@ -24,14 +24,14 @@ Dr.Implement('PixelCamera', function (global, module_get) {
 	};
 	
 	Module.prototype.updateViewMatrix = function () {
-		this.view_matrix = Matrix4.LookAtLH(this.position, this.target_position, PixelVector3.Up());
+		this.view_matrix = Matrix4.LookAtLH(this.position, this.target_position, Vector3.Up());
 	};
 	
 	// Rotate Camera(Self) around Target
 	Module.prototype.rotateAroundTarget = function (rotate_x, rotate_y, rotate_z) {
 		var trans_matrix = Matrix.RotationYawPitchRoll(rotate_y, rotate_x, rotate_z);
 		var forward_vector = this.target_position.subtract(this.position);
-		forward_vector = PixelVector3.TransformCoordinates(forward_vector, trans_matrix);
+		forward_vector = Vector3.TransformCoordinates(forward_vector, trans_matrix);
 		
 		this.position = this.target_position.subtract(forward_vector);
 	}
@@ -40,7 +40,7 @@ Dr.Implement('PixelCamera', function (global, module_get) {
 	Module.prototype.rotateAroundSelf = function (rotate_x, rotate_y, rotate_z) {
 		var trans_matrix = Matrix.RotationYawPitchRoll(rotate_y, rotate_x, rotate_z);
 		var forward_vector = this.target_position.subtract(this.position);
-		forward_vector = PixelVector3.TransformCoordinates(forward_vector, trans_matrix);
+		forward_vector = Vector3.TransformCoordinates(forward_vector, trans_matrix);
 		
 		this.target_position = this.position.add(forward_vector);
 	}
@@ -55,14 +55,18 @@ Dr.Implement('PixelCamera', function (global, module_get) {
 Dr.Declare('PixelRender', 'class');
 Dr.Require('PixelRender', 'PixelModel');
 Dr.Require('PixelRender', 'PixelMotion');
-Dr.Require('PixelCamera', 'PixelVector3');
+Dr.Require('PixelCamera', 'Vector3');
+Dr.Require('PixelCamera', 'Color4');
+Dr.Require('PixelCamera', 'Matrix4');
+Dr.Require('PixelCamera', 'Ray');
 Dr.Implement('PixelRender', function (global, module_get) {
 	
 	var PixelModel = Dr.Get('PixelModel');	//
 	var PixelMotion = Dr.Get('PixelMotion');	//
-	var PixelVector3 = Dr.Get('PixelVector3');	//
+	var Vector3 = Dr.Get('Vector3');	//
 	var Color4 = Dr.Get('Color4');	//
 	var Matrix4 = Dr.Get('Matrix4');	//
+	var Ray = Dr.Get('Ray');	//
 	
 	
 	var Module = function () {
@@ -274,13 +278,13 @@ Dr.Implement('PixelRender', function (global, module_get) {
 	
 	//from 3d to 2d with depth
 	Module.prototype.project = function (source_vector, transform_matrix) {
-		var frustum_vector = PixelVector3.TransformCoordinates(source_vector, transform_matrix);
+		var frustum_vector = Vector3.TransformCoordinates(source_vector, transform_matrix);
 		
 		//scale frustum_vector from 1 x 1 to working_width x working_height
 		var x = (0.5 + frustum_vector.x) * this.working_width;
 		var y = (0.5 - frustum_vector.y) * this.working_height;
 		
-		return new PixelVector3(x, y, frustum_vector.z);
+		return new Vector3(x, y, frustum_vector.z);
 	};
 	
 	//from 2d + depth to 3d
@@ -292,7 +296,7 @@ Dr.Implement('PixelRender', function (global, module_get) {
 		var frustum_x = x / this.working_width - 0.5;
 		var frustum_y = 0.5 - y / this.working_height;
 		
-		var source_vector = PixelVector3.TransformCoordinates(new PixelVector3(frustum_x, frustum_y, depth), invert_transform_matrix);
+		var source_vector = Vector3.TransformCoordinates(new Vector3(frustum_x, frustum_y, depth), invert_transform_matrix);
 		return source_vector;
 	};
 	
@@ -352,7 +356,7 @@ Dr.Implement('PixelRender', function (global, module_get) {
 			//calc Dot light intensity (0~1)
 			var light_direction = modelBlock.WorldCenterVertex.Coord.subtract(dot_light_pack[index].Coord);
 			light_direction.normalize();
-			var intensity = - Vector3.Dot(PixelVector3.Up(), light_direction);
+			var intensity = - Vector3.Dot(Vector3.Up(), light_direction);
 			//Blending
 			light_color = Color4.MethodBlend(light_color, dot_light_pack[index].Color, "L", intensity);
 		}
@@ -379,8 +383,8 @@ Dr.Implement('PixelRender', function (global, module_get) {
 		//for each global light:
 		for (var index = 0; index < global_light_pack.length; index++) {
 			//calc angle intensity (0~1)
-			var intensity = - PixelVector3.Dot(
-				PixelVector3.Up(),
+			var intensity = - Vector3.Dot(
+				Vector3.Up(),
 				global_light_pack[index].direction
 			);
 			//Blending
@@ -447,8 +451,11 @@ Dr.Implement('PixelRender', function (global, module_get) {
 	
 	
 	
+	
+	
+	
+	// TODO: simple tracing by point, not ray yet
 	Module.prototype.raytracing = function (zoom, camera, render_data, screen_x, screen_y, depth) {
-		
 		var output_index = Math.floor(screen_y) * this.output_width + Math.floor(screen_x);
 		var working_index = this.quick_output_working_index_map[output_index] >> 2;
 		
@@ -456,15 +463,9 @@ Dr.Implement('PixelRender', function (global, module_get) {
 		var working_y = Math.floor(working_index / this.working_width); // - this.working_height * 0.5;
 		var working_z = depth;
 		
-		
-		this.putPixel(
-			working_x,
-			working_y,
-			working_z,
-			new Color4(0, 0, 0, 255)
-		);
-		
-		
+		// var ray_origin = new Vector3(working_x, working_y, working_z);
+		// var ray_direction = new Vector3(0, 0, 1);
+		// var target_ray = new Ray(ray_origin, ray_direction);
 		
 		var min_distance_sqrt = Infinity; //Number.POSITIVE_INFINITY;
 		var result_node = null;
@@ -516,7 +517,7 @@ Dr.Implement('PixelRender', function (global, module_get) {
 					
 					var pixel_position = pixel_pixel.position;
 					
-					var distance_sqrt = PixelVector3.DistanceSquared(pixel_position, working_position);
+					var distance_sqrt = Vector3.DistanceSquared(pixel_position, working_position);
 					
 					if (distance_sqrt < min_distance_sqrt) {
 						min_distance_sqrt = distance_sqrt;
@@ -530,9 +531,14 @@ Dr.Implement('PixelRender', function (global, module_get) {
 		});
 		
 		// Dr.log(min_distance_sqrt, result_node, result_part, result_pixel);
-		if (result_pixel) {
-			result_pixel.color = new Color4(255, 0, 0, 255);
-		}
+		if (result_pixel) { result_pixel.color = new Color4(255, 0, 0, 255); }
 	};
+	
+	
+	
+	
+	
+	
+	
 	return Module;
 });
