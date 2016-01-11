@@ -268,9 +268,12 @@ Dr.Implement('Matrix4', function (global, module_get) {
 	Module.OrthographicLH = function (width, height, zoom) {
 		var matrix = Module.Zero();
 		var wh = zoom * Math.sqrt(width * height);
-		matrix.m[0] = wh / width;
-		matrix.m[5] = wh / height;
+		matrix.m[0] = wh;
+		matrix.m[5] = - wh;	//for canvas Y axis is the negative of math Y axis
 		matrix.m[10] = 1;
+		
+		matrix.m[12] = 0.5 * width;
+		matrix.m[13] = 0.5 * height;
 		/*
 		00 01 02 03
 		04 05 06 07

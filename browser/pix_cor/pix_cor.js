@@ -224,6 +224,10 @@ var pix_cor_init = function () {
 	
 	var Action = Dr.Get("Action");
 	Action.applyActionListener(render_canvas, function(action_event) {
+		if (!action_event.positions.target) {
+			return;
+		}
+		
 		Dr.pixel_render.raytracing(
 			zoom, 
 			Dr.pixel_camera,

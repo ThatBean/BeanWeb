@@ -275,31 +275,6 @@ Dr.Implement('PixelRender', function (global, module_get) {
 		return min + (max - min) * (Math.max(0, Math.min(gradient, 1)));
 	};
 	
-	
-	//from 3d to 2d with depth
-	Module.prototype.project = function (source_vector, transform_matrix) {
-		var frustum_vector = Vector3.TransformCoordinates(source_vector, transform_matrix);
-		
-		//scale frustum_vector from 1 x 1 to working_width x working_height
-		var x = (0.5 + frustum_vector.x) * this.working_width;
-		var y = (0.5 - frustum_vector.y) * this.working_height;
-		
-		return new Vector3(x, y, frustum_vector.z);
-	};
-	
-	//from 2d + depth to 3d
-	Module.prototype.deProject = function (x, y, depth, transform_matrix) {
-		//get inverted projection transform matrix
-		var invert_transform_matrix = transform_matrix.copy().invert();
-		
-		//revert scale from working_width x working_height to 1 x 1 frustum_vector
-		var frustum_x = x / this.working_width - 0.5;
-		var frustum_y = 0.5 - y / this.working_height;
-		
-		var source_vector = Vector3.TransformCoordinates(new Vector3(frustum_x, frustum_y, depth), invert_transform_matrix);
-		return source_vector;
-	};
-	
 	Module.prototype.processScanLine = function (scan_y, pa, pb, pc, pd, color) {
 		var gradient1 = (pa.y != pb.y ? (scan_y - pa.y) / (pb.y - pa.y) : 1);
 		var gradient2 = (pc.y != pd.y ? (scan_y - pc.y) / (pd.y - pc.y) : 1);
@@ -373,6 +348,7 @@ Dr.Implement('PixelRender', function (global, module_get) {
 		var view_matrix = camera.getViewMatrix();
 		var projection_matrix = Matrix4.OrthographicLH(this.working_width, this.working_height, zoom); //Matrix4.PerspectiveFovLH(0.78, this.working_width / this.working_height, 0.01, 1.0);
 		
+		var view_projection_matrix = view_matrix.multiply(projection_matrix);
 		
 		var data_tree_root = render_data.data_tree_root;
 		var global_light_pack = render_data.global_light_pack || [];
@@ -422,8 +398,7 @@ Dr.Implement('PixelRender', function (global, module_get) {
 				);
 				
 				//Calc applys World+View+Projection in order
-				var world_view_matrix = world_matrix.multiply(view_matrix);
-				var transform_matrix = world_view_matrix.multiply(projection_matrix);
+				var transform_matrix = world_matrix.multiply(view_projection_matrix);
 				
 				//draw PixelPixel
 				var pixel_pixel_list = pixel_part.pixels;
@@ -434,7 +409,8 @@ Dr.Implement('PixelRender', function (global, module_get) {
 					// pixel_position = pixel_position.pixelRotate(part_position, part_rotation);
 					
 					//local_position + transform_matrix = screen position
-					var canter_vector = _this.project(pixel_position, transform_matrix);
+					var canter_vector = Vector3.TransformCoordinates(pixel_position, transform_matrix);
+					
 					
 					_this.drawPixelPixel(
 						pixel_pixel,
@@ -463,9 +439,9 @@ Dr.Implement('PixelRender', function (global, module_get) {
 		var working_y = Math.floor(working_index / this.working_width); // - this.working_height * 0.5;
 		var working_z = depth;
 		
-		// var ray_origin = new Vector3(working_x, working_y, working_z);
-		// var ray_direction = new Vector3(0, 0, 1);
-		// var target_ray = new Ray(ray_origin, ray_direction);
+		var ray_origin = new Vector3(working_x, working_y, working_z);
+		var ray_direction = new Vector3(0, 0, 1);
+		var target_ray = new Ray(ray_origin, ray_direction);
 		
 		var min_distance_sqrt = Infinity; //Number.POSITIVE_INFINITY;
 		var result_node = null;
@@ -476,6 +452,8 @@ Dr.Implement('PixelRender', function (global, module_get) {
 		//process: Model --> World --> View(Camera) --> Projection(3D->2D)
 		var view_matrix = camera.getViewMatrix();
 		var projection_matrix = Matrix4.OrthographicLH(this.working_width, this.working_height, zoom); //Matrix4.PerspectiveFovLH(0.78, this.working_width / this.working_height, 0.01, 1.0);
+		
+		var view_projection_matrix = view_matrix.multiply(projection_matrix);
 		
 		var data_tree_root = render_data.data_tree_root;
 		
@@ -505,10 +483,13 @@ Dr.Implement('PixelRender', function (global, module_get) {
 				);
 				
 				//Calc applys World+View+Projection in order
-				var world_view_matrix = world_matrix.multiply(view_matrix);
-				var transform_matrix = world_view_matrix.multiply(projection_matrix);
+				var transform_matrix = world_matrix.multiply(view_projection_matrix);
 				
-				var working_position = _this.deProject(working_x, working_y, working_z, transform_matrix);
+				//get inverted projection transform matrix
+				var invert_transform_matrix = transform_matrix.copy().invert();
+				
+				var working_position = Vector3.TransformCoordinates(ray_origin, invert_transform_matrix);
+				
 				
 				//draw PixelPixel
 				var pixel_pixel_list = pixel_part.pixels;
@@ -531,7 +512,8 @@ Dr.Implement('PixelRender', function (global, module_get) {
 		});
 		
 		// Dr.log(min_distance_sqrt, result_node, result_part, result_pixel);
-		if (result_pixel) { result_pixel.color = new Color4(255, 0, 0, 255); }
+		if (result_pixel) { result_pixel.color = Color4.Random(255); }
+		// if (result_pixel) { result_pixel.color = new Color4(255, 0, 0, 255); }
 	};
 	
 	
