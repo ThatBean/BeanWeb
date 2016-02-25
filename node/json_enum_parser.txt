@@ -1,0 +1,75 @@
+JSON ENUM FORMAT
+
+{
+	"enum_name" = "", 
+	"common_prefix" = "", 
+	"default_enum_key" = "", 
+	"comment" = "",
+	
+	"key_list" : [
+		["enum_key", "custom_value", "comment"],
+		["enum_key", null, "comment"],
+		["enum_key", null, null],
+	],
+}
+
+
+enum_name, common_prefix, default_enum_key, invalid_enum_key, comment, key_list[enum_key, custom_value, comment]
+
+
+TO cpp enum:
+	enum <enum_name> <comment>
+	{
+		<enum_key> = <custom_value>, <comment>
+		<enum_key>, <comment>
+		<enum_key>,
+	};
+
+
+To cpp StringToEnum:
+	<enum_name> Parse<enum_name>String(std::string source_string)
+	{
+		std::string::size_type found_pos = source_string.find_first_of(<common_prefix>);
+		if (found_pos != std::string::npos) source_string = source_string.replace(found_pos, strlen(<common_prefix>), "");
+
+		if (source_string.empty()) return <default_enum_key>;
+		else if (source_string == "<enum_key>") return <enum_key>;
+		else if (source_string == "<enum_key>") return <enum_key>;
+		else if (source_string == "<enum_key>") return <enum_key>;
+		else if (source_string == "<enum_key>") return <enum_key>;
+		else if (source_string == "<enum_key>") return <enum_key>;
+		else if (source_string == "<enum_key>") return <enum_key>;
+		else if (source_string == "<enum_key>") return <enum_key>;
+		else
+		{
+			Log("[Parse<enum_name>String] error source_string <%s>!", source_string.c_str());
+			assert(false);
+			return <invalid_enum_key>;
+		}
+	}
+
+
+To cpp EnumToString:
+	const std::string& Get<enum_name>String(<enum_name> enum_value)
+	{
+		static std::map<<enum_name>, std::string> convert_map_buff_mod_key;
+		if (convert_map_buff_mod_key.empty())
+		{
+			convert_map_buff_mod_key[<enum_key>] = "<enum_key>";
+			convert_map_buff_mod_key[<enum_key>] = "<enum_key>";
+			convert_map_buff_mod_key[<enum_key>] = "<enum_key>";
+			convert_map_buff_mod_key[<enum_key>] = "<enum_key>";
+			convert_map_buff_mod_key[<enum_key>] = "<enum_key>";
+			convert_map_buff_mod_key[<enum_key>] = "<enum_key>";
+			convert_map_buff_mod_key[<enum_key>] = "<enum_key>";
+		}
+		std::map<eActorBuffModKeyType, std::string>::iterator find_result = convert_map_buff_mod_key.find(enum_value);
+		if (find_result != convert_map_buff_mod_key.end())
+			return convert_map_buff_mod_key[enum_value];
+		else
+		{
+			Log("[Get<enum_name>String] error enum_value <%d>!", enum_value);
+			assert(false);
+			return "Error <enum_name>";
+		}
+	}
