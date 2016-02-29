@@ -52,6 +52,7 @@ To cpp StringToEnum:
 To cpp EnumToString:
 	const std::string& Get<enum_name>String(<enum_name> enum_value)
 	{
+	    static std::string invalid_string = "Error <enum_name>";
 		static std::map<<enum_name>, std::string> convert_map_buff_mod_key;
 		if (convert_map_buff_mod_key.empty())
 		{
@@ -70,6 +71,6 @@ To cpp EnumToString:
 		{
 			Log("[Get<enum_name>String] error enum_value <%d>!", enum_value);
 			assert(false);
-			return "Error <enum_name>";
+			return invalid_string;
 		}
 	}

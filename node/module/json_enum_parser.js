@@ -1,0 +1,320 @@
+Dr.Declare('JsonEnumParser', 'class');
+Dr.Require('JsonEnumParser', 'Directory');
+Dr.Implement('JsonEnumParser', function (global, module_get) {
+    var Fs = Dr.require('fs');
+    var Path = Dr.require('path');
+    var Assert = Dr.require('assert');
+
+    var Module = function () {
+        //
+    };
+    
+    Module.parseCppEnum = function (enum_string) {
+        var quick_find_or_die = function (source_string, target_string, error_message, success_callback) {
+            var result_index = source_string.search(target_string);
+            if (result_index > 0) success_callback(result_index, source_string.substr(result_index + target_string.length));
+            else Dr.assert(false, '[quick_find_or_die] missing "' + target_string + '"!', error_message);
+        };
+        
+        var quick_pick_name_string_or_die = function (source_string, error_message, success_callback) {
+            var result_array = source_string.match(/\w+/);
+            if (result_array) success_callback(result_array[0], source_string.substr(result_array[0].length));
+            else Dr.assert(false, '[quick_pick_name_string_or_die] no name string found!', error_message);
+        };
+        
+        var result_index_enum = source_string.search('enum');
+        var result_index_start = source_string.search('{');
+        var result_index_end = source_string.search('}');
+        
+        if (result_index_enum < 0) {
+            Dr.assert(false, '[parseCppEnum] missing "enum"!'); return;
+        }
+        if (result_index_start < 0) {
+            Dr.assert(false, '[parseCppEnum] missing "{"!'); return;
+        }
+        if (result_index_end < 0) {
+            Dr.assert(false, '[parseCppEnum] missing "}"!'); return;
+        }
+        
+        var source_string = source_string.substr(result_index_enum, result_index_end - result_index_enum);
+        var result_json_enum = {};
+        
+        quick_pick_name_string_or_die(enum_string, "missing enum_name", function (result_name, result_string) {
+            result_json_enum["enum_name"] = result_name;
+            
+            
+        });
+        
+        quick_find_or_die(enum_string, '{', 'missing "{"', function (result_index, result_string) {
+            
+            
+        });
+        
+        //find "enum"
+        var result_index = enum_string.search("enum");
+        
+        if (result_index < 0) {
+             Dr.assert(false, '[parseCppEnum] missing "enum"! enum_string:', enum_string);
+        }
+        
+        //find "{"
+        //find ","
+        //find "}"
+        
+        
+        
+// enum kTeamTypeIndex
+// {
+//   kTeamMainIndex          = 0,
+//   kTeamBabelIndex         = 1,
+//   kFactionBattle          = 15,
+//   kCrossFactionBattleTeam = 16,
+//   kCrossFactionBattleSetTeam = 17,
+// };
+    }
+    
+    
+    
+    
+    Module.getPathType = function (path) {
+        var path_type;
+        try {
+            var stat = Fs.lstatSync(path);
+            if (stat.isDirectory()) path_type = 'Directory';
+            else if (stat.isFile()) path_type = 'File';
+            //else if (stat.isSymbolicLink()) path_type = 'SymbolicLink';
+            else path_type = 'Other';
+        }
+        catch (error) {
+            path_type = 'Error';
+        };
+        return path_type;
+    }
+
+
+    Module.getDirContent = function (dir_path) { return Fs.readdirSync(dir_path); }
+
+    Module.createDirRecursive = function (dir_path) {
+        var dir_path = Path.resolve(dir_path);
+        var upper_dir_path = Path.dirname(dir_path);
+        if (Module.getPathType(upper_dir_path) != 'Directory') Module.createDirRecursive(upper_dir_path);
+        if (Module.getPathType(dir_path) != 'Directory') Fs.mkdirSync(dir_path);
+    };
+
+
+    Module._delete = function (path_type, path) {
+        Dr.debug(5, '[_delete]', arguments);
+        if (Module.getPathType(path) === 'Error') {
+            Dr.log('[_delete] non-exist, skipped');
+            return;
+        }
+        switch (path_type) {
+            case 'File':
+                //case 'SymbolicLink':
+                return Fs.unlinkSync(path);
+            case 'Directory':
+                return Fs.rmdirSync(path);
+            default:
+                Dr.log('[deleteContent] strange path type', path_type);
+                return false;
+        }
+    }
+
+    Module._move = function (path_type, from_path, to_path) {
+        Dr.debug(5, '[_move]', arguments);
+        if (Module.getPathType(to_path) === path_type) {
+            Dr.log('[_move] exist, skipped');
+            return;
+        }
+        switch (path_type) {
+            case 'File':
+            //case 'SymbolicLink':
+            case 'Directory':
+                return Fs.renameSync(from_path, to_path);
+            default:
+                Dr.log('[moveContent] strange path type', path_type);
+                return false;
+        }
+    }
+
+
+    Module._copy = function (path_type, from_path, to_path) {
+        Dr.debug(5, '[_copy]', arguments);
+        if (Module.getPathType(to_path) === path_type) {
+            Dr.log('[_copy] exist, skipped');
+            return;
+        }
+        switch (path_type) {
+            case 'File':
+                //case 'SymbolicLink':
+                return Module.copyFileSync(from_path, to_path);
+            case 'Directory':
+                return Fs.mkdirSync(to_path);
+            default:
+                Dr.log('[copyContent] strange path type', path_type);
+                return false;
+        }
+    }
+
+    Module.copyFileSync = function (from_file_path, to_file_path) {
+        var fd_from	= Fs.openSync(from_file_path, 'r');
+        var stat = Fs.fstatSync(fd_from);
+        var fd_to = Fs.openSync(to_file_path, 'w', stat.mode);
+        var bytes_read = stat.size;
+        var pos = 0;
+
+        var BUFFER_LENGTH = 64 * 1024;
+        var buffer = new Buffer(BUFFER_LENGTH);
+
+        while (bytes_read > 0) {
+            bytes_read = Fs.readSync(fd_from, buffer, 0, BUFFER_LENGTH, pos);
+            Fs.writeSync(fd_to, buffer, 0, bytes_read);
+            pos += bytes_read;
+        }
+
+        Fs.closeSync(fd_from);
+        Fs.closeSync(fd_to);
+    }
+
+
+    Module.prototype.init = function (dir_path) {
+        if (Module.getPathType(dir_path) !== 'Directory') {
+            Dr.log('[init] Error! path not Directory', dir_path);
+            return;
+        }
+
+        this.path = dir_path;
+        this.content = {
+            'Directory': {},
+            'File': [],
+            //'SymbolicLink': [],
+            'Other': [],
+        };
+
+        this.init_content();
+    };
+
+    Module.prototype.init_content = function () {
+        Dr.debug(5, 'init_content', this.path);
+        var content = Module.getDirContent(this.path);
+        for (var index in content) {
+            var name = content[index];
+            var sub_path = Path.join(this.path, name);
+            var path_type = Module.getPathType(sub_path);
+            switch (path_type) {
+                case 'File':
+                    //case 'SymbolicLink':
+                    this.content[path_type].push(name);
+                    break;
+                case 'Directory':
+                    this.content.Directory[name] = Module.create(sub_path);
+                    break;
+                default:
+                    this.content.Other.push(name);
+                    break;
+            }
+        }
+    }
+
+    Module.prototype.walk = function (callback, is_call_before_walk) {
+        for (var type in this.content) {
+            var list = this.content[type];
+            for (var index in list) {
+                var name;
+                if (type == 'Directory') name = index;
+                else name = list[index];
+
+                if (type == 'Directory' && !is_call_before_walk) {
+                    list[index].walk(callback, is_call_before_walk);
+                }
+
+                var option = callback(this.path, name, type);
+
+                if (option == 'continue') continue;	//skip current (should be sub Directory + is_call_before_walk == false)
+                if (option == 'break') break;	//skip current content type
+                if (option == 'return') return;	//skip the rest of content
+
+                if (type == 'Directory' && is_call_before_walk) {
+                    list[index].walk(callback, is_call_before_walk);
+                }
+            }
+        }
+    }
+
+    Module.prototype.modify = function (operation, to_path_root) {
+        var callback_name;
+        var is_call_before_walk;
+        var to_path_list = {};
+
+        if (to_path_root) to_path_list[this.path] = to_path_root;
+
+        switch (operation) {
+            case 'copy':
+                callback_name = '_copy';
+                is_call_before_walk = true;
+                Module.createDirRecursive(to_path_root);
+                break;
+            case 'delete':
+                callback_name = '_delete';
+                is_call_before_walk = false;
+                break;
+            case 'move':
+                callback_name = '_move';
+                is_call_before_walk = true;
+                Module.createDirRecursive(to_path_root);
+                break;
+            default:
+                Dr.log('[modify] Error operation', operation);
+                break;
+        }
+
+        var callback = function (path, name, type)  {
+            Dr.debug(1, path, name, type);
+            var from_path = Path.join(path, name);
+            if (to_path_root) {
+                to_path_list[from_path] = Path.join(to_path_list[path], name);
+                return Module[callback_name](type, from_path, to_path_list[from_path]);
+            }
+            else {
+                return Module[callback_name](type, from_path);
+            }
+        };
+
+        this.walk(callback, is_call_before_walk);
+    };
+
+    Module.modify = function (operation, type, path, to_path) {
+        var type = type || Module.getPathType(path);
+
+        switch (operation) {
+            case 'copy':
+            case 'delete':
+            case 'move':
+                break;
+            default:
+                Dr.log('[modify] Error operation', operation);
+                return;
+                break;
+        }
+
+        if (type == 'File') {
+            Module['_' + operation](type, path, to_path);
+            return;
+        }
+        if (type == 'Directory') {
+            Module.create(path).modify(operation, to_path);
+            if (operation == 'delete' || operation == 'move') Module._delete('Directory', path);
+            return;
+        }
+        Dr.log('[modify] Error type', type);
+        return;
+    };
+
+    Module.create = function (path) {
+        var instance = new Module;
+        instance.init(path);
+        return instance;
+    };
+
+    return Module;
+});

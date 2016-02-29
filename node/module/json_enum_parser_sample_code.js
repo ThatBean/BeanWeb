@@ -1,44 +1,124 @@
 require('../Dr.js');
 
-Dr.loadLocalScript('./job_center.js', function () {
+Dr.loadLocalScript('../../common/data/auto_parser.js', function () {
 	Dr.log("All script loaded");
 	Dr.LoadAll();
-	
-	var JobCenter = Dr.Get('JobCenter');
-	var JobBase = Dr.Get('JobBase');
-	
-	var job_center = new JobCenter;
-	var job_create_func = function (data, callback) {
-		var job_base = new JobBase;
-		job_base.init(data, callback);
-		job_base.id = Dr.generateId();
-		Dr.log('job_base', data, job_base.id);
-	
-	
-		job_base.start = function () {
-			var job_id = this.id;
-			Dr.log('job_base', job_id);
-			setTimeout(function () {
-				callback('Error', data, job_id);
-			}, 1000);
-		}
-		
-		return job_base;
-	}
-	
-	var job_data_list = [1,2,3,4,5,6,7,8];
-	var common_callback = function (status) {
-		Dr.log('[common_callback] status:', status, 'arguments:', arguments);
-		
-		if (status == 'Error') {
-			Dr.log('get error!!! omit');
-			return true;
-		}
-	}
-	
-	job_center.init(job_data_list, job_create_func, common_callback);
-	
-	job_center.start();
-	
+
+	var auto_parser = Dr.GetNew('AutoParser');
+    //var result = auto_parser.parse(Dr.Get('AutoParser').parse_config_map.enum_parse_config, 'enum eItemSubType \
+    //{\
+    //    kItemSubTypeMoney                = 1,\
+    //    kItemSubTypeGoods                = 2,\
+    //    kItemSubTypeBoxRand              = 3,\
+    //    kItemSubTypeBox                  = 4,\
+    //};');
+
+
+	var result = auto_parser.parse(Dr.Get('AutoParser').parse_config_map.enum_parse_config, '\
+		\n\
+		enum eActorAttributeType  //independent float value //from 1 to 9999\n\
+		{\n\
+		kActorAttributeInvalid = 0, //min\n\
+		\n\
+		//basic\n\
+		kActorAttributeTimeActive,\n\
+		\n\
+		//Health & Energy\n\
+		kActorAttributeHealthMax,  //normal\n\
+		kActorAttributeHealthCurrent,  //battle only\n\
+		kActorAttributeHealthRecover,  //recover per second, dispense by 0.2sec\n\
+		\n\
+		kActorAttributeEnergyMax,\n\
+		kActorAttributeEnergyCurrent,\n\
+		kActorAttributeEnergyRecover,\n\
+		\n\
+		//Factor\n\
+		kActorAttributeFactorCritical,\n\
+		kActorAttributeFactorCriticalResist,\n\
+		kActorAttributeFactorCriticalExtra,\n\
+		\n\
+		kActorAttributeFactorHit,\n\
+		\n\
+		kActorAttributeFactorDodge,\n\
+		kActorAttributeFactorDodgeExtra,\n\
+		\n\
+		kActorAttributeFactorDamageAdjust,\n\
+		kActorAttributeFactorDamageAdjustResist,\n\
+		kActorAttributeFactorDamageAdjustExtra,\n\
+		\n\
+		kActorAttributeFactorSkillDamage,\n\
+		kActorAttributeFactorSkillDamageResist,\n\
+		\n\
+		//Speed\n\
+		kActorAttributeSpeedAttack,\n\
+		kActorAttributeSpeedMove,\n\
+		\n\
+		//Damage Related\n\
+		kActorAttributeAttackPhysical,\n\
+		kActorAttributeAttackMagical,\n\
+		kActorAttributeAttackCritical,\n\
+		\n\
+		kActorAttributeDefensePhysical,\n\
+		kActorAttributeDefenseMagical,\n\
+		kActorAttributeDefenseCritical,\n\
+		\n\
+		//Trigger Related\n\
+		kActorAttributeTriggerSizeScaleAttack,\n\
+		kActorAttributeTriggerSizeScaleGuard,\n\
+		\n\
+		kActorAttributeAttackAreaRadius, //by the number of grid, not pixel\n\
+		kActorAttributeAttackAreaWidth, //by the number of grid, not pixel\n\
+		kActorAttributeAttackAreaHeight, //by the number of grid, not pixel\n\
+		\n\
+		kActorAttributeGuardAreaRadius, //by the number of grid, not pixel\n\
+		kActorAttributeGuardAreaWidth, //by the number of grid, not pixel\n\
+		kActorAttributeGuardAreaHeight, //by the number of grid, not pixel\n\
+		\n\
+		//kActorAttributeDamage,\n\
+		kActorAttributeDamageAddition,  //for all kinds, applied last\n\
+		kActorAttributeDamageAdditionPhysical,\n\
+		kActorAttributeDamageAdditionMagical,\n\
+		kActorAttributeDamageAdditionCritical,\n\
+		kActorAttributeDamageAdditionHealth,\n\
+		kActorAttributeDamageAdditionEnergy,\n\
+		\n\
+		kActorAttributeDamageReduction, //for all kinds, applied last\n\
+		kActorAttributeDamageReductionPhysical,\n\
+		kActorAttributeDamageReductionMagical,\n\
+		kActorAttributeDamageReductionCritical,\n\
+		kActorAttributeDamageReductionHealth,\n\
+		kActorAttributeDamageReductionEnergy,\n\
+		\n\
+		\n\
+		//Statistic Related\n\
+		kActorAttributeKillCount,\n\
+		\n\
+		kActorAttributeAttackCount,\n\
+		kActorAttributeAttackNormalCount,\n\
+		kActorAttributeAttackPowerCount,\n\
+		kActorAttributeAttackSpecialCount,\n\
+		\n\
+		\n\
+		kActorAttributeLogicInvalid = 1000,\n\
+		\n\
+		kActorAttributeMotionInvalid = 2000,\n\
+		\n\
+		kActorAttributeControlInvalid = 3000,\n\
+		\n\
+		kActorAttributeBuffInvalid = 4000,\n\
+		\n\
+		kActorAttributeSkillInvalid = 5000,\n\
+		\n\
+		kActorAttributeAnimationInvalid = 6000,\n\
+		kActorAttributeAnimationScale,\n\
+		\n\
+		kActorAttributeSpecifiedInvalid = 7000,\n\
+		\n\
+		kActorAttribute = 9999  //max\n\
+		};\n\
+	').result;
+
+    Dr.log(result);
+
 	//Dr.startREPL();
 });
