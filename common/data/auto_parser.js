@@ -1,7 +1,7 @@
 Dr.Declare('AutoParser', 'class');
 Dr.Implement('AutoParser', function (global, module_get) {
     var enum_parse_config = {
-        operation_list = [
+        operation_list: [
             { operation: 'skip_till_text', arg: 'enum' },
             { operation: 'pick_one_regexp', arg: /\w+/, as: 'enum_name' },
             { operation: 'pick_one_regexp', arg: /\/\/\w+/, as: 'comment', optional: true },
@@ -34,7 +34,7 @@ Dr.Implement('AutoParser', function (global, module_get) {
     
     Module.prototype.parse_operation = function (operation_data, text) {
         var result_data = {};
-        var result_operation = Module.prototype[operation_data.operation].call(this, operation_data);
+        var result_operation = Module.prototype[operation_data.operation].call(this, operation_data, text);
         if (result_operation.is_success) {
             if (operation_data.as) {
                 result_data[operation_data.as] = result_operation.result;
