@@ -5,6 +5,12 @@
 *
 *  basic idea: operations reduce the source text, result is collected
 *
+*   text -> { data, data, data... }
+*   text -> { data, data, data... }
+*   text -> { data, data, data... }
+*
+*   {}, {}, {} -> [ {}, {}, {} ]
+*
 * */
 
 Dr.Declare('AutoParser', 'class');
@@ -45,7 +51,7 @@ Dr.Implement('AutoParser', function (global, module_get) {
     Module.prototype.parse_operation = function (operation_data, text) {
         var result_data = Module.parse_operation_map[operation_data.operation].call(this, operation_data, text);
         if (result_data) {
-            Dr.log('[parse_operation] success', operation_data.operation, result_data.result, result_data.text.length - text.length);
+            Dr.debug(10, '[parse_operation] success', operation_data.operation, result_data.result, result_data.text.length - text.length);
             if (operation_data.as && result_data.result) {
                 result_data[operation_data.as] = result_data.result;
                 delete result_data.result;
@@ -53,7 +59,7 @@ Dr.Implement('AutoParser', function (global, module_get) {
             return result_data;
         }
         else {
-            Dr.log('[parse_operation] failed', operation_data.operation, operation_data.optional);
+            Dr.debug(10, '[parse_operation] failed', operation_data.operation, operation_data.optional);
             if (operation_data.optional == true) {
                 return {
                     text: text, //original text
@@ -103,7 +109,7 @@ Dr.Implement('AutoParser', function (global, module_get) {
         var result_index = text.search(operation_data.arg);
         var loop_result = [];
         var loop_text = (result_index >= 0)
-            ? text.substr(0, result_index - operation_data.arg.length)
+            ? text.substr(0, result_index - operation_data.arg.length + 1)
             : text; //parse all
 
         while (loop_text.length != 0) {
@@ -147,8 +153,9 @@ Dr.Implement('AutoParser', function (global, module_get) {
         if (result_array) {
             var result_group = operation_data.group || 0;
             Dr.assert(result_group < result_array.length);
+            Dr.assert(result_array.index >= 0);
             return {
-                text: text.substr(text.search(result_array[0]) + result_array[0].length),
+                text: text.substr(result_array.index + result_array[0].length),
                 result: result_array[result_group],
             }
         }
@@ -157,16 +164,36 @@ Dr.Implement('AutoParser', function (global, module_get) {
         }
     };
 
+    Module.parse_operation_map.drop_excess_comment = function (operation_data, text) {
+        var text_line_array = text.split('\n');
+        var result_line_array = [];
+        for (var index in text_line_array) {
+            var text_without_comment = text_line_array[index].replace(/^\s*\/\/[^\[].*/, '');
+            if (text_without_comment) result_line_array.push(text_without_comment);
+        }
+        return {
+            text: result_line_array.join('\n'),
+        }
+    };
+
+
+
+    //"common_prefix" = "",
+    //    "default_enum_key" = "",
 
     //parse_config
     Module.parse_config_map.enum_parse_config = {
         operation_list: [
+            { operation: 'drop_excess_comment' },
             { operation: 'skip_after_text', arg: 'enum' },
             { operation: 'pick_one_regexp', arg: /\w+/, as: 'enum_name' },
             { operation: 'pick_one_regexp', arg: /^\s*\/\/\s*([^\n\r]*)[\n\r]+/, group: 1, as: 'comment', optional: true },
+            { operation: 'pick_one_regexp', arg: /^\s*\/\/\[common_prefix\]\s*(\w*)/, group: 1, as: 'common_prefix', optional: true },
+            { operation: 'pick_one_regexp', arg: /^\s*\/\/\[default_enum_key\]\s*(\w*)/, group: 1, as: 'default_enum_key', optional: true },
+
             { operation: 'skip_after_text', arg: '{' },
             { operation: 'loop_till_text', arg: '}', as: 'key_list', operation_list: [
-                { operation: 'pick_one_regexp', arg: /^\s*\/\/\s*([^\n\r]*)[\n\r]+/, group: 1, as: 'comment', optional: true },
+                { operation: 'pick_one_regexp', arg: /^\s*\/\/\s*([^\n\r]*)[\n\r]+/, group: 1, optional: true }, //drop comment data
                 { operation: 'pick_one_regexp', arg: /\w+/, as: 'enum_key' },
                 { operation: 'pick_one_regexp', arg: /^\s*=\s*(\d+)/, group: 1, as: 'custom_value', optional: true },
                 { operation: 'skip_after_text', arg: ',', optional: true },
