@@ -34,7 +34,7 @@ Dr.Implement('PixelModel', function (global, module_get) {
 		//motion will be applied from outside
 	}
 	
-	//inhert method
+	//inherit method
 	Module.prototype = Object.create(DataTreeNode.prototype);
 	Module.prototype.proto = DataTreeNode;
 	

@@ -329,7 +329,7 @@ Dr.Implement('PixelRender', function (global, module_get) {
 		var light_color = new Color4(0, 0, 0, 0);
 		for (var index = 0; index < dot_light_pack.length; index++) {
 			//calc Dot light intensity (0~1)
-			var light_direction = modelBlock.WorldCenterVertex.Coord.subtract(dot_light_pack[index].Coord);
+			var light_direction = draw_position.subtract(dot_light_pack[index].Coord);
 			light_direction.normalize();
 			var intensity = - Vector3.Dot(Vector3.Up(), light_direction);
 			//Blending
@@ -389,15 +389,10 @@ Dr.Implement('PixelRender', function (global, module_get) {
 				var part_rotation = pixel_part.rotation; //node_rotation.add(pixel_part.rotation);
 				
 				//Calc Model to World matrix
-				var world_matrix = Matrix4.RotationYawPitchRoll(
-					part_rotation.y, part_rotation.x, part_rotation.z
-				).multiply(
-					Matrix4.Translation(
-						part_position.x, part_position.y, part_position.z
-					)
-				);
+				var world_matrix = Matrix4.RotationYawPitchRoll(part_rotation.y, part_rotation.x, part_rotation.z)
+					.multiply(Matrix4.Translation(part_position.x, part_position.y, part_position.z));
 				
-				//Calc applys World+View+Projection in order
+				//Calc World+View+Projection in order
 				var transform_matrix = world_matrix.multiply(view_projection_matrix);
 				
 				//draw PixelPixel
@@ -409,12 +404,11 @@ Dr.Implement('PixelRender', function (global, module_get) {
 					// pixel_position = pixel_position.pixelRotate(part_position, part_rotation);
 					
 					//local_position + transform_matrix = screen position
-					var canter_vector = Vector3.TransformCoordinates(pixel_position, transform_matrix);
-					
-					
+					var center_vector = Vector3.TransformCoordinates(pixel_position, transform_matrix);
+
 					_this.drawPixelPixel(
 						pixel_pixel,
-						canter_vector,
+						center_vector,
 						dot_light_pack,
 						global_light_color,
 						option_extra
@@ -452,13 +446,10 @@ Dr.Implement('PixelRender', function (global, module_get) {
 		//process: Model --> World --> View(Camera) --> Projection(3D->2D)
 		var view_matrix = camera.getViewMatrix();
 		var projection_matrix = Matrix4.OrthographicLH(this.working_width, this.working_height, zoom); //Matrix4.PerspectiveFovLH(0.78, this.working_width / this.working_height, 0.01, 1.0);
-		
 		var view_projection_matrix = view_matrix.multiply(projection_matrix);
 		
 		var data_tree_root = render_data.data_tree_root;
-		
-		var _this = this;
-		
+
 		//render each node(PixelModel or PixelMotion)
 		data_tree_root.traverseDown(function (node) {
 			
@@ -474,15 +465,10 @@ Dr.Implement('PixelRender', function (global, module_get) {
 				var part_rotation = pixel_part.rotation; //node_rotation.add(pixel_part.rotation);
 				
 				//Calc Model to World matrix
-				var world_matrix = Matrix4.RotationYawPitchRoll(
-					part_rotation.y, part_rotation.x, part_rotation.z
-				).multiply(
-					Matrix4.Translation(
-						part_position.x, part_position.y, part_position.z
-					)
-				);
+				var world_matrix = Matrix4.RotationYawPitchRoll(part_rotation.y, part_rotation.x, part_rotation.z)
+					.multiply(Matrix4.Translation(part_position.x, part_position.y, part_position.z));
 				
-				//Calc applys World+View+Projection in order
+				//Calc World+View+Projection in order
 				var transform_matrix = world_matrix.multiply(view_projection_matrix);
 				
 				//get inverted projection transform matrix
@@ -512,6 +498,7 @@ Dr.Implement('PixelRender', function (global, module_get) {
 		});
 		
 		// Dr.log(min_distance_sqrt, result_node, result_part, result_pixel);
+
 		if (result_pixel) { result_pixel.color = Color4.Random(255); }
 		// if (result_pixel) { result_pixel.color = new Color4(255, 0, 0, 255); }
 	};

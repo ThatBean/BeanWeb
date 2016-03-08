@@ -7,10 +7,9 @@
     <script src="../../Dr.js"></script>
     <script src="../../Dr.browser.js"></script>
     <script type="text/javascript">
-
         Dr.loadScriptByList([
-            '../../common/data/auto_parser.js',
-            '../../common/data/auto_composer.js',
+            'auto_parser.js',
+            'auto_composer.js',
         ], function () {
             Dr.log("All script loaded");
             Dr.LoadAll();
@@ -137,24 +136,20 @@
 
             Dr.parse_result = auto_parser.parse(AutoParser.parse_config_map.enum_parse_config, cpp_enum_source).result;
 
-
-            Dr.log(Dr.parse_result);
+//            Dr.log(Dr.parse_result);
 //            Dr.log(JSON.stringify(Dr.parse_result, null, "\t"));
 
 
             Dr.cpp_enum_compose_result = auto_composer.compose(AutoComposer.compose_config_map.cpp_enum_compose_config, Dr.parse_result).join('');
-
             Dr.string_to_enum_compose_result = auto_composer.compose(AutoComposer.compose_config_map.cpp_convert_string_to_enum_compose_config, Dr.parse_result).join('');
-
             Dr.enum_to_string_compose_result = auto_composer.compose(AutoComposer.compose_config_map.cpp_convert_enum_to_string_compose_config, Dr.parse_result).join('');
-
 
             Dr.log(Dr.parse_result);
             Dr.log(Dr.cpp_enum_compose_result);
             Dr.log(Dr.string_to_enum_compose_result);
             Dr.log(Dr.enum_to_string_compose_result);
 
-
+            // check diff
             var json_again = auto_parser.parse(AutoParser.parse_config_map.enum_parse_config, Dr.cpp_enum_compose_result).result;
             var text_again = auto_composer.compose(AutoComposer.compose_config_map.cpp_enum_compose_config, json_again).join('');
             for (var index in text_again) {

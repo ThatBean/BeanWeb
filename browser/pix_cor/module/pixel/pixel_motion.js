@@ -44,7 +44,7 @@ Dr.Implement('PixelMotion', function (global, module_get) {
 	}
 	
 	
-	//inhert method
+	//inherit method
 	Module.prototype = Object.create(DataTreeNode.prototype);
 	Module.prototype.proto = DataTreeNode;
 	
