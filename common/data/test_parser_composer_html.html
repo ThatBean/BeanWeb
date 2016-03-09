@@ -28,6 +28,7 @@
             //    kItemSubTypeBox                  = 4,\
             //};');
 
+
             var cpp_enum_source = '\
                 \n\
                 enum eActorAttributeType  //independent float value //from 1 to 9999\n\
@@ -134,20 +135,33 @@
                 };\n\
             ';
 
-            Dr.parse_result = auto_parser.parse(AutoParser.parse_config_map.enum_parse_config, cpp_enum_source).result;
+            Dr.parse_result = auto_parser.parse(AutoParser.parse_config_map.enum_parse_config, cpp_enum_source);
 
 //            Dr.log(Dr.parse_result);
 //            Dr.log(JSON.stringify(Dr.parse_result, null, "\t"));
 
 
-            Dr.cpp_enum_compose_result = auto_composer.compose(AutoComposer.compose_config_map.cpp_enum_compose_config, Dr.parse_result).join('');
-            Dr.string_to_enum_compose_result = auto_composer.compose(AutoComposer.compose_config_map.cpp_convert_string_to_enum_compose_config, Dr.parse_result).join('');
-            Dr.enum_to_string_compose_result = auto_composer.compose(AutoComposer.compose_config_map.cpp_convert_enum_to_string_compose_config, Dr.parse_result).join('');
+            Dr.cpp_enum_compose_result = auto_composer.compose(AutoComposer.compose_config_map.cpp_enum_compose_config, Dr.parse_result.result).join('');
+            Dr.header_string_to_enum_compose_result = auto_composer.compose(AutoComposer.compose_config_map.header_convert_string_to_enum_compose_config, Dr.parse_result.result).join('');
+            Dr.cpp_string_to_enum_compose_result = auto_composer.compose(AutoComposer.compose_config_map.cpp_convert_string_to_enum_compose_config, Dr.parse_result.result).join('');
+            Dr.header_enum_to_string_compose_result = auto_composer.compose(AutoComposer.compose_config_map.header_convert_enum_to_string_compose_config, Dr.parse_result.result).join('');
+            Dr.cpp_enum_to_string_compose_result = auto_composer.compose(AutoComposer.compose_config_map.cpp_convert_enum_to_string_compose_config, Dr.parse_result.result).join('');
 
-            Dr.log(Dr.parse_result);
+            Dr.log("##################################################################")
+            Dr.log(Dr.parse_result.result);
+            Dr.log("##################################################################")
+            Dr.log(Dr.parse_result.text);
+            Dr.log("##################################################################")
             Dr.log(Dr.cpp_enum_compose_result);
-            Dr.log(Dr.string_to_enum_compose_result);
-            Dr.log(Dr.enum_to_string_compose_result);
+            Dr.log("##################################################################")
+            Dr.log(Dr.header_string_to_enum_compose_result);
+            Dr.log("##################################################################")
+            Dr.log(Dr.cpp_string_to_enum_compose_result);
+            Dr.log("##################################################################")
+            Dr.log(Dr.header_enum_to_string_compose_result);
+            Dr.log("##################################################################")
+            Dr.log(Dr.cpp_enum_to_string_compose_result);
+            Dr.log("##################################################################")
 
             // check diff
             var json_again = auto_parser.parse(AutoParser.parse_config_map.enum_parse_config, Dr.cpp_enum_compose_result).result;

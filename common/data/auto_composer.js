@@ -130,7 +130,12 @@ Dr.Implement('AutoComposer', function (global, module_get) {
             //{
             // <key_list>
             //};
-            { operation: 'format_data', arg: 'enum {0} // {1}\n//[common_prefix] {2}\n//[default_enum_key] {3}\n{\n{4}\n};\n', operation_list: [
+            { operation: 'format_data', arg: 'enum {0} // {1}\n' +
+            '//[common_prefix] {2}\n' +
+            '//[default_enum_key] {3}\n' +
+            '{\n' +
+            '{4}\n' +
+            '};\n', operation_list: [
                 { operation: 'pick_data', arg: 'enum_name', as: 'string' },
                 { operation: 'pick_data', arg: 'comment', as: 'string', optional: true },
                 { operation: 'pick_data', arg: 'common_prefix', as: 'string', optional: true },
@@ -161,35 +166,47 @@ Dr.Implement('AutoComposer', function (global, module_get) {
 
     Module.compose_config_map.header_convert_string_to_enum_compose_config = {
         operation_list: [
-            //<enum_name> <enum_name>FromString(std::string source_string);
-            { operation: 'format_data', arg: '{0} {0}FromString(std::string source_string);\n', operation_list: [
-                { operation: 'pick_data', arg: 'enum_name', as: 'string' },
-            ] },
+            { operation: 'if_data', arg: 'common_prefix', optional: true,
+                //<enum_name> <enum_name>FromString(std::string source_string);
+                if_operation: { operation: 'format_data', arg: '{0} {0}FromString(std::string source_string);\n', operation_list: [
+                    { operation: 'pick_data', arg: 'enum_name', as: 'string' },
+                ] },
+                //<enum_name> <enum_name>FromString(const std::string& source_string);
+                else_operation: { operation: 'format_data', arg: '{0} {0}FromString(const std::string& source_string);\n', operation_list: [
+                    { operation: 'pick_data', arg: 'enum_name', as: 'string' },
+                ] },
+            },
         ],
     };
+
     Module.compose_config_map.cpp_convert_string_to_enum_compose_config = {
         operation_list: [
-            //<enum_name> <enum_name>FromString(std::string source_string)
-            //{
-            { operation: 'format_data', arg: '{0} {0}FromString(std::string source_string)\n{\n', operation_list: [
-                { operation: 'pick_data', arg: 'enum_name', as: 'string' },
-            ] },
-
-            //    std::string::size_type found_pos = source_string.find_first_of(<common_prefix>);
-            //    if (found_pos != std::string::npos) source_string = source_string.replace(found_pos, strlen(<common_prefix>), "");
-            //{ operation: 'if_data', arg: 'common_prefix', optional: true,
-            //    if_operation: { operation: 'format_data', arg: '\tstd::string::size_type found_pos = source_string.find_first_of("{0}");\n\tif (found_pos != std::string::npos) source_string = source_string.replace(found_pos, strlen("{0}"), "");\n', operation_list: [
-            //        { operation: 'pick_data', arg: 'common_prefix', as: 'string' },
-            //    ] },
-            //},
-
+            { operation: 'if_data', arg: 'common_prefix', optional: true,
+                //<enum_name> <enum_name>FromString(std::string source_string)
+                //{
+                //    std::string::size_type found_pos = source_string.find("<common_prefix>");
+                //    if (found_pos != std::string::npos) source_string = source_string.replace(found_pos, strlen("<common_prefix>"), "");
+                if_operation: { operation: 'format_data', arg: '{0} {0}FromString(std::string source_string)\n' +
+                '{\n' +
+                '\tstd::string::size_type found_pos = source_string.find("{1}");\n' +
+                '\tif (found_pos != std::string::npos) source_string = source_string.replace(found_pos, strlen("{1}"), "");\n', operation_list: [
+                    { operation: 'pick_data', arg: 'enum_name', as: 'string' },
+                    { operation: 'pick_data', arg: 'common_prefix', as: 'string' },
+                ] },
+                //<enum_name> <enum_name>FromString(const std::string& source_string)
+                //{
+                else_operation: { operation: 'format_data', arg: '{0} {0}FromString(const std::string& source_string)\n' +
+                '{\n', operation_list: [
+                    { operation: 'pick_data', arg: 'enum_name', as: 'string' },
+                ] },
+            },
             //    if (source_string.empty()) return <default_enum_key>;
-            //    if (false && source_string.empty()) return <enum_name>(-1);   //prevent further error
+            //    if (source_string.empty()) return <enum_name>(-1);   //prevent further error
             { operation: 'if_data', arg: 'default_enum_key', optional: true,
                 if_operation: { operation: 'format_data', arg: '\tif (source_string.empty()) return {0};\n', operation_list: [
                     { operation: 'pick_data', arg: 'default_enum_key', as: 'string' },
                 ] },
-                else_operation: { operation: 'format_data', arg: '\tif (false && source_string.empty()) return {0}(-1);\n', operation_list: [
+                else_operation: { operation: 'format_data', arg: '\tif (source_string.empty()) return {0}(-1);\n', operation_list: [
                     { operation: 'pick_data', arg: 'enum_name', as: 'string' },
                 ] },
             },
@@ -207,7 +224,13 @@ Dr.Implement('AutoComposer', function (global, module_get) {
             //        return <enum_name>(-1);
             //    }
             //}
-            { operation: 'format_data', arg: '\telse\n\t{\n\t\tLog("[{0}FromString] error source_string <%s>!", source_string.c_str());\n\t\tassert(false);\n\t\treturn {1};\n\t}\n}', operation_list: [
+            { operation: 'format_data', arg: '\telse\n' +
+            '\t{\n' +
+            '\t\tLog("[{0}FromString] error source_string <%s>!", source_string.c_str());\n' +
+            '\t\tassert(false);\n' +
+            '\t\treturn {1};\n' +
+            '\t}\n' +
+            '}\n', operation_list: [
                 { operation: 'pick_data', arg: 'enum_name', as: 'string' },
                 { operation: 'if_data', arg: 'invalid_enum_key', optional: true,
                     if_operation: { operation: 'pick_data', arg: 'invalid_enum_key', as: 'string' },
@@ -236,7 +259,12 @@ Dr.Implement('AutoComposer', function (global, module_get) {
             //    static std::map<<enum_name>, std::string> convert_map;
             //    if (convert_map.empty())
             //    {
-            { operation: 'format_data', arg: 'const std::string& {0}ToString({0} enum_value)\n{\n\tstatic std::string invalid_string = "Error {0}";\n\tstatic std::map<{0}, std::string> convert_map;\n\tif (convert_map.empty())\n\t{\n', operation_list: [
+            { operation: 'format_data', arg: 'const std::string& {0}ToString({0} enum_value)\n' +
+            '{\n' +
+            '\tstatic std::string invalid_string = "Error {0}";\n' +
+            '\tstatic std::map<{0}, std::string> convert_map;\n' +
+            '\tif (convert_map.empty())\n' +
+            '\t{\n', operation_list: [
                 { operation: 'pick_data', arg: 'enum_name', as: 'string' },
             ] },
             { operation: 'for_each_in_data', arg: 'key_list',
@@ -256,7 +284,17 @@ Dr.Implement('AutoComposer', function (global, module_get) {
             //        return invalid_string;
             //    }
             //}
-            { operation: 'format_data', arg: '\t}\n\tstd::map<{0}, std::string>::iterator find_result = convert_map.find(enum_value);\n\tif (find_result != convert_map.end())\n\t\treturn convert_map[enum_value];\n\telse\n\t{\n\t\tLog("[{0}ToString] error enum_value <%d>!", enum_value);\n\t\tassert(false);\n\t\treturn invalid_string;\n\t}\n}', operation_list: [
+            { operation: 'format_data', arg: '\t}\n' +
+            '\tstd::map<{0}, std::string>::iterator find_result = convert_map.find(enum_value);\n' +
+            '\tif (find_result != convert_map.end())\n' +
+            '\t\treturn convert_map[enum_value];\n' +
+            '\telse\n' +
+            '\t{\n' +
+            '\t\tLog("[{0}ToString] error enum_value <%d>!", enum_value);\n' +
+            '\t\tassert(false);\n' +
+            '\t\treturn invalid_string;\n' +
+            '\t}\n' +
+            '}\n', operation_list: [
                 { operation: 'pick_data', arg: 'enum_name', as: 'string' },
             ] },
         ],
