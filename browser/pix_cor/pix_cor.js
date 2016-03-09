@@ -4,10 +4,6 @@
 
 /*
  Pixel Core Client main entry script
-
-
-
-
  */
 
 //to use
@@ -42,6 +38,22 @@ var pix_cor_init = function () {
     var PixCor = Dr.Get("PixCor");
     Dr.pix_cor_game = PixCor.create();
 
+    var get_random_number = function (random_range) {
+        return Math.random() * random_range - random_range * 0.5;
+    }
+
+    var RANDOM_RANGE = 20;
+
+    var get_random_pixel_list = function (count) {
+        var pixel_list = [];
+
+        Dr.loop(count, function () {
+            pixel_list.push( {'XYZ': [get_random_number(RANDOM_RANGE), get_random_number(RANDOM_RANGE), get_random_number(RANDOM_RANGE)], 'RGBA': [Math.random(), Math.random(), Math.random(), 1],});
+        })
+
+        return pixel_list;
+    }
+
 
     //test model
     var sample_pixel_model_data = {
@@ -52,38 +64,22 @@ var pix_cor_init = function () {
                 'NAME': "A",
                 'XYZ': [0, 0, 0],
                 'XYZR': [0, 0, 0, 0],
-                'pixel_pixel_list': [
-                    {
-                        'XYZ': [0, 0, 0],
-                        'RGBA': [0, 0, 0, 0.5],
-                    },
-                    {
-                        'XYZ': [0, 1, 0],
-                        'RGBA': [0, 1, 0, 0.5],
-                    },
-                    {
-                        'XYZ': [-3, -3, 0],
-                        'RGBA': [0, 0, 1, 1],
-                    },
-                ],
+                'pixel_pixel_list': get_random_pixel_list(99999),
+                //'pixel_pixel_list': [
+                //    {'XYZ': [0, 0, 0], 'RGBA': [0, 0, 0, 0.5],},
+                //    {'XYZ': [0, 1, 0], 'RGBA': [0, 1, 0, 0.5],},
+                //    {'XYZ': [-3, -3, 0], 'RGBA': [0, 0, 1, 1],},
+                //],
             },
             {
                 'NAME': "B",
                 'XYZ': [1, 0, 0],
                 'XYZR': [0, 0, 0, 0],
+                //'pixel_pixel_list': get_random_pixel_list(99999),
                 'pixel_pixel_list': [
-                    {
-                        'XYZ': [0, 0, 0],
-                        'RGBA': [0, 0, 0, 0.5],
-                    },
-                    {
-                        'XYZ': [0, 1, 0],
-                        'RGBA': [0, 1, 0, 0.5],
-                    },
-                    {
-                        'XYZ': [-3, -3, 0],
-                        'RGBA': [0, 0, 1, 1],
-                    },
+                    {'XYZ': [0, 0, 0], 'RGBA': [0, 0, 0, 0.5],},
+                    {'XYZ': [0, 1, 0], 'RGBA': [0, 1, 0, 0.5],},
+                    {'XYZ': [-3, -3, 0], 'RGBA': [0, 0, 1, 1],},
                 ],
             },
         ],
@@ -132,7 +128,7 @@ var pix_cor_init = function () {
                 ],
             },
             {
-                'ID': 300, // number, starts from 0
+                'ID': 200, // number, starts from 0
                 'XYZ': [0, 0, 0],
                 'XYZR': [0, 0, 0, 0],
                 'pixel_bone_list': [

@@ -311,34 +311,31 @@ Dr.Implement('PixelRender', function (global, module_get) {
 		
 		var draw_position = center_vector;
 		
-		if (
-			draw_position.z < 0 ||	//if behind camera
-			(Math.abs(draw_position.x - this.working_width * 0.5) > (this.working_width * 0.5)) ||
-			(Math.abs(draw_position.y - this.working_height * 0.5) > (this.working_height * 0.5))
-		) {
-			return;
-		}
-		
-		//draw Skeletons
-		if (option_extra == "skeleton") {
-			this.putPixel(draw_position.x, draw_position.y, draw_position.z, pixel_pixel.color);
-			return;
-		}
-		
+		//if (
+		//	draw_position.z < 0 ||	//if behind camera
+		//	(Math.abs(draw_position.x - this.working_width * 0.5) > (this.working_width * 0.5)) ||
+		//	(Math.abs(draw_position.y - this.working_height * 0.5) > (this.working_height * 0.5))
+		//) {
+		//	return;
+		//}
+
+		// no light
+		this.putPixel(draw_position.x, draw_position.y, draw_position.z, pixel_pixel.color);
+
 		//draw with light
-		var light_color = new Color4(0, 0, 0, 0);
-		for (var index = 0; index < dot_light_pack.length; index++) {
-			//calc Dot light intensity (0~1)
-			var light_direction = draw_position.subtract(dot_light_pack[index].Coord);
-			light_direction.normalize();
-			var intensity = - Vector3.Dot(Vector3.Up(), light_direction);
-			//Blending
-			light_color = Color4.MethodBlend(light_color, dot_light_pack[index].Color, "L", intensity);
-		}
-		light_color = Color4.MethodBlend(light_color, global_light_color, "L", 1);
-		var draw_color = Color4.MethodBlend(pixel_pixel.color, light_color, "F");
-		
-		this.putPixel(draw_position.x, draw_position.y, draw_position.z, draw_color);
+		//var light_color = new Color4(0, 0, 0, 0);
+		//for (var index = 0; index < dot_light_pack.length; index++) {
+		//	//calc Dot light intensity (0~1)
+		//	var light_direction = draw_position.subtract(dot_light_pack[index].Coord);
+		//	light_direction.normalize();
+		//	var intensity = - Vector3.Dot(Vector3.Up(), light_direction);
+		//	//Blending
+		//	light_color = Color4.MethodBlend(light_color, dot_light_pack[index].Color, "L", intensity);
+		//}
+		//light_color = Color4.MethodBlend(light_color, global_light_color, "L", 1);
+		//var draw_color = Color4.MethodBlend(pixel_pixel.color, light_color, "F");
+		//
+		//this.putPixel(draw_position.x, draw_position.y, draw_position.z, draw_color);
 	};
 	
 
