@@ -2,7 +2,7 @@
 var dr_author = 'Bean/Dr.Eames';
 var dr_version = '0.12';
 var dr_environment = 'unknown';
-var dr_global = this.global || this;	//normally window, or {} for a sandbox?
+var dr_global = global || this.global || this;	//normally window, or {} for a sandbox?
 
 // Prevent unnecessary re-define
 var Dr = (

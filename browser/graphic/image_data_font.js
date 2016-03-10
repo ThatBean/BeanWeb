@@ -30,7 +30,7 @@ Dr.Implement('ImageDataFont', function (global, module_get) {
 	
 	
 	Module.prototype.getFontConfig = function (font_size, line_height, font_style, font_family, fill_style) {
-		//check CSS font for usuage
+		//check CSS font for usage
 		var font_size = font_size || this._default_font_size;
 		var line_height = line_height || this._default_line_height;
 		var font_style = font_style || this._default_font_style;

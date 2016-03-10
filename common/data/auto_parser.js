@@ -3,13 +3,17 @@
 * from text
 * using configurable logic
 *
-*  basic idea: operations reduce the source text, result is collected
+* - basic idea: operations consume the source text, result is collected
+* - - text -> { data, data, data... }
+* - - text -> { data, data, data... }
+* - - text -> { data, data, data... }
 *
-*   text -> { data, data, data... }
-*   text -> { data, data, data... }
-*   text -> { data, data, data... }
+* - - {}, {}, {} -> [ {}, {}, {} ]
 *
-*   {}, {}, {} -> [ {}, {}, {} ]
+* - input format: (operation_data, text)
+* - result success: { text: 'text left', result: {} }
+* - result failed: null
+*
 *
 * */
 

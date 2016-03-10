@@ -11,25 +11,26 @@ var config_file = global_args[2];
 var target_dir = global_args[3];
 var target_version = global_args[4];
 
-var usuage = '' 
-	+ '<node>' 
-	+ ' + ' + '<this_script>' 
-	+ ' + ' + '<config_file>'
-	+ ' [optional:'
-	+ ' + ' + '<target_dir>'
-	+ ' + ' + '<target_version>'
-	+ ' ]';
-var get_arg = '' 
-	+ node_exe 
-	+ ' + ' + script_file 
-	+ ' + ' + (config_file || '<config_file>')
-	+ ' [optional: '
-	+ ' + ' + (target_dir || '<target_dir>')
-	+ ' + ' + (target_version || '<target_version>')
-	+ ' ]';
+
+var usuage = [
+	'<node>',
+	'<this_script>',
+	'<config_file>',
+	'[optional]',
+	'<target_dir>',
+	'<target_version>',
+].join(' + ');
+var get_arg = [
+	node_exe,
+	script_file,
+	(config_file || '<config_file>'),
+	'[optional]',
+	(target_dir || '<target_dir>'),
+	(target_version || '<target_version>'),
+].join(' + ');
 
 if (global_args.length < 3) {
-	Dr.log('[Usuage]\n' + usuage);
+	Dr.log('[Usage]\n' + usuage);
 	Dr.log('[Get]\n' + get_arg);
 	Dr.log('[Error] required arguments missing!');
 	process.exit(-1);

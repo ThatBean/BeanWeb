@@ -5,7 +5,7 @@ else {
     // Required Non-Standard-JavaScript Methods
     Dr.log('[Dr] Adding node methods...');
 
-    var Fs = Dr.require('fs');
+    var node_module_fs = Dr.require('fs');
 
     Dr.loadScript = function (script_src, callback) {
         Dr.debug(10, 'Loading Script:', script_src);
@@ -29,7 +29,7 @@ else {
     };
 
     Dr.loadJsonFile = function (file_path) {
-        var file_text = Fs.readFileSync(file_path, {encoding: 'utf8'});
+        var file_text = node_module_fs.readFileSync(file_path, {encoding: 'utf8'});
         //delete the '//...' from each line to support basic comment
         var file_line_array = file_text.split('\n');
         var json_line_array = [];

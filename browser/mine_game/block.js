@@ -42,7 +42,7 @@ Dr.Implement('Mine_Block', function (global, module_get) {
 		this._chain_block_list = [];
 		
 		var surround_list = Mine_Type.getSurroundList(this._block_type, this._y, this._x);
-		for (index in surround_list) {
+		for (var index in surround_list) {
 			var y = surround_list[index][0];
 			var x = surround_list[index][1];
 			var is_edge_connected = surround_list[index][2];
@@ -64,7 +64,7 @@ Dr.Implement('Mine_Block', function (global, module_get) {
 	Module.prototype.calcSurroundMineCount = function () {
 		var count = 0;
 		
-		for (index in this._surround_block_list) {
+		for (var index in this._surround_block_list) {
 			var surround_block = this._surround_block_list[index];
 			count += surround_block.getMineCount();
 		}
@@ -118,7 +118,7 @@ Dr.Implement('Mine_Block', function (global, module_get) {
 		
 		//continue
 		if (is_chain_continue) {
-			for (index in this._chain_block_list) {
+			for (var index in this._chain_block_list) {
 				var chain_block = this._chain_block_list[index];
 				
 				var arg_array = Dr.getArgumentArray(arguments);

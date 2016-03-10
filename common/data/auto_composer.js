@@ -3,14 +3,17 @@
  * to text
  * using configurable logic
  *
- * basic idea: operation will expand a text from input JSON data
+ * - basic idea: operation will expand a text from input JSON data
  *
- *   data, data, data... -> text
- *   data, data, data... -> text
- *   data, data, data... -> text
+ * - - data, data, data... -> text
+ * - - data, data, data... -> text
+ * - - data, data, data... -> text
  *
- *   text, text, text -> result_text
+ * - - text, text, text -> result_text
  *
+ * - input format: (operation_data, data)
+ * - result success: 'result text'
+ * - result failed: null
  * */
 
 Dr.Declare('AutoComposer', 'class');
