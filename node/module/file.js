@@ -1,5 +1,5 @@
-Dr.Declare('Directory', 'class');
-Dr.Implement('Directory', function (global, module_get) {
+Dr.Declare('File', 'class');
+Dr.Implement('File', function (global, module_get) {
     var node_module_fs = Dr.require('fs');
     var node_module_path = Dr.require('path');
 
@@ -39,6 +39,23 @@ Dr.Implement('Directory', function (global, module_get) {
         var upper_dir_path = node_module_path.dirname(dir_path);
         if (Module.getPathType(upper_dir_path) != Module.type.Directory) Module._create_dir_recursive(upper_dir_path);
         if (Module.getPathType(dir_path) != Module.type.Directory) node_module_fs.mkdirSync(dir_path);
+    };
+
+
+    Module.readFileSync = function (file_path) {
+        var fd = node_module_fs.openSync(file_path, 'r');
+        var stat = node_module_fs.fstatSync(fd);
+        var buffer = new Buffer(stat.size);
+        node_module_fs.readSync(fd, buffer, 0, stat.size, 0);
+        node_module_fs.closeSync(fd);
+        return buffer;
+    };
+
+    Module.writeFileSync = function (file_path, buffer, mode) {
+        var fd = node_module_fs.openSync(file_path, 'w', mode);
+        node_module_fs.writeSync(fd, buffer, 0, buffer.length);
+        node_module_fs.closeSync(fd);
+        return buffer;
     };
 
     Module._copy_file_sync = function (from_file_path, to_file_path) {
@@ -166,6 +183,10 @@ Dr.Implement('Directory', function (global, module_get) {
             var result_file_path = output_file_prefix
                 ? node_module_path.join(file_path, output_file_prefix + file_name)
                 : source_file_path;
+
+
+            Dr.debug(10, '[getFileList] get', source_file_path, result_file_path);
+
             return [source_file_path, result_file_path];
         }
 

@@ -65,9 +65,9 @@ Dr.loadLocalScript('./Dr.node.js', function () {
         Dr.LoadAll();
 
         var Command = Dr.Get('Command');
-        var Directory = Dr.Get('Directory');
+        var File = Dr.Get('File');
 
-        var directory = Directory.create(target_dir);
+        var directory = File.create(target_dir);
 
         directory.walk(function (path, name, type) {
             if (type == 'File' && name.match(regexp_selector)) {

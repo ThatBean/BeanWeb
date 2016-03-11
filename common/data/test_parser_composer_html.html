@@ -141,7 +141,7 @@
 //            Dr.log(JSON.stringify(Dr.parse_result, null, "\t"));
 
 
-            Dr.cpp_enum_compose_result = auto_composer.compose(AutoComposer.compose_config_map.cpp_enum_compose_config, Dr.parse_result.result).join('');
+            Dr.cpp_enum_compose_result = auto_composer.compose(AutoComposer.compose_config_map.enum_definition_compose_config, Dr.parse_result.result).join('');
             Dr.header_string_to_enum_compose_result = auto_composer.compose(AutoComposer.compose_config_map.header_convert_string_to_enum_compose_config, Dr.parse_result.result).join('');
             Dr.cpp_string_to_enum_compose_result = auto_composer.compose(AutoComposer.compose_config_map.cpp_convert_string_to_enum_compose_config, Dr.parse_result.result).join('');
             Dr.header_enum_to_string_compose_result = auto_composer.compose(AutoComposer.compose_config_map.header_convert_enum_to_string_compose_config, Dr.parse_result.result).join('');
@@ -165,7 +165,7 @@
 
             // check diff
             var json_again = auto_parser.parse(AutoParser.parse_config_map.enum_parse_config, Dr.cpp_enum_compose_result).result;
-            var text_again = auto_composer.compose(AutoComposer.compose_config_map.cpp_enum_compose_config, json_again).join('');
+            var text_again = auto_composer.compose(AutoComposer.compose_config_map.enum_definition_compose_config, json_again).join('');
             for (var index in text_again) {
                 if (text_again[index] != Dr.cpp_enum_compose_result[index]) {
                     Dr.log('diff at:', index);

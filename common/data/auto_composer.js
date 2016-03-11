@@ -125,7 +125,7 @@ Dr.Implement('AutoComposer', function (global, module_get) {
 
 
     //parse_config
-    Module.compose_config_map.cpp_enum_compose_config = {
+    Module.compose_config_map.enum_definition_compose_config = {
         operation_list: [
             //enum <enum_name> <comment>
             //[common_prefix] common_prefix

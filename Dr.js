@@ -1,15 +1,11 @@
-// Js Dr Bean Dr.Eames
+// Dr.js by Bean/Dr.Eames
 var dr_author = 'Bean/Dr.Eames';
 var dr_version = '0.12';
 var dr_environment = 'unknown';
-var dr_global = global || this.global || this;	//normally window, or {} for a sandbox?
+var dr_global = (typeof (window) !== 'undefined' ? window : (typeof (global) !== 'undefined' ? global : this)); //normally window, global or this for a sandbox?
 
 // Prevent unnecessary re-define
-var Dr = (
-    typeof (Dr) == 'function'
-    && Dr.author == dr_author
-    && Dr.version >= dr_version
-) ? Dr : (function (undefined) {
+var Dr = (typeof (Dr) == 'function' && Dr.version >= dr_version) ? Dr : (function (undefined) {
 
     // Check Environment
     console.log('[Dr] Check Environment...');
@@ -688,14 +684,14 @@ var Dr = (
             Dr.nodeExePath = process.argv[0];
             Dr.require = require;
 
-            var Path = require('path');
-            Dr.nodeStartScriptPath = Path.resolve(process.cwd(), Path.dirname(process.argv[1]));
+            var node_module_path = require('path');
+            Dr.nodeStartScriptPath = node_module_path.resolve(process.cwd(), node_module_path.dirname(process.argv[1]));
             Dr.getLocalPath = function (relative_path) {
-                return Path.resolve(Dr.nodeStartScriptPath, relative_path);
+                return node_module_path.resolve(Dr.nodeStartScriptPath, relative_path);
             }
             Dr.startREPL = function () {
-                var Repl = require("repl");
-                Repl.start({
+                var node_module_repl = require("repl");
+                node_module_repl.start({
                     prompt: 'Dr.node> ',
                     input: process.stdin,
                     output: process.stdout,

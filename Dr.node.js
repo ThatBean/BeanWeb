@@ -1,5 +1,8 @@
-if (typeof(Dr) === 'undefined' || Dr.environment !== 'node') {
-    console.log('[Dr] something wrong...');
+if (typeof(Dr) === 'undefined') {
+    console.log('[Dr][node] something wrong... <Dr> not defined');
+}
+else if (Dr.environment !== 'node') {
+    console.log('[Dr][node] something wrong... environment: ', Dr.environment);
 }
 else {
     // Required Non-Standard-JavaScript Methods

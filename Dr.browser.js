@@ -1,5 +1,8 @@
-if (typeof(Dr) === 'undefined' || Dr.environment !== 'browser') {
-    console.log('[Dr] something wrong...');
+if (typeof(Dr) === 'undefined') {
+    console.log('[Dr][node] something wrong... <Dr> not defined');
+}
+else if (Dr.environment !== 'browser' && Dr.environment !== 'cordova') {
+    console.log('[Dr][node] something wrong... environment: ', Dr.environment);
 }
 else {
     // Required Non-Standard-JavaScript Methods
