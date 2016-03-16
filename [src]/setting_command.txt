@@ -37,6 +37,7 @@
 	cd /etc/apache2/sites-enabled/
 	nano 000-default
 
+	a2ensite
 
 
 
