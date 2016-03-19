@@ -121,6 +121,17 @@ Dr.Implement('AutoComposer', function (global, module_get) {
         }
     };
 
+    //
+    //Module.compose_operation_map.remove_prefix = function (operation_data, data) {
+    //    function format_text (format, data_list) {
+    //        return format.replace(/{(\d+)}/g, function(match, number) {
+    //            return typeof(data_list[number]) != 'undefined' ? data_list[number] : match;
+    //        });
+    //    }
+    //    var format = operation_data.arg;
+    //    var text_list = this.compose_operation_list(operation_data, data);
+    //    return format_text(format, text_list);;
+    //};
 
 
 
@@ -203,18 +214,18 @@ Dr.Implement('AutoComposer', function (global, module_get) {
                     { operation: 'pick_data', arg: 'enum_name', as: 'string' },
                 ] },
             },
-            //    if (source_string.empty()) return <default_enum_key>;
-            //    if (source_string.empty()) return <enum_name>(-1);   //prevent further error
             { operation: 'if_data', arg: 'default_enum_key', optional: true,
+                //    if (source_string.empty()) return <default_enum_key>;
                 if_operation: { operation: 'format_data', arg: '\tif (source_string.empty()) return {0};\n', operation_list: [
                     { operation: 'pick_data', arg: 'default_enum_key', as: 'string' },
                 ] },
+                //    if (source_string.empty()) return <enum_name>(-1);   //prevent further error
                 else_operation: { operation: 'format_data', arg: '\tif (source_string.empty()) return {0}(-1);\n', operation_list: [
                     { operation: 'pick_data', arg: 'enum_name', as: 'string' },
                 ] },
             },
+            //    else if (source_string == "<enum_key>") return <enum_key>;
             { operation: 'for_each_in_data', arg: 'key_list',
-                //    else if (source_string == "<enum_key>") return <enum_key>;
                 for_operation: { operation: 'format_data', arg: '\telse if (source_string == "{0}") return {0};\n', operation_list: [
                     { operation: 'pick_data', arg: 'enum_key', as: 'string' },
                 ] },
